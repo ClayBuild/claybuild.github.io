@@ -138,8 +138,10 @@ async function runAiInit() {
     container.innerHTML = `
       <div class="alert alert-error">
         Couldn't prepare your questions: ${escapeHtml(e.message || e)}.
-        <br><button class="btn btn-sm" style="margin-top:0.75rem;" onclick="runAiInit()">Try again</button>
+        <br><button class="btn btn-sm" style="margin-top:0.75rem;" id="retry-ai-init">Try again</button>
       </div>`;
+    const retryBtn = container.querySelector('#retry-ai-init');
+    if (retryBtn) retryBtn.addEventListener('click', runAiInit);
   }
 }
 

@@ -32,26 +32,26 @@
   .sidebar-card .kv .k { color: var(--text-3); font-size: 0.85rem; }
   .sidebar-card .kv .v { font-weight: 500; text-align: right; }
 
-  .publish-card { background: var(--text); color: var(--bg); border-radius: var(--radius-md); padding: 1.5rem; }
-  .publish-card h4 { color: var(--bg); font-size: 1.1rem; margin-bottom: 0.4rem; text-transform: none; letter-spacing: -0.01em; font-weight: 700; }
-  .publish-card p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem; }
-  .publish-card .btn { background: var(--accent); color: var(--accent-text); border-color: var(--accent); width: 100%; justify-content: center; }
-  .publish-card .btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-  .publish-card .published-url { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius); padding: 0.85rem; font-size: 0.82rem; word-break: break-all; margin-top: 0.75rem; }
-  .publish-card .published-url a { color: var(--bg); text-decoration: underline; text-underline-offset: 2px; }
-  .publish-card .published-url a:hover { color: var(--accent); }
+  .publish-card { background: var(--grey-900); color: #FFF; border-radius: var(--radius-md); padding: 1.25rem; }
+  .publish-card h4 { color: #FFF; font-size: 1.05rem; margin-bottom: 0.35rem; text-transform: none; letter-spacing: -0.01em; font-weight: 700; }
+  .publish-card p { color: var(--grey-400); font-size: 0.85rem; margin-bottom: 0.85rem; }
+  .publish-card .btn { background: #FFF; color: var(--grey-900); border-color: #FFF; width: 100%; justify-content: center; }
+  .publish-card .btn:hover { background: var(--grey-100); border-color: var(--grey-100); color: var(--grey-900); }
+  .publish-card .published-url { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius); padding: 0.75rem; font-size: 0.8rem; word-break: break-all; margin-top: 0.6rem; }
+  .publish-card .published-url a { color: #FFF; text-decoration: underline; text-underline-offset: 2px; }
+  .publish-card .published-url a:hover { color: var(--grey-300); }
 
   .deploy-progress { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem; }
   .deploy-progress .line { padding: 0.25rem 0; display: flex; align-items: center; gap: 0.5rem; }
   .deploy-progress .line .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); flex-shrink: 0; }
-  .deploy-progress .line.active .dot { background: var(--accent); animation: pulse 1.2s infinite; }
+  .deploy-progress .line.active .dot { background: #FFF; animation: pulse 1.2s infinite; }
   .deploy-progress .line.done .dot { background: var(--success); }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   .file-browser { font-size: 0.85rem; }
   .file-browser .file { padding: 0.55rem 0.7rem; cursor: pointer; border-radius: var(--radius); display: flex; align-items: center; gap: 0.5rem; color: var(--text-2); font-weight: 500; transition: background .15s, color .15s; }
   .file-browser .file:hover { background: var(--surface-2); }
-  .file-browser .file.active { background: var(--accent); color: var(--accent-text); }
+  .file-browser .file.active { background: var(--grey-800); color: #FFF; }
   .file-browser .file i { width: 16px; }
 
   .code-viewer { background: #1C1917; color: #ECEAE4; border-radius: var(--radius); padding: 1rem; overflow: auto; max-height: 460px; font-size: 0.78rem; line-height: 1.6; white-space: pre; font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; }

@@ -65,6 +65,9 @@ export function extractJSON<T = any>(raw: string): T {
   const fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
   if (fence) s = fence[1].trim();
 
+  // Strip leading BOM if present
+  if (s.charCodeAt(0) === 0xFEFF) s = s.slice(1);
+
   // Find the first { or [ and the matching last } or ]
   const firstObj = s.indexOf("{");
   const firstArr = s.indexOf("[");
@@ -84,6 +87,23 @@ export function extractJSON<T = any>(raw: string): T {
   }
   const end = s.lastIndexOf(close);
   if (end <= start) throw new Error("Malformed JSON in model response");
-  const slice = s.slice(start, end + 1);
-  return JSON.parse(slice) as T;
+  let slice = s.slice(start, end + 1);
+
+  // Attempt 1: direct parse
+  try {
+    return JSON.parse(slice) as T;
+  } catch (_) {
+    // Attempt 2: try to fix common LLM JSON mistakes
+    let fixed = slice;
+    // Remove trailing commas before } or ]
+    fixed = fixed.replace(/,(\s*[}\]])/g, "$1");
+    // Replace smart quotes with straight quotes
+    fixed = fixed.replace(/[\u201C\u201D]/g, '"');
+    fixed = fixed.replace(/[\u2018\u2019]/g, "'");
+    try {
+      return JSON.parse(fixed) as T;
+    } catch (e) {
+      throw new Error("Invalid JSON: " + (e as Error).message);
+    }
+  }
 }

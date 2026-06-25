@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
         { role: "system", content: DESIGN_DOC_SYSTEM_PROMPT },
         { role: "user",   content: USER_TEMPLATE(ctx) },
       ],
-      { temperature: 0.6, max_tokens: 4000 }
+      { temperature: 0.6, max_tokens: 6000 }
     );
 
     const parsed = extractJSON<{ design_doc: string; generation_prompt: string }>(raw);

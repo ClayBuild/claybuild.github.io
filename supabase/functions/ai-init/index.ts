@@ -62,12 +62,23 @@ RULES — READ CAREFULLY:
 
 9. All JSON keys must be present. No extra keys.
 
-10. Output JSON ONLY. No markdown fences, no prose before or after.`;
+10. Output JSON ONLY. No markdown fences, no prose before or after.
+
+CRITICAL — JSON ESCAPING:
+- Every double-quote character INSIDE a string value MUST be escaped as \\".
+- Every backslash MUST be escaped as \\\\.
+- Every newline inside a string MUST be escaped as \\n.
+- Do NOT use single quotes inside string values to avoid escaping — use proper escaped double quotes.
+- The entire output must be valid, parseable JSON. If you are unsure, simplify the text to avoid special characters.`;
 
 const INIT_USER_TEMPLATE = (idea: string, name: string | null) => `Business idea: """${idea}"""
 Project name: ${name && name.trim() ? `"""${name.trim()}"""` : "(none provided — generate one)"}
 
-Return the JSON now. Remember: do NOT ask about anything already stated in the business idea above.`;
+Return the JSON now. Remember: do NOT ask about anything already stated in the business idea above. Output ONLY valid JSON — no markdown, no prose.`;
+
+const RETRY_USER_MSG = `Your previous response could not be parsed as valid JSON. The error was: ${"ERROR_PLACEHOLDER"}
+
+Please output the COMPLETE, VALID JSON again. Make sure every double-quote inside string values is escaped as \\". Do not include any prose or markdown — only the JSON object.`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -84,59 +95,75 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("OPENROUTER_API_KEY");
     if (!apiKey) return errorJson("OPENROUTER_API_KEY secret not set. Add it in Supabase → Edge Functions → Secrets.", 500);
 
-    let raw: string;
-    try {
-      // NOTE: We intentionally do NOT pass response_format here. Many free models
-      // on OpenRouter (including gpt-oss-120b:free) do not support it and return
-      // a 500. We rely on extractJSON() to parse the response instead.
-      raw = await callOpenRouter(
-        apiKey,
-        "openai/gpt-oss-120b:free",
-        [
-          { role: "system", content: INIT_SYSTEM_PROMPT },
-          { role: "user",   content: INIT_USER_TEMPLATE(idea, name) },
-        ],
-        { temperature: 0.7, max_tokens: 3000 }
-      );
-    } catch (e) {
-      const msg = String(e?.message || e);
-      // Surface the actual OpenRouter error to the user
-      return errorJson("AI model request failed: " + msg, 502);
-    }
+    const messages: { role: string; content: string }[] = [
+      { role: "system", content: INIT_SYSTEM_PROMPT },
+      { role: "user", content: INIT_USER_TEMPLATE(idea, name) },
+    ];
 
-    if (!raw || !raw.trim()) {
-      return errorJson("AI model returned an empty response. Please try again.", 502);
-    }
-
-    let parsed;
-    try {
-      parsed = extractJSON(raw);
-    } catch (e) {
-      return errorJson("Could not parse AI response as JSON. The model may be overloaded — please try again. Raw preview: " + raw.slice(0, 200), 502);
-    }
-
-    // Validate / sanitize
-    const ALLOWED_STYLES = new Set(["minimalism","brutalism","swiss","neumorphism","editorial","glassmorphism","art-deco","corporate","playful","organic"]);
-    parsed.design_styles = (parsed.design_styles || []).filter((s: string) => ALLOWED_STYLES.has(s));
-    if (parsed.design_styles.length === 0) {
-      parsed.design_styles = ["minimalism","swiss","editorial"];
-    }
-
-    // Normalize multi_select + default on each question
-    parsed.questions = (parsed.questions || []).map((q: any) => {
-      const multi = q.multi_select === true;
-      let def = q.default;
-      if (multi) {
-        if (!Array.isArray(def)) {
-          def = def ? [def] : (q.options && q.options.length ? [q.options[0]] : []);
-        }
-      } else {
-        if (Array.isArray(def)) def = def[0] || (q.options && q.options[0]) || "";
+    // Try up to 3 times — if JSON parsing fails, ask the model to fix it.
+    let lastError = "";
+    for (let attempt = 0; attempt < 3; attempt++) {
+      let raw: string;
+      try {
+        raw = await callOpenRouter(
+          apiKey,
+          "openai/gpt-oss-120b:free",
+          messages,
+          { temperature: attempt === 0 ? 0.7 : 0.3, max_tokens: 8000 }
+        );
+      } catch (e) {
+        const msg = String(e?.message || e);
+        return errorJson("AI model request failed: " + msg, 502);
       }
-      return { ...q, multi_select: multi, default: def };
-    });
 
-    return json(parsed);
+      if (!raw || !raw.trim()) {
+        lastError = "Empty response from model.";
+        continue;
+      }
+
+      let parsed;
+      try {
+        parsed = extractJSON(raw);
+        // Validate required fields
+        if (!parsed.questions || !Array.isArray(parsed.questions) || !parsed.color_palettes || !parsed.design_styles) {
+          throw new Error("Missing required fields (questions, color_palettes, or design_styles).");
+        }
+
+        // Sanitize
+        const ALLOWED_STYLES = new Set(["minimalism","brutalism","swiss","neumorphism","editorial","glassmorphism","art-deco","corporate","playful","organic"]);
+        parsed.design_styles = (parsed.design_styles || []).filter((s: string) => ALLOWED_STYLES.has(s));
+        if (parsed.design_styles.length === 0) {
+          parsed.design_styles = ["minimalism","swiss","editorial"];
+        }
+
+        // Normalize multi_select + default on each question
+        parsed.questions = (parsed.questions || []).map((q: any) => {
+          const multi = q.multi_select === true;
+          let def = q.default;
+          if (multi) {
+            if (!Array.isArray(def)) {
+              def = def ? [def] : (q.options && q.options.length ? [q.options[0]] : []);
+            }
+          } else {
+            if (Array.isArray(def)) def = def[0] || (q.options && q.options[0]) || "";
+          }
+          return { ...q, multi_select: multi, default: def };
+        });
+
+        return json(parsed);
+      } catch (parseErr) {
+        lastError = String(parseErr?.message || parseErr);
+        // Add the bad response + a retry instruction to the message history
+        messages.push({ role: "assistant", content: raw });
+        messages.push({ role: "user", content: RETRY_USER_MSG.replace("ERROR_PLACEHOLDER", lastError) });
+        // Loop continues — next attempt will include the correction request
+      }
+    }
+
+    return errorJson(
+      "Could not parse AI response as valid JSON after 3 attempts. Last error: " + lastError + ". Please try again — the model may be overloaded.",
+      502
+    );
   } catch (e) {
     return errorJson("Server error: " + String(e?.message || e), 500);
   }
