@@ -24,11 +24,16 @@ const STATE = {
 };
 
 const STYLE_DESCRIPTIONS = {
-  minimalism:  "Essential only. Whitespace, light typography, quiet confidence.",
-  brutalism:   "Loud, raw, exposed. Big type, hard borders, zero apology.",
-  swiss:       "Mathematical. 12-column grid, modular scale, asymmetric balance.",
-  neumorphism: "Soft, tactile, extruded shadows. Monochrome depth.",
-  editorial:   "Newspaper-grade. Serif headlines, drop caps, ruled sections.",
+  minimalism:   "Essential only. Whitespace, light typography, quiet confidence.",
+  brutalism:    "Loud, raw, exposed. Big type, hard borders, zero apology.",
+  swiss:        "Mathematical. 12-column grid, modular scale, asymmetric balance.",
+  neumorphism:  "Soft, tactile, extruded shadows. Monochrome depth.",
+  editorial:    "Newspaper-grade. Serif headlines, drop caps, ruled sections.",
+  glassmorphism:"Frosted glass panels over vibrant gradients. Modern, airy.",
+  "art-deco":   "1920s glamour. Gold + black, geometric patterns, ornate.",
+  corporate:    "Professional B2B. Navy + white, structured, trustworthy.",
+  playful:      "Bright, rounded, bouncy. Bold colors, casual and fun.",
+  organic:      "Natural & biophilic. Sage greens, organic shapes, calm.",
 };
 
 // ============================================================================
@@ -145,21 +150,29 @@ function renderQuestions() {
     return;
   }
   container.innerHTML = STATE.questions.map(q => {
+    const multi = q.multi_select === true;
     const current = STATE.answers[q.id];
+    const isSel = (opt) => multi
+      ? Array.isArray(current) && current.includes(opt)
+      : current === opt;
+    const multiHint = multi
+      ? '<span class="q-multi-hint"><i class="fa-solid fa-check-double"></i> Select all that apply</span>'
+      : '';
     return `
-      <div class="q-card" data-qid="${q.id}">
+      <div class="q-card" data-qid="${q.id}" data-multi="${multi ? '1' : '0'}">
         <div class="q-title">${escapeHtml(q.question)}</div>
         ${q.help_text ? `<div class="q-help">${escapeHtml(q.help_text)}</div>` : ''}
+        ${multiHint}
         <div class="q-options">
           ${q.options.map(opt => `
-            <button type="button" class="q-opt ${current === opt ? 'selected' : ''}" data-opt="${escapeAttr(opt)}">
+            <button type="button" class="q-opt ${isSel(opt) ? 'selected' : ''}" data-opt="${escapeAttr(opt)}">
               <span class="dot"></span>${escapeHtml(opt)}
             </button>
           `).join('')}
         </div>
         <div class="q-custom">
-          <span class="label">Or write your own:</span>
-          <input class="input" type="text" data-custom="${q.id}" value="${current && !q.options.includes(current) ? escapeAttr(current) : ''}" placeholder="Custom answer…">
+          <span class="label">${multi ? 'Or add your own (comma-separated):' : 'Or write your own:'}</span>
+          <input class="input" type="text" data-custom="${q.id}" value="${customInputValue(q, current)}" placeholder="${multi ? 'Custom value, another value' : 'Custom answer…'}">
         </div>
       </div>
     `;
@@ -168,21 +181,51 @@ function renderQuestions() {
   // Wire up option clicks
   container.querySelectorAll('.q-card').forEach(card => {
     const qid = card.dataset.qid;
+    const multi = card.dataset.multi === '1';
     card.querySelectorAll('.q-opt').forEach(btn => {
       btn.addEventListener('click', () => {
         const opt = btn.dataset.opt;
-        STATE.answers[qid] = opt;
-        card.querySelectorAll('.q-opt').forEach(b => b.classList.toggle('selected', b.dataset.opt === opt));
-        card.querySelector(`input[data-custom="${qid}"]`).value = '';
+        if (multi) {
+          let arr = Array.isArray(STATE.answers[qid]) ? [...STATE.answers[qid]] : [];
+          if (arr.includes(opt)) arr = arr.filter(x => x !== opt);
+          else arr.push(opt);
+          STATE.answers[qid] = arr;
+          btn.classList.toggle('selected', arr.includes(opt));
+        } else {
+          STATE.answers[qid] = opt;
+          card.querySelectorAll('.q-opt').forEach(b => b.classList.toggle('selected', b.dataset.opt === opt));
+          card.querySelector(`input[data-custom="${qid}"]`).value = '';
+        }
       });
     });
     const customInput = card.querySelector(`input[data-custom="${qid}"]`);
     customInput.addEventListener('input', () => {
-      STATE.answers[qid] = customInput.value;
-      // Deselect option buttons
-      card.querySelectorAll('.q-opt').forEach(b => b.classList.remove('selected'));
+      if (multi) {
+        const parts = customInput.value.split(',').map(s => s.trim()).filter(Boolean);
+        STATE.answers[qid] = parts;
+        // Don't deselect option buttons in multi mode — user might mix presets + custom
+      } else {
+        STATE.answers[qid] = customInput.value;
+        card.querySelectorAll('.q-opt').forEach(b => b.classList.remove('selected'));
+      }
     });
   });
+}
+
+function customInputValue(q, current) {
+  if (q.multi_select === true) {
+    if (!Array.isArray(current) || current.length === 0) return '';
+    // Show custom values that aren't in the preset options
+    const custom = current.filter(v => !q.options.includes(v));
+    return custom.join(', ');
+  }
+  // Single-select: show value only if it's not one of the preset options
+  return (current && !q.options.includes(current)) ? escapeAttr(current) : '';
+}
+
+function formatAnswer(a) {
+  if (Array.isArray(a)) return a.length ? a.join(', ') : '—';
+  return a || '—';
 }
 
 // ============================================================================
@@ -190,7 +233,11 @@ function renderQuestions() {
 // ============================================================================
 function step3Next() {
   // Validate that all questions have answers
-  const missing = STATE.questions.filter(q => !STATE.answers[q.id] || STATE.answers[q.id].toString().trim() === '');
+  const missing = STATE.questions.filter(q => {
+    const a = STATE.answers[q.id];
+    if (Array.isArray(a)) return a.length === 0;
+    return !a || a.toString().trim() === '';
+  });
   if (missing.length) {
     toast(`Please answer all questions (${missing.length} remaining).`);
     return;
@@ -234,7 +281,7 @@ function selectPalette(p) {
   // Update preview
   const url = clayPalettePreviewUrl(p);
   document.getElementById('palette-preview').src = url;
-  document.getElementById('palette-preview-url').textContent = url.replace(/^\.\//, '');
+  document.getElementById('palette-preview-url').textContent = 'Palette preview · ' + p.name;
 }
 
 function setupCustomPalette() {
@@ -335,7 +382,7 @@ async function handleLogoFile(file) {
     // Update preview iframe with logo palette
     const url = clayPalettePreviewUrl(logoPalette);
     document.getElementById('palette-preview').src = url;
-    document.getElementById('palette-preview-url').textContent = 'palette-preview.html (logo colors)';
+    document.getElementById('palette-preview-url').textContent = 'Palette preview · Logo colors';
 
     toast('Logo analyzed. Brand colors extracted.');
   } catch (e) {
@@ -387,7 +434,7 @@ function selectStyle(style) {
   });
   document.getElementById('style-preview').src = `./samples/${style}.html`;
   document.getElementById('style-preview-label').textContent = style.charAt(0).toUpperCase() + style.slice(1);
-  document.getElementById('style-preview-url').textContent = `samples/${style}.html`;
+  document.getElementById('style-preview-url').textContent = 'Design style · ' + style.charAt(0).toUpperCase() + style.slice(1);
   document.getElementById('step5-next').disabled = false;
 }
 
@@ -426,7 +473,7 @@ function renderReview() {
       <dl>
         ${STATE.questions.map(q => `
           <dt>${escapeHtml(q.question)}</dt>
-          <dd>${escapeHtml(STATE.answers[q.id] || '—')}</dd>
+          <dd>${escapeHtml(formatAnswer(STATE.answers[q.id]))}</dd>
         `).join('')}
       </dl>
     </div>
@@ -463,6 +510,10 @@ async function generate() {
     // Reset all stages to initial state
     resetGenStages();
 
+    // Get the authenticated user's id (required for the projects.owner_id column)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated. Please sign in again.');
+
     // ---- 1. Ensure project row exists in DB (silent — no stage update) ----
     const { data: existing } = await supabase
       .from('projects')
@@ -483,6 +534,7 @@ async function generate() {
       const { data: proj, error } = await supabase.from('projects').insert({
         name: finalName,
         slug: STATE.slug,
+        owner_id: user.id,
         business_idea: STATE.business_idea,
         questionnaire: { answers: STATE.answers, questions: STATE.questions },
         status: 'draft',

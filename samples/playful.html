@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playful — Clay Design Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --coral:#FF6B6B; --teal:#4ECDC4; --yellow:#FFE66D; --purple:#A78BFA; --ink:#3D2C5E; --cream:#FFF8F0; }
+body { font-family:'Nunito',sans-serif; color:var(--ink); background:var(--cream); line-height:1.6; overflow-x:hidden; }
+.tag { position:fixed; top:16px; right:16px; background:var(--yellow); color:var(--ink); padding:6px 16px; font-size:12px; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; border-radius:999px; z-index:99; border:3px solid var(--ink); transform:rotate(3deg); box-shadow:3px 3px 0 var(--ink); }
+nav { display:flex; justify-content:space-between; align-items:center; padding:1.5rem 3rem; }
+.brand { display:flex; align-items:center; gap:0.6rem; font-weight:900; font-size:1.5rem; color:var(--ink); letter-spacing:-0.02em; }
+.brand .logo { width:42px; height:42px; background:var(--coral); border-radius:50%; display:grid; place-items:center; color:#fff; font-size:1.2rem; border:3px solid var(--ink); box-shadow:3px 3px 0 var(--ink); transform:rotate(-5deg); }
+.nav-links { display:flex; gap:1.5rem; align-items:center; }
+.nav-links a { color:var(--ink); text-decoration:none; font-weight:700; font-size:0.95rem; padding:6px 14px; border-radius:999px; transition:background .2s; }
+.nav-links a:hover { background:var(--yellow); }
+.btn-primary { background:var(--coral); color:#fff; text-decoration:none; padding:10px 22px; border-radius:999px; font-weight:800; font-size:0.92rem; border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); transition:transform .15s, box-shadow .15s; }
+.btn-primary:hover { transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
+.btn-primary:active { transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
+.hero { padding:3rem 3rem 5rem; text-align:center; max-width:920px; margin:0 auto; position:relative; }
+.hero .blob1, .hero .blob2 { position:absolute; border-radius:50%; filter:blur(2px); opacity:0.5; z-index:-1; }
+.hero .blob1 { width:180px; height:180px; background:var(--teal); top:0; left:5%; }
+.hero .blob2 { width:140px; height:140px; background:var(--purple); bottom:10%; right:8%; }
+.hero .badge { display:inline-block; background:var(--teal); color:var(--ink); padding:6px 18px; border-radius:999px; font-weight:800; font-size:0.85rem; margin-bottom:1.25rem; border:3px solid var(--ink); transform:rotate(-2deg); }
+.hero h1 { font-size:4rem; font-weight:900; line-height:1.05; letter-spacing:-0.03em; margin-bottom:1.25rem; }
+.hero h1 .w1 { background:var(--coral); color:#fff; padding:0 0.3em; border-radius:14px; display:inline-block; transform:rotate(-2deg); border:3px solid var(--ink); }
+.hero h1 .w2 { color:var(--purple); }
+.hero p { font-size:1.2rem; font-weight:600; color:#5a4a7a; max-width:560px; margin:0 auto 2rem; }
+.hero .cta { display:inline-flex; gap:1rem; align-items:center; }
+.btn-ghost { background:#fff; color:var(--ink); text-decoration:none; padding:10px 22px; border-radius:999px; font-weight:800; font-size:0.92rem; border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); transition:transform .15s, box-shadow .15s; }
+.btn-ghost:hover { transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
+.features { padding:2rem 3rem 5rem; max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
+.feature { background:#fff; padding:2rem; border-radius:24px; border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink); transition:transform .2s; position:relative; }
+.feature:hover { transform:translate(-3px,-3px) rotate(-1deg); box-shadow:9px 9px 0 var(--ink); }
+.feature:nth-child(2) { transform:rotate(1deg); }
+.feature:nth-child(2):hover { transform:rotate(2deg) translate(-3px,-3px); }
+.feature .icon { width:60px; height:60px; border-radius:18px; display:grid; place-items:center; color:#fff; font-size:1.6rem; margin-bottom:1rem; border:3px solid var(--ink); }
+.feature:nth-child(1) .icon { background:var(--coral); }
+.feature:nth-child(2) .icon { background:var(--teal); }
+.feature:nth-child(3) .icon { background:var(--purple); }
+.feature h3 { font-size:1.3rem; font-weight:900; margin-bottom:0.5rem; letter-spacing:-0.01em; }
+.feature p { font-size:0.95rem; font-weight:600; color:#5a4a7a; }
+.cta-band { margin:0 3rem 3rem; max-width:1100px; margin-left:auto; margin-right:auto; background:var(--yellow); padding:3.5rem 2rem; text-align:center; border-radius:32px; border:4px solid var(--ink); box-shadow:8px 8px 0 var(--ink); position:relative; }
+.cta-band h2 { font-size:2.5rem; font-weight:900; margin-bottom:0.75rem; letter-spacing:-0.02em; }
+.cta-band p { font-size:1.1rem; font-weight:700; color:#5a4a7a; margin-bottom:1.75rem; }
+.cta-band .emoji { position:absolute; font-size:2rem; }
+.cta-band .e1 { top:10px; left:24px; transform:rotate(-15deg); }
+.cta-band .e2 { top:10px; right:24px; transform:rotate(15deg); }
+footer { padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; font-weight:700; color:#5a4a7a; }
+footer .social { display:flex; gap:0.75rem; }
+footer .social a { width:38px; height:38px; background:#fff; border-radius:50%; display:grid; place-items:center; color:var(--ink); text-decoration:none; border:3px solid var(--ink); transition:transform .15s; }
+footer .social a:hover { transform:translateY(-3px); }
+@media (max-width:768px) {
+  nav,.hero,.features,.cta-band,footer { padding-left:1.25rem; padding-right:1.25rem; }
+  .hero h1 { font-size:2.6rem; }
+  .features { grid-template-columns:1fr; gap:1.25rem; }
+  .feature:nth-child(2) { transform:rotate(0); }
+  .feature:nth-child(2):hover { transform:rotate(1deg) translate(-3px,-3px); }
+  .cta-band { margin:0 1rem 2rem; padding:2.5rem 1.5rem; }
+  .cta-band h2 { font-size:1.8rem; }
+  .nav-links a:not(.btn-primary) { display:none; }
+}
+</style>
+</head>
+<body>
+<div class="tag">Playful</div>
+<nav>
+  <div class="brand"><span class="logo">🚀</span> Bounce</div>
+  <div class="nav-links">
+    <a href="#">For Parents</a><a href="#">Subjects</a><a href="#">Pricing</a>
+    <a href="#" class="btn-primary">Try free!</a>
+  </div>
+</nav>
+<main>
+<section class="hero">
+  <span class="blob1"></span><span class="blob2"></span>
+  <span class="badge">⭐ Loved by 1M+ kids</span>
+  <h1><span class="w1">Learning</span> that<br>actually <span class="w2">bounces</span>! 🎉</h1>
+  <p>Bounce turns math, reading, and science into bite-sized adventures. Kids beg for one more level — parents love the progress reports.</p>
+  <div class="cta">
+    <a href="#" class="btn-primary">Start 14-day free trial</a>
+    <a href="#" class="btn-ghost"><i class="fa-solid fa-play" style="margin-right:6px"></i> See it in action</a>
+  </div>
+</section>
+<section class="features">
+  <div class="feature">
+    <div class="icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+    <h3>Game-based lessons</h3>
+    <p>Every concept is a mini-game. Kids stay glued in the best way — and remember 3x more.</p>
+  </div>
+  <div class="feature">
+    <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
+    <h3>Built by teachers</h3>
+    <p>Aligned to Common Core and reviewed by 200+ classroom teachers. No fluff, no ads.</p>
+  </div>
+  <div class="feature">
+    <div class="icon"><i class="fa-solid fa-chart-simple"></i></div>
+    <h3>Weekly parent reports</h3>
+    <p>See exactly what your kid mastered — and what's coming next. No mystery, no guilt.</p>
+  </div>
+</section>
+<section class="cta-band">
+  <span class="emoji e1">🎈</span><span class="emoji e2">✨</span>
+  <h2>Ready to make learning fun?</h2>
+  <p>Join a million families already bouncing. First 14 days are on us.</p>
+  <a href="#" class="btn-primary">Let's bounce! 🚀</a>
+</section>
+</main>
+<footer>
+  <span>© 2026 Bounce Learning · Made with 💛</span>
+  <div class="social">
+    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organic — Clay Design Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --sage:#7C9070; --sage-dark:#5E7556; --cream:#F5F1E8; --brown:#8B6F47; --ink:#3A382E; --light:#EDE7D6; }
+body { font-family:'Inter',sans-serif; color:var(--ink); background:var(--cream); line-height:1.7; }
+.tag { position:fixed; top:16px; right:16px; background:var(--sage); color:var(--cream); padding:6px 16px; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; border-radius:999px 999px 999px 4px; z-index:99; font-weight:500; }
+/* organic blobs */
+.blob { position:absolute; border-radius:60% 40% 50% 50% / 50% 60% 40% 50%; z-index:0; }
+.leaf-pattern { position:absolute; opacity:0.08; pointer-events:none; }
+nav { display:flex; justify-content:space-between; align-items:center; padding:1.5rem 3rem; position:relative; z-index:5; }
+.brand { display:flex; align-items:center; gap:0.6rem; font-family:'Lora',serif; font-weight:600; font-size:1.4rem; color:var(--sage-dark); letter-spacing:-0.01em; }
+.brand .logo { width:38px; height:38px; background:var(--sage); border-radius:50% 0 50% 50%; display:grid; place-items:center; color:var(--cream); font-size:1rem; transform:rotate(-45deg); }
+.brand .logo i { transform:rotate(45deg); }
+.nav-links { display:flex; gap:2rem; align-items:center; }
+.nav-links a { color:var(--ink); text-decoration:none; font-size:0.92rem; font-weight:500; transition:color .2s; }
+.nav-links a:hover { color:var(--sage); }
+.btn-primary { background:var(--sage); color:var(--cream); text-decoration:none; padding:10px 22px; border-radius:999px; font-size:0.9rem; font-weight:600; transition:background .2s, transform .2s; }
+.btn-primary:hover { background:var(--sage-dark); transform:translateY(-1px); }
+.hero { padding:4rem 3rem 6rem; max-width:1100px; margin:0 auto; position:relative; display:grid; grid-template-columns:1.1fr 1fr; gap:4rem; align-items:center; }
+.hero .blob-bg { position:absolute; width:280px; height:280px; background:var(--light); top:-2rem; right:2rem; z-index:0; }
+.hero .blob-bg2 { position:absolute; width:160px; height:160px; background:rgba(124,144,112,0.15); bottom:2rem; left:30%; border-radius:50% 30% 70% 40%; z-index:0; }
+.hero > * { position:relative; z-index:2; }
+.hero .eyebrow { display:inline-flex; align-items:center; gap:0.5rem; color:var(--sage-dark); font-size:0.82rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1.25rem; }
+.hero .eyebrow i { font-size:0.75rem; }
+.hero h1 { font-family:'Lora',serif; font-weight:500; font-size:3.4rem; line-height:1.15; letter-spacing:-0.015em; margin-bottom:1.25rem; }
+.hero h1 em { font-style:italic; color:var(--sage-dark); }
+.hero p { font-size:1.08rem; color:#5a584a; margin-bottom:2rem; max-width:480px; font-weight:300; }
+.hero .cta { display:flex; gap:1rem; align-items:center; }
+.btn-outline { border:1.5px solid var(--sage); color:var(--sage-dark); text-decoration:none; padding:9px 22px; border-radius:999px; font-size:0.9rem; font-weight:600; background:transparent; }
+.hero-card { background:var(--cream); border:1px solid rgba(124,144,112,0.25); border-radius:40% 60% 50% 50% / 50% 40% 60% 50%; padding:3rem 2.5rem; text-align:center; box-shadow:0 12px 36px rgba(124,144,112,0.15); }
+.hero-card .icon-circle { width:80px; height:80px; background:var(--sage); border-radius:50% 50% 50% 0; display:grid; place-items:center; margin:0 auto 1.25rem; color:var(--cream); font-size:2rem; transform:rotate(-10deg); }
+.hero-card .icon-circle i { transform:rotate(10deg); }
+.hero-card h3 { font-family:'Lora',serif; font-style:italic; font-size:1.4rem; margin-bottom:0.5rem; color:var(--sage-dark); }
+.hero-card p { font-size:0.92rem; color:#5a584a; }
+.features { padding:4rem 3rem; max-width:1100px; margin:0 auto; }
+.section-head { text-align:center; margin-bottom:3rem; }
+.section-head .eyebrow { color:var(--sage); font-size:0.78rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.6rem; }
+.section-head h2 { font-family:'Lora',serif; font-weight:500; font-size:2.2rem; letter-spacing:-0.015em; color:var(--ink); }
+.section-head h2 em { font-style:italic; color:var(--sage-dark); }
+.features .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
+.feature { text-align:center; padding:2.5rem 1.75rem; background:var(--cream); border-radius:30% 70% 70% 30% / 30% 30% 70% 70%; border:1px solid rgba(124,144,112,0.2); transition:transform .25s; }
+.feature:nth-child(2) { border-radius:70% 30% 30% 70% / 70% 70% 30% 30%; }
+.feature:nth-child(3) { border-radius:50% 50% 70% 30% / 30% 70% 50% 50%; }
+.feature:hover { transform:translateY(-4px); }
+.feature .icon-circle { width:64px; height:64px; background:var(--sage); border-radius:50% 50% 50% 0; display:grid; place-items:center; margin:0 auto 1.25rem; color:var(--cream); font-size:1.4rem; transform:rotate(-8deg); }
+.feature .icon-circle i { transform:rotate(8deg); }
+.feature h3 { font-family:'Lora',serif; font-weight:500; font-size:1.25rem; margin-bottom:0.6rem; color:var(--sage-dark); }
+.feature p { font-size:0.92rem; color:#5a584a; font-weight:300; }
+.cta-band { margin:2rem 3rem 3rem; max-width:1100px; margin-left:auto; margin-right:auto; background:var(--sage); color:var(--cream); padding:4rem 3rem; text-align:center; border-radius:50% 50% 50% 50% / 30% 30% 70% 70%; position:relative; }
+.cta-band .leaf { position:absolute; color:rgba(245,241,232,0.15); font-size:3rem; }
+.cta-band .l1 { top:1.5rem; left:2rem; transform:rotate(-20deg); }
+.cta-band .l2 { bottom:1.5rem; right:2rem; transform:rotate(30deg); }
+.cta-band h2 { font-family:'Lora',serif; font-weight:500; font-style:italic; font-size:2.3rem; margin-bottom:0.75rem; position:relative; z-index:2; }
+.cta-band p { font-size:1.05rem; font-weight:300; max-width:520px; margin:0 auto 1.75rem; color:rgba(245,241,232,0.9); position:relative; z-index:2; }
+.cta-band .btn-light { background:var(--cream); color:var(--sage-dark); text-decoration:none; padding:11px 26px; border-radius:999px; font-weight:600; font-size:0.92rem; position:relative; z-index:2; transition:transform .2s; }
+.cta-band .btn-light:hover { transform:translateY(-2px); }
+footer { padding:2.5rem 3rem; border-top:1px solid rgba(124,144,112,0.2); display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; color:#5a584a; }
+footer .links { display:flex; gap:1.5rem; }
+footer .links a { color:#5a584a; text-decoration:none; }
+footer .links a:hover { color:var(--sage); }
+@media (max-width:768px) {
+  nav,.hero,.features,.cta-band,footer { padding-left:1.25rem; padding-right:1.25rem; }
+  .hero { grid-template-columns:1fr; gap:2.5rem; padding-top:2.5rem; padding-bottom:3rem; }
+  .hero h1 { font-size:2.3rem; }
+  .hero .blob-bg { width:180px; height:180px; right:-1rem; top:-1rem; }
+  .features .grid { grid-template-columns:1fr; gap:1.25rem; }
+  .feature, .feature:nth-child(2), .feature:nth-child(3) { border-radius:30% 70% 70% 30% / 30% 30% 70% 70%; }
+  .cta-band { margin:0 1rem 2rem; padding:3rem 1.5rem; }
+  .cta-band h2 { font-size:1.7rem; }
+  .nav-links a:not(.btn-primary) { display:none; }
+}
+</style>
+</head>
+<body>
+<div class="tag">Organic</div>
+<nav>
+  <div class="brand"><span class="logo"><i class="fa-solid fa-leaf"></i></span> Verdant</div>
+  <div class="nav-links">
+    <a href="#">Plants</a><a href="#">Care</a><a href="#">Journal</a><a href="#">Visit</a>
+    <a href="#" class="btn-primary">Shop now</a>
+  </div>
+</nav>
+<main>
+<section class="hero">
+  <span class="blob-bg"></span>
+  <span class="blob-bg2"></span>
+  <div>
+    <span class="eyebrow"><i class="fa-solid fa-seedling"></i> Grown with intention</span>
+    <h1>Bring the<br><em>quiet outdoors</em><br>inside.</h1>
+    <p>Verdant pairs small-batch plants with honest care guidance — so your living room finally feels like a forest floor, not a furniture showroom.</p>
+    <div class="cta">
+      <a href="#" class="btn-primary">Shop the collection</a>
+      <a href="#" class="btn-outline">Read the care guide</a>
+    </div>
+  </div>
+  <div class="hero-card">
+    <div class="icon-circle"><i class="fa-solid fa-plant-wilt"></i></div>
+    <h3>This week's pick</h3>
+    <p>Calathea orbifolia — lush, striped, and surprisingly forgiving. Potted in terracotta from a Lisbon studio.</p>
+  </div>
+</section>
+<section class="features">
+  <div class="section-head">
+    <div class="eyebrow">Why Verdant</div>
+    <h2>Plants, <em>and the people</em> who help them thrive.</h2>
+  </div>
+  <div class="grid">
+    <div class="feature">
+      <div class="icon-circle"><i class="fa-solid fa-mug-saucer"></i></div>
+      <h3>Small-batch soil</h3>
+      <p>Each blend mixed by hand for the species it serves — no generic potting mix, ever.</p>
+    </div>
+    <div class="feature">
+      <div class="icon-circle"><i class="fa-solid fa-leaf"></i></div>
+      <h3>Greenhouse-grown</h3>
+      <p>Sourced from family nurseries within 200 miles. Acclimated slowly, so leaves don't drop on arrival.</p>
+    </div>
+    <div class="feature">
+      <div class="icon-circle"><i class="fa-solid fa-heart"></i></div>
+      <h3>Care for life</h3>
+      <p>Every plant comes with a named guide and a real human to text when something looks off.</p>
+    </div>
+  </div>
+</section>
+<section class="cta-band">
+  <i class="fa-solid fa-leaf leaf l1"></i>
+  <i class="fa-solid fa-leaf leaf l2"></i>
+  <h2>Start with one plant.</h2>
+  <p>Take $15 off your first leaf, and we'll send a handwritten note from the greenhouse.</p>
+  <a href="#" class="btn-light">Claim your welcome</a>
+</section>
+</main>
+<footer>
+  <span>© 2026 Verdant · Grown in Portland</span>
+  <div class="links"><a href="#">Care guides</a><a href="#">Shipping</a><a href="#">Contact</a><a href="#">Instagram</a></div>
+</footer>
+</body>
+</html>

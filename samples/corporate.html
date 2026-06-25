@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporate — Clay Design Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --navy:#1E3A5F; --navy-dark:#15293F; --accent:#3B82F6; --grey:#64748B; --light:#F1F5F9; --line:#E2E8F0; }
+body { font-family:'Inter',sans-serif; color:#1a2540; background:#fff; line-height:1.6; -webkit-font-smoothing:antialiased; }
+.tag { position:fixed; top:14px; right:14px; background:var(--navy); color:#fff; padding:5px 12px; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; border-radius:4px; z-index:99; font-weight:500; }
+nav { display:flex; justify-content:space-between; align-items:center; padding:1.1rem 3rem; border-bottom:1px solid var(--line); position:sticky; top:0; background:#fff; z-index:50; }
+.brand { display:flex; align-items:center; gap:0.6rem; font-weight:700; font-size:1.2rem; color:var(--navy); letter-spacing:-0.02em; }
+.brand i { color:var(--accent); font-size:1.4rem; }
+.nav-links { display:flex; gap:2rem; align-items:center; }
+.nav-links a { color:#475569; text-decoration:none; font-size:0.9rem; font-weight:500; transition:color .2s; }
+.nav-links a:hover { color:var(--navy); }
+.btn-primary { background:var(--navy); color:#fff; text-decoration:none; padding:9px 20px; border-radius:6px; font-size:0.88rem; font-weight:600; transition:background .2s; }
+.btn-primary:hover { background:var(--navy-dark); }
+.hero { padding:5rem 3rem; max-width:1150px; margin:0 auto; display:grid; grid-template-columns:1.1fr 1fr; gap:4rem; align-items:center; }
+.hero .eyebrow { display:inline-flex; align-items:center; gap:0.5rem; background:var(--light); color:var(--navy); padding:5px 12px; border-radius:20px; font-size:0.78rem; font-weight:600; margin-bottom:1.25rem; }
+.hero .eyebrow i { color:var(--accent); font-size:0.7rem; }
+.hero h1 { font-size:3rem; font-weight:800; line-height:1.1; letter-spacing:-0.025em; color:var(--navy); margin-bottom:1.25rem; }
+.hero h1 span { color:var(--accent); }
+.hero p { font-size:1.05rem; color:var(--grey); margin-bottom:2rem; max-width:520px; }
+.hero .cta { display:flex; gap:1rem; align-items:center; }
+.btn-outline { border:1px solid var(--line); color:var(--navy); text-decoration:none; padding:9px 20px; border-radius:6px; font-size:0.88rem; font-weight:600; background:#fff; }
+.hero-card { background:var(--light); border:1px solid var(--line); border-radius:12px; padding:2rem; }
+.hero-card .label { font-size:0.75rem; color:var(--grey); font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem; }
+.hero-card .row { display:flex; justify-content:space-between; padding:0.7rem 0; border-bottom:1px solid var(--line); font-size:0.88rem; }
+.hero-card .row:last-child { border-bottom:none; }
+.hero-card .row b { color:var(--navy); font-weight:600; }
+.hero-card .row .up { color:#16a34a; font-weight:600; }
+.stats { background:var(--navy); color:#fff; padding:3rem; }
+.stats .inner { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; text-align:center; }
+.stats .stat .num { font-size:2.4rem; font-weight:800; letter-spacing:-0.02em; }
+.stats .stat .num span { color:var(--accent); }
+.stats .stat .lbl { font-size:0.82rem; color:rgba(255,255,255,0.7); margin-top:0.3rem; }
+.features { padding:5rem 3rem; max-width:1100px; margin:0 auto; }
+.section-head { text-align:center; margin-bottom:3rem; }
+.section-head .eyebrow { color:var(--accent); font-size:0.78rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.6rem; }
+.section-head h2 { font-size:2rem; font-weight:700; color:var(--navy); letter-spacing:-0.02em; }
+.section-head p { color:var(--grey); margin-top:0.6rem; }
+.features .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
+.feature { padding:2rem; border:1px solid var(--line); border-radius:10px; transition:border-color .2s, box-shadow .2s; }
+.feature:hover { border-color:var(--accent); box-shadow:0 4px 16px rgba(30,58,95,0.06); }
+.feature i { color:var(--accent); font-size:1.4rem; margin-bottom:1rem; }
+.feature h3 { font-size:1.15rem; font-weight:700; color:var(--navy); margin-bottom:0.5rem; }
+.feature p { font-size:0.92rem; color:var(--grey); }
+.testimonial { background:var(--light); padding:4rem 3rem; }
+.testimonial .inner { max-width:800px; margin:0 auto; text-align:center; }
+.testimonial .stars { color:#f59e0b; margin-bottom:1rem; }
+.testimonial blockquote { font-size:1.3rem; font-weight:500; color:var(--navy); line-height:1.5; letter-spacing:-0.01em; }
+.testimonial cite { display:block; margin-top:1.25rem; font-style:normal; font-size:0.85rem; color:var(--grey); }
+.testimonial cite b { color:var(--navy); }
+.cta-band { padding:4rem 3rem; text-align:center; background:linear-gradient(135deg,var(--navy) 0%,var(--navy-dark) 100%); color:#fff; }
+.cta-band h2 { font-size:2rem; font-weight:700; margin-bottom:0.6rem; letter-spacing:-0.02em; }
+.cta-band p { color:rgba(255,255,255,0.8); margin-bottom:1.75rem; }
+.cta-band .btn-primary { background:var(--accent); }
+.cta-band .btn-primary:hover { background:#2563eb; }
+footer { padding:2.5rem 3rem; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; color:var(--grey); }
+footer .links { display:flex; gap:1.5rem; }
+footer .links a { color:var(--grey); text-decoration:none; }
+@media (max-width:768px) {
+  nav,.hero,.stats,.features,.testimonial,.cta-band,footer { padding-left:1.25rem; padding-right:1.25rem; }
+  .hero { grid-template-columns:1fr; gap:2rem; padding-top:3rem; padding-bottom:3rem; }
+  .hero h1 { font-size:2.1rem; }
+  .stats .inner { grid-template-columns:repeat(2,1fr); gap:1.5rem; }
+  .features .grid { grid-template-columns:1fr; }
+  .nav-links a:not(.btn-primary) { display:none; }
+}
+</style>
+</head>
+<body>
+<div class="tag">Corporate</div>
+<nav>
+  <div class="brand"><i class="fa-solid fa-compass"></i> Meridian</div>
+  <div class="nav-links">
+    <a href="#">Platform</a><a href="#">Customers</a><a href="#">Resources</a><a href="#">Pricing</a>
+    <a href="#" class="btn-primary">Book a demo</a>
+  </div>
+</nav>
+<main>
+<section class="hero">
+  <div>
+    <span class="eyebrow"><i class="fa-solid fa-circle"></i> Trusted by 2,400+ enterprises</span>
+    <h1>The operating system for <span>modern finance teams</span>.</h1>
+    <p>Meridian unifies planning, consolidation, and reporting into one governed platform — so your close goes faster and your numbers never disagree.</p>
+    <div class="cta">
+      <a href="#" class="btn-primary">Start free trial</a>
+      <a href="#" class="btn-outline"><i class="fa-solid fa-play" style="margin-right:6px"></i> Watch 2-min tour</a>
+    </div>
+  </div>
+  <div class="hero-card">
+    <div class="label"><i class="fa-solid fa-gauge-high"></i> Quarter-to-date dashboard</div>
+    <div class="row"><span>Days to close</span><b>3.2 <span class="up">↓ 41%</span></b></div>
+    <div class="row"><span>Forecast accuracy</span><b>97.8% <span class="up">↑ 4.1pt</span></b></div>
+    <div class="row"><span>Reconciliations</span><b>1,204 automated</b></div>
+    <div class="row"><span>Audit readiness</span><b>SOC 2 · Type II</b></div>
+  </div>
+</section>
+<section class="stats">
+  <div class="inner">
+    <div class="stat"><div class="num">2,400<span>+</span></div><div class="lbl">Enterprise customers</div></div>
+    <div class="stat"><div class="num">$1.8<span>B</span></div><div class="lbl">Revenue reconciled / mo</div></div>
+    <div class="stat"><div class="num">99.99<span>%</span></div><div class="lbl">Platform uptime SLA</div></div>
+    <div class="stat"><div class="num">68<span>%</span></div><div class="lbl">Faster monthly close</div></div>
+  </div>
+</section>
+<section class="features">
+  <div class="section-head">
+    <div class="eyebrow">Platform</div>
+    <h2>One platform. Every finance workflow.</h2>
+    <p>Replace six disconnected tools with a single source of truth your auditors will love.</p>
+  </div>
+  <div class="grid">
+    <div class="feature">
+      <i class="fa-solid fa-layer-group"></i>
+      <h3>Unified close</h3>
+      <p>Consolidate entities, currencies, and adjustments in one workflow — with full audit trails out of the box.</p>
+    </div>
+    <div class="feature">
+      <i class="fa-solid fa-brain"></i>
+      <h3>AI variance analysis</h3>
+      <p>Meridian flags the drivers behind every variance in plain English, ranked by materiality.</p>
+    </div>
+    <div class="feature">
+      <i class="fa-solid fa-shield-halved"></i>
+      <h3>Governed by design</h3>
+      <p>Row-level permissions, SSO, and approval chains enforce control without slowing teams down.</p>
+    </div>
+  </div>
+</section>
+<section class="testimonial">
+  <div class="inner">
+    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+    <blockquote>"We cut our close from twelve days to four. Meridian paid for itself in the first quarter — and our auditors actually complimented us."</blockquote>
+    <cite><b>Dana Whitfield</b> · CFO, Northbridge Industries</cite>
+  </div>
+</section>
+<section class="cta-band">
+  <h2>Ready to close faster?</h2>
+  <p>See Meridian on your data in a 30-minute working session. No slides, no fluff.</p>
+  <a href="#" class="btn-primary">Book a demo</a>
+</section>
+</main>
+<footer>
+  <span>© 2026 Meridian Software, Inc.</span>
+  <div class="links"><a href="#">Privacy</a><a href="#">Security</a><a href="#">Status</a><a href="#">Contact</a></div>
+</footer>
+</body>
+</html>

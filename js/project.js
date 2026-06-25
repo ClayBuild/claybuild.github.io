@@ -153,7 +153,7 @@ function renderSidebar() {
   Object.keys(answers).forEach(k => {
     const v = answers[k];
     if (typeof v === 'string') {
-      if (['minimalism','brutalism','swiss','neumorphism','editorial'].includes(v.toLowerCase())) {
+      if (['minimalism','brutalism','swiss','neumorphism','editorial','glassmorphism','art-deco','corporate','playful','organic'].includes(v.toLowerCase())) {
         style = v;
       }
     }

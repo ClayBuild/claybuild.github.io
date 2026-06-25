@@ -38,7 +38,7 @@ Rules:
 - Generate between 5 and 7 questions. Always include a navigation question (options must include "Top-bar" and "Sidebar"; include "Mega-menu" ONLY if the site is large, e.g. e-commerce, education, or publishing). Always include a "primary_sections" question (multi-option list of which sections to include — Home, About, Services, Pricing, Testimonials, Contact, Blog, FAQ). Always include a "tone" question. Always include a "contact_info" question. Add 1-2 business-specific questions.
 - Each question MUST have exactly 3-5 options written in plain English for non-technical users. No jargon. No code.
 - Generate 4 color palettes, each with EXACTLY 5 hex codes in this order: [background, primary, secondary, accent, text]. The hex codes must be real, valid, and visually cohesive. Tailor the palettes to the business (e.g. warm earthy tones for a bakery; cool blue/grey for a law firm). Use uppercase hex like "#F5F1E8".
-- design_styles MUST be chosen from this list and ONLY this list: ["minimalism","brutalism","swiss","neumorphism","editorial"]. Pick 3 that best fit the business type. Do not invent new styles.
+- design_styles MUST be chosen from this list and ONLY this list: ["minimalism","brutalism","swiss","neumorphism","editorial","glassmorphism","art-deco","corporate","playful","organic"]. Pick 3-4 that best fit the business type. Do not invent new styles.
 - The "name" field must be plain text, no quotes inside, no emoji.
 - All JSON keys must be present. No extra keys.
 - Output JSON ONLY.
