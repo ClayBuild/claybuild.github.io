@@ -460,8 +460,10 @@ async function generate() {
   STATE.slug = claySlugify(finalName) || 'project-' + Date.now().toString(36);
 
   try {
-    // ---- 1. Ensure project row exists in DB ----
-    updateGenStage('save', 'active');
+    // Reset all stages to initial state
+    resetGenStages();
+
+    // ---- 1. Ensure project row exists in DB (silent — no stage update) ----
     const { data: existing } = await supabase
       .from('projects')
       .select('id')
@@ -489,7 +491,6 @@ async function generate() {
       projectId = proj.id;
     }
     STATE.project_id = projectId;
-    updateGenStage('save', 'done');
 
     // ---- 2. Generate design doc + generation prompt ----
     updateGenStage('design', 'active');
@@ -557,11 +558,16 @@ async function generate() {
   }
 }
 
+function resetGenStages() {
+  document.querySelectorAll('#gen-steps div[data-stage]').forEach(el => {
+    el.classList.remove('active','done');
+  });
+}
 function updateGenStage(stage, state) {
   const el = document.querySelector(`#gen-steps div[data-stage="${stage}"]`);
   if (!el) return;
   el.classList.remove('active','done');
-  el.classList.add(state);
+  if (state) el.classList.add(state);
 }
 function updateGenTitle(t) { document.getElementById('gen-title').textContent = t; }
 

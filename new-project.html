@@ -7,52 +7,53 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="./css/main.css">
 <style>
-  /* New-project-specific tweaks */
   .logo-drop {
-    border: 2px dashed var(--rule); border-radius: var(--radius-lg);
+    border: 2px dashed var(--border-strong); border-radius: var(--radius-md);
     padding: 2.5rem 1.5rem; text-align: center; cursor: pointer;
     transition: border-color .15s, background .15s;
-    background: var(--paper-2);
+    background: var(--surface-2);
   }
-  .logo-drop:hover, .logo-drop.dragover { border-color: var(--ink); background: #fff; }
-  .logo-drop .icon { font-size: 2rem; color: var(--ink-3); margin-bottom: 0.75rem; }
-  .logo-drop .t { font-weight: 600; margin-bottom: 0.25rem; }
-  .logo-drop .s { font-size: 0.85rem; color: var(--ink-3); }
-  .logo-preview { display: flex; align-items: center; gap: 1rem; background: #fff; border: 1px solid var(--rule); border-radius: var(--radius-lg); padding: 1rem; }
-  .logo-preview img { width: 80px; height: 80px; object-fit: contain; border: 1px solid var(--rule); border-radius: var(--radius); background: #fff; }
+  .logo-drop:hover, .logo-drop.dragover { border-color: var(--accent); background: var(--accent-light); }
+  .logo-drop .icon { font-size: 2rem; color: var(--accent); margin-bottom: 0.75rem; }
+  .logo-drop .t { font-weight: 600; margin-bottom: 0.25rem; font-size: 1rem; }
+  .logo-drop .s { font-size: 0.85rem; color: var(--text-3); }
+  .logo-preview { display: flex; align-items: center; gap: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; margin-top: 1rem; }
+  .logo-preview img { width: 80px; height: 80px; object-fit: contain; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
   .logo-preview .info { flex: 1; }
   .logo-preview .info .name { font-weight: 600; }
   .logo-preview .info .colors { display: flex; gap: 0.3rem; margin-top: 0.4rem; }
-  .logo-preview .info .colors span { width: 22px; height: 22px; border-radius: 3px; border: 1px solid var(--rule); }
+  .logo-preview .info .colors span { width: 22px; height: 22px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
 
-  .review-section { background: #fff; border: 1px solid var(--rule); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 0.85rem; }
-  .review-section .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-  .review-section .head h4 { font-size: 0.95rem; }
-  .review-section .head a { font-size: 0.8rem; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-  .review-section dl { display: grid; grid-template-columns: 130px 1fr; gap: 0.4rem 1rem; margin: 0; font-size: 0.88rem; }
-  .review-section dt { color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; }
-  .review-section dd { margin: 0; }
+  .review-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 0.85rem; }
+  .review-section .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+  .review-section .head h4 { font-size: 0.98rem; }
+  .review-section .head a { font-size: 0.85rem; font-weight: 600; }
+  .review-section dl { display: grid; grid-template-columns: 140px 1fr; gap: 0.5rem 1rem; margin: 0; font-size: 0.9rem; }
+  .review-section dt { color: var(--text-3); font-size: 0.85rem; font-weight: 500; }
+  .review-section dd { margin: 0; color: var(--text); }
 
   .generating-screen {
-    position: fixed; inset: 0; background: var(--paper); z-index: 9998;
+    position: fixed; inset: 0; background: var(--bg); z-index: 9998;
     display: none; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; padding: 2rem;
   }
   .generating-screen.show { display: flex; }
   .generating-screen .icon-wrap { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; }
-  .generating-screen .icon-wrap .spinner { width: 36px; height: 36px; border-width: 3px; color: var(--ink); }
+  .generating-screen .icon-wrap .spinner { width: 40px; height: 40px; border-width: 4px; }
   .generating-screen h3 { font-size: 1.4rem; margin: 0; }
-  .generating-screen p { color: var(--ink-3); font-size: 0.95rem; max-width: 420px; text-align: center; margin: 0; }
-  .generating-screen .step-list { margin-top: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--ink-3); text-align: left; }
-  .generating-screen .step-list div { padding: 0.25rem 0; opacity: 0.5; }
-  .generating-screen .step-list div.active { opacity: 1; color: var(--ink); font-weight: 600; }
-  .generating-screen .step-list div.done { opacity: 1; color: var(--ink); }
-  .generating-screen .step-list div.done::before { content: '✓ '; }
-  .generating-screen .step-list div.active::before { content: '› '; }
+  .generating-screen p { color: var(--text-3); font-size: 0.95rem; max-width: 420px; text-align: center; margin: 0; }
+  .generating-screen .step-list { margin-top: 1rem; font-size: 0.88rem; text-align: left; min-width: 280px; }
+  .generating-screen .step-list div { padding: 0.35rem 0; opacity: 0.4; display: flex; align-items: center; gap: 0.6rem; color: var(--text-3); }
+  .generating-screen .step-list div.active { opacity: 1; color: var(--accent); font-weight: 600; }
+  .generating-screen .step-list div.done { opacity: 1; color: var(--success); }
+  .generating-screen .step-list div .dot-ic { width: 18px; height: 18px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; }
+  .generating-screen .step-list div.active .dot-ic { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  .generating-screen .step-list div.done .dot-ic { background: var(--success); color: #fff; border-color: var(--success); }
+  .generating-screen .step-list div.done .dot-ic::before { content: '✓'; }
 
-  .preview-modal-host { position: fixed; inset: 0; background: rgba(20,19,15,0.7); display: none; align-items: center; justify-content: center; z-index: 9997; padding: 1.5rem; }
+  .preview-modal-host { position: fixed; inset: 0; background: rgba(28,25,23,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9997; padding: 1.5rem; }
   .preview-modal-host.open { display: flex; }
-  .preview-modal { background: var(--paper); border-radius: var(--radius-lg); width: 100%; max-width: 1100px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
-  .preview-modal .head { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; background: var(--paper-2); }
+  .preview-modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 1100px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg); }
+  .preview-modal .head { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); }
   .preview-modal .head .t { font-weight: 600; font-size: 0.95rem; }
   .preview-modal iframe { width: 100%; flex: 1; border: 0; background: #fff; min-height: 60vh; }
 </style>
@@ -61,7 +62,9 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a href="./index.html" class="brand"><span class="mark"></span> Clay <span class="sub">/ build</span></a>
+    <a href="./index.html" class="brand">
+      <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
+    </a>
     <nav>
       <a href="./dashboard.html"><i class="fa-solid fa-arrow-left"></i> Back to dashboard</a>
     </nav>
@@ -72,17 +75,17 @@
 
   <!-- Progress bar -->
   <div class="wizard-progress" id="progress">
-    <div class="step active" data-step="1"><span class="num">01</span>Idea</div>
-    <div class="step" data-step="2"><span class="num">02</span>Name</div>
-    <div class="step" data-step="3"><span class="num">03</span>Questions</div>
-    <div class="step" data-step="4"><span class="num">04</span>Brand</div>
-    <div class="step" data-step="5"><span class="num">05</span>Style</div>
-    <div class="step" data-step="6"><span class="num">06</span>Review</div>
+    <div class="step active" data-step="1"><span class="num">1.</span> Idea</div>
+    <div class="step" data-step="2"><span class="num">2.</span> Name</div>
+    <div class="step" data-step="3"><span class="num">3.</span> Questions</div>
+    <div class="step" data-step="4"><span class="num">4.</span> Brand</div>
+    <div class="step" data-step="5"><span class="num">5.</span> Style</div>
+    <div class="step" data-step="6"><span class="num">6.</span> Review</div>
   </div>
 
   <!-- STEP 1: IDEA -->
   <section class="wizard-step active" data-step="1">
-    <span class="kicker">— Step 01 of 06</span>
+    <span class="eyebrow">Step 1 of 6</span>
     <h2>Describe your idea.</h2>
     <p class="lede">In a sentence or two, tell Clay what you're building. The more specific, the better — but you don't need to be technical.</p>
 
@@ -100,12 +103,12 @@
 
   <!-- STEP 2: NAME -->
   <section class="wizard-step" data-step="2">
-    <span class="kicker">— Step 02 of 06</span>
+    <span class="eyebrow">Step 2 of 6</span>
     <h2>What's the project name?</h2>
     <p class="lede">This will be the title of your project in the dashboard. Don't have one yet? No problem — Clay will suggest one based on your idea.</p>
 
     <div class="field">
-      <label for="proj-name">Project name <span style="text-transform:none; color:var(--muted); font-weight:400;">(optional)</span></label>
+      <label for="proj-name">Project name <span style="color:var(--text-muted); font-weight:400;">(optional)</span></label>
       <input class="input" id="proj-name" type="text" placeholder="e.g. Clay Bakery">
       <div class="field-hint">Leave blank to let Clay suggest one. You can change it later.</div>
     </div>
@@ -118,12 +121,12 @@
 
   <!-- STEP 3: QUESTIONS -->
   <section class="wizard-step" data-step="3">
-    <span class="kicker">— Step 03 of 06</span>
+    <span class="eyebrow">Step 3 of 6</span>
     <h2>A few questions about your site.</h2>
     <p class="lede">Clay has prepared a short questionnaire based on your idea. Pick an option for each, or write your own answer.</p>
 
     <div id="questions-container">
-      <div style="text-align:center; padding:3rem;"><div class="spinner spinner-lg"></div><div style="margin-top:1rem; color:var(--ink-3); font-size:0.85rem;">Preparing your questions…</div></div>
+      <div style="text-align:center; padding:3rem;"><div class="spinner spinner-lg"></div><div style="margin-top:1rem; color:var(--text-3); font-size:0.9rem;">Preparing your questions…</div></div>
     </div>
 
     <div class="wizard-actions">
@@ -134,7 +137,7 @@
 
   <!-- STEP 4: BRAND (logo OR palette) -->
   <section class="wizard-step" data-step="4">
-    <span class="kicker">— Step 04 of 06</span>
+    <span class="eyebrow">Step 4 of 6</span>
     <h2>Your brand's look.</h2>
     <p class="lede">Upload a logo and Clay will extract your brand colors automatically. Or skip ahead and pick from AI-curated palettes — previewed live on a sample site.</p>
 
@@ -152,24 +155,23 @@
         <div class="info">
           <div class="name" id="logo-file-name">logo.png</div>
           <div class="colors" id="logo-colors"></div>
-          <div id="logo-desc" style="font-size:0.82rem; color:var(--ink-3); margin-top:0.4rem;"></div>
+          <div id="logo-desc" style="font-size:0.82rem; color:var(--text-3); margin-top:0.4rem;"></div>
         </div>
         <button class="btn btn-ghost btn-sm" id="logo-remove">Remove</button>
       </div>
 
-      <div style="text-align:center; margin: 1.5rem 0; color:var(--ink-3); font-size:0.8rem; letter-spacing:0.15em; text-transform:uppercase;">— or —</div>
+      <div style="text-align:center; margin: 1.5rem 0; color:var(--text-3); font-size:0.85rem; font-weight: 500;">— or pick a color palette —</div>
 
-      <h3 style="font-size:1rem; margin-bottom:0.75rem;">Pick a color palette</h3>
       <div class="palette-grid" id="palette-grid"></div>
 
       <details style="margin-top:1rem;">
-        <summary style="cursor:pointer; font-size:0.88rem; color:var(--ink-2); padding:0.5rem 0;">Build a custom palette instead</summary>
+        <summary style="cursor:pointer; font-size:0.9rem; color:var(--text-2); padding:0.5rem 0; font-weight: 500;">Build a custom palette instead</summary>
         <div class="custom-palette" id="custom-palette">
-          <div class="row"><label>Background</label><input type="color" data-slot="0" value="#ffffff"><input type="text" class="input mono" data-slot-text="0" value="#FFFFFF"></div>
-          <div class="row"><label>Primary</label><input type="color" data-slot="1" value="#000000"><input type="text" class="input mono" data-slot-text="1" value="#000000"></div>
-          <div class="row"><label>Secondary</label><input type="color" data-slot="2" value="#555555"><input type="text" class="input mono" data-slot-text="2" value="#555555"></div>
-          <div class="row"><label>Accent</label><input type="color" data-slot="3" value="#ff6b35"><input type="text" class="input mono" data-slot-text="3" value="#FF6B35"></div>
-          <div class="row"><label>Text</label><input type="color" data-slot="4" value="#1a1a1a"><input type="text" class="input mono" data-slot-text="4" value="#1A1A1A"></div>
+          <div class="row"><label>Background</label><div class="color-pick"><input type="color" data-slot="0" value="#ffffff"><input type="text" data-slot-text="0" value="#FFFFFF"></div></div>
+          <div class="row"><label>Primary</label><div class="color-pick"><input type="color" data-slot="1" value="#000000"><input type="text" data-slot-text="1" value="#000000"></div></div>
+          <div class="row"><label>Secondary</label><div class="color-pick"><input type="color" data-slot="2" value="#555555"><input type="text" data-slot-text="2" value="#555555"></div></div>
+          <div class="row"><label>Accent</label><div class="color-pick"><input type="color" data-slot="3" value="#ff6b35"><input type="text" data-slot-text="3" value="#FF6B35"></div></div>
+          <div class="row"><label>Text</label><div class="color-pick"><input type="color" data-slot="4" value="#1a1a1a"><input type="text" data-slot-text="4" value="#1A1A1A"></div></div>
           <button class="btn btn-sm" id="custom-palette-apply" style="margin-top:0.5rem;">Use this palette</button>
         </div>
       </details>
@@ -178,7 +180,7 @@
     <!-- Live preview -->
     <div style="margin-top:1.5rem;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-        <span class="kicker" style="margin:0;">— Live preview</span>
+        <span class="eyebrow" style="margin:0;">Live preview</span>
         <button class="btn btn-ghost btn-sm" id="palette-fullscreen"><i class="fa-solid fa-expand"></i> Fullscreen</button>
       </div>
       <div class="preview-frame-wrap">
@@ -199,15 +201,15 @@
 
   <!-- STEP 5: DESIGN STYLE -->
   <section class="wizard-step" data-step="5">
-    <span class="kicker">— Step 05 of 06</span>
+    <span class="eyebrow">Step 5 of 6</span>
     <h2>Pick a design style.</h2>
-    <p class="lede">Each style has its own philosophy — typography, spacing, mood. Preview each one before you choose.</p>
+    <p class="lede">Each style has its own personality — typography, spacing, mood. Preview each one before you choose.</p>
 
     <div class="style-grid" id="style-grid"></div>
 
     <div style="margin-top:1.5rem;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-        <span class="kicker" style="margin:0;">— Preview: <span id="style-preview-label">Click a style</span></span>
+        <span class="eyebrow" style="margin:0;">Preview: <span id="style-preview-label">Click a style</span></span>
         <button class="btn btn-ghost btn-sm" id="style-fullscreen"><i class="fa-solid fa-expand"></i> Fullscreen</button>
       </div>
       <div class="preview-frame-wrap large">
@@ -228,7 +230,7 @@
 
   <!-- STEP 6: REVIEW -->
   <section class="wizard-step" data-step="6">
-    <span class="kicker">— Step 06 of 06</span>
+    <span class="eyebrow">Step 6 of 6</span>
     <h2>Review &amp; generate.</h2>
     <p class="lede">Take one last look. Click any section to edit. When you're ready, Clay will build your website.</p>
 
@@ -259,16 +261,18 @@
   <h3 id="gen-title">Building your website…</h3>
   <p id="gen-sub">This usually takes 30–60 seconds. Sit tight.</p>
   <div class="step-list" id="gen-steps">
-    <div class="active" data-stage="design">Generating design system</div>
-    <div data-stage="code">Writing HTML, CSS &amp; JavaScript</div>
-    <div data-stage="save">Saving to your project</div>
+    <div class="active" data-stage="design"><span class="dot-ic"></span> Generating design system</div>
+    <div data-stage="code"><span class="dot-ic"></span> Writing HTML, CSS &amp; JavaScript</div>
+    <div data-stage="save"><span class="dot-ic"></span> Saving to your project</div>
   </div>
 </div>
 
 <footer class="footer">
   <div class="container footer-inner">
-    <a href="./index.html" class="brand"><span class="mark"></span> Clay <span class="sub">/ build</span></a>
-    <div class="mono" style="font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">© 2026 Clay</div>
+    <a href="./index.html" class="brand">
+      <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
+    </a>
+    <div style="font-size:0.82rem; color:var(--text-muted);">© 2026 Clay</div>
   </div>
 </footer>
 

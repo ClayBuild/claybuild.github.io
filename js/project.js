@@ -49,7 +49,7 @@ function renderProject() {
 
   document.getElementById('proj-name').textContent = PROJECT.name || 'Untitled';
   document.getElementById('proj-idea').textContent = PROJECT.business_idea || '';
-  document.getElementById('slug-stamp').textContent = PROJECT.slug || 'no-slug';
+  document.getElementById('slug-badge').textContent = PROJECT.slug || 'no-slug';
   document.getElementById('created-at').textContent = new Date(PROJECT.created_at).toLocaleDateString();
   document.getElementById('updated-at').textContent = clayTimeAgo(PROJECT.updated_at);
 

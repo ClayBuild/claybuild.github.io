@@ -12,20 +12,27 @@
 <div class="auth-wrap">
   <!-- LEFT ASIDE -->
   <aside class="auth-aside">
-    <a href="./index.html" class="brand"><span class="mark" style="background:var(--paper)"></span> Clay <span class="sub" style="color:#a8a599">/ build</span></a>
-    <div class="quote">
-      "Clay felt less like using software and more like sitting with a <em>patient designer</em> who happened to write code."
-      <div style="margin-top:1.5rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.18em; color:#a8a599; text-transform:uppercase;">— A first-time founder, 2026</div>
+    <a href="./index.html" class="brand">
+      <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
+    </a>
+    <div>
+      <div class="quote">
+        Clay felt less like using software and more like sitting with a <em>patient designer</em> who happened to write code.
+      </div>
+      <div class="attribution">— A first-time founder, 2026</div>
+      <div class="feature-list" style="margin-top: 2.5rem;">
+        <div class="item"><i class="fa-solid fa-check"></i> No credit card required</div>
+        <div class="item"><i class="fa-solid fa-check"></i> No email verification</div>
+        <div class="item"><i class="fa-solid fa-check"></i> First site live in minutes</div>
+      </div>
     </div>
-    <div class="meta">
-      DOSSIER · OPEN · 001 / 999
-    </div>
+    <div class="meta">© 2026 Clay · Build something today</div>
   </aside>
 
   <!-- RIGHT MAIN -->
   <main class="auth-main">
     <div class="auth-card">
-      <span class="kicker">— Create account</span>
+      <span class="eyebrow">Create your account</span>
       <h1>Start building.</h1>
       <p class="sub">No email verification. No credit card. Just answer a few questions and you're online.</p>
 
@@ -44,15 +51,15 @@
           <label for="password">Password</label>
           <div class="pw-wrap">
             <input class="input" id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required minlength="8">
-            <button type="button" class="pw-toggle" data-target="password" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+            <button type="button" class="pw-toggle" data-target="password" tabindex="-1" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
           </div>
-          <div class="field-hint">Min 8 characters. Mix in a number for safety.</div>
+          <div class="field-hint">Min 8 characters. Mix in a number for extra safety.</div>
         </div>
         <div class="field">
           <label for="confirm">Confirm password</label>
           <div class="pw-wrap">
             <input class="input" id="confirm" name="confirm" type="password" autocomplete="new-password" placeholder="Re-enter your password" required minlength="8">
-            <button type="button" class="pw-toggle" data-target="confirm" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+            <button type="button" class="pw-toggle" data-target="confirm" tabindex="-1" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
           </div>
         </div>
         <button type="submit" class="btn btn-block btn-lg" id="submit-btn">
@@ -73,63 +80,65 @@
 <script src="./js/supabase.js"></script>
 <script>
 (function () {
-  clayRedirectIfAuthed();
-
-  // Password visibility toggles
-  document.querySelectorAll('.pw-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = document.getElementById(btn.dataset.target);
+  // Set up password toggles FIRST — so they work even if auth redirect fires.
+  document.querySelectorAll('.pw-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.dataset.target);
+      if (!target) return;
       if (target.type === 'password') {
         target.type = 'text';
         btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
+        btn.setAttribute('aria-label', 'Hide password');
       } else {
         target.type = 'password';
         btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
+        btn.setAttribute('aria-label', 'Show password');
       }
     });
   });
 
-  const form = document.getElementById('signup-form');
-  const err = document.getElementById('err');
-  const btn = document.getElementById('submit-btn');
+  // Redirect to dashboard if already logged in.
+  clayRedirectIfAuthed();
 
-  form.addEventListener('submit', async (e) => {
+  var form = document.getElementById('signup-form');
+  var err = document.getElementById('err');
+  var btn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
     err.classList.add('hidden');
 
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const confirm = document.getElementById('confirm').value;
+    var name = document.getElementById('name').value.trim();
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var confirm = document.getElementById('confirm').value;
 
     if (name.length < 2) return showError('Please enter your full name.');
     if (password.length < 8) return showError('Password must be at least 8 characters.');
     if (password !== confirm) return showError('Passwords do not match.');
-    if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-      // Soft requirement — we'll allow letters-only but warn
-    }
 
     btn.disabled = true;
     btn.querySelector('.btn-label').textContent = 'Creating…';
-    btn.querySelector('.spinner')?.remove();
-    btn.insertAdjacentHTML('afterbegin', '<span class="spinner"></span>');
+    var spinner = document.createElement('span');
+    spinner.className = 'spinner spinner-on-accent';
+    btn.insertBefore(spinner, btn.firstChild);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      var { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
         options: { data: { full_name: name } },
       });
       if (error) throw error;
       toast('Account created. Welcome to Clay.');
-      setTimeout(() => {
+      setTimeout(function () {
         window.location.href = './dashboard.html';
       }, 600);
     } catch (e) {
       showError(e.message || 'Sign-up failed. Please try again.');
       btn.disabled = false;
       btn.querySelector('.btn-label').textContent = 'Create account';
-      btn.querySelector('.spinner')?.remove();
+      if (spinner.parentNode) spinner.remove();
     }
   });
 

@@ -11,18 +11,21 @@
 
 <div class="auth-wrap">
   <aside class="auth-aside">
-    <a href="./index.html" class="brand"><span class="mark" style="background:var(--paper)"></span> Clay <span class="sub" style="color:#a8a599">/ build</span></a>
-    <div class="quote">
-      Pick up exactly where you left off — your projects, your dossiers, your <em>published URLs</em>.
+    <a href="./index.html" class="brand">
+      <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
+    </a>
+    <div>
+      <div class="quote">
+        Pick up exactly where you left off — your projects, your drafts, your <em>published URLs</em>.
+      </div>
+      <div class="attribution">— Welcome back</div>
     </div>
-    <div class="meta">
-      DOSSIER · CONTINUE · 001 / 999
-    </div>
+    <div class="meta">© 2026 Clay · Build something today</div>
   </aside>
 
   <main class="auth-main">
     <div class="auth-card">
-      <span class="kicker">— Welcome back</span>
+      <span class="eyebrow">Welcome back</span>
       <h1>Sign in.</h1>
       <p class="sub">Continue to your dashboard and projects.</p>
 
@@ -37,7 +40,7 @@
           <label for="password">Password</label>
           <div class="pw-wrap">
             <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
-            <button type="button" class="pw-toggle" data-target="password" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+            <button type="button" class="pw-toggle" data-target="password" tabindex="-1" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
           </div>
         </div>
         <button type="submit" class="btn btn-block btn-lg" id="submit-btn">
@@ -58,47 +61,53 @@
 <script src="./js/supabase.js"></script>
 <script>
 (function () {
-  clayRedirectIfAuthed();
-
-  document.querySelectorAll('.pw-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = document.getElementById(btn.dataset.target);
+  // Password toggles FIRST.
+  document.querySelectorAll('.pw-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.dataset.target);
+      if (!target) return;
       if (target.type === 'password') {
         target.type = 'text';
         btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
+        btn.setAttribute('aria-label', 'Hide password');
       } else {
         target.type = 'password';
         btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
+        btn.setAttribute('aria-label', 'Show password');
       }
     });
   });
 
-  const form = document.getElementById('login-form');
-  const err = document.getElementById('err');
-  const btn = document.getElementById('submit-btn');
+  clayRedirectIfAuthed();
 
-  form.addEventListener('submit', async (e) => {
+  var form = document.getElementById('login-form');
+  var err = document.getElementById('err');
+  var btn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
     err.classList.add('hidden');
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
 
     btn.disabled = true;
     btn.querySelector('.btn-label').textContent = 'Signing in…';
-    btn.insertAdjacentHTML('afterbegin', '<span class="spinner"></span>');
+    var spinner = document.createElement('span');
+    spinner.className = 'spinner spinner-on-accent';
+    btn.insertBefore(spinner, btn.firstChild);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      var { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
       if (error) throw error;
       toast('Welcome back.');
-      const next = new URLSearchParams(location.search).get('next') || './dashboard.html';
-      setTimeout(() => { window.location.href = next; }, 400);
+      var next = new URLSearchParams(location.search).get('next') || './dashboard.html';
+      setTimeout(function () { window.location.href = next; }, 400);
     } catch (e) {
       showError(e.message || 'Sign-in failed. Check your email and password.');
       btn.disabled = false;
       btn.querySelector('.btn-label').textContent = 'Sign in';
-      btn.querySelector('.spinner')?.remove();
+      if (spinner.parentNode) spinner.remove();
     }
   });
 

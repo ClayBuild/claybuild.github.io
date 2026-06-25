@@ -7,65 +7,69 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="./css/main.css">
 <style>
-  .proj-header { padding: 1.5rem 0; border-bottom: 1px solid var(--rule); }
+  .proj-header { padding: 1.5rem 0; }
   .proj-header .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
-  .proj-header h1 { font-size: 1.9rem; margin-bottom: 0.25rem; }
-  .proj-header .meta { display: flex; gap: 1.5rem; font-size: 0.82rem; color: var(--ink-3); margin-top: 0.5rem; flex-wrap: wrap; }
+  .proj-header .head-left .badges { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .proj-header h1 { font-size: 1.85rem; }
+  .proj-header .meta { display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-3); margin-top: 0.6rem; flex-wrap: wrap; }
   .proj-header .meta .item { display: flex; align-items: center; gap: 0.4rem; }
   .proj-header .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-  .preview-wrap { border: 1px solid var(--rule-strong); border-radius: var(--radius-lg); overflow: hidden; background: #fff; box-shadow: var(--shadow); }
-  .preview-wrap .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.85rem; background: var(--paper-2); border-bottom: 1px solid var(--rule); }
+  .preview-wrap { border: 1px solid var(--border-strong); border-radius: var(--radius-md); overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+  .preview-wrap .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.95rem; background: var(--surface-2); border-bottom: 1px solid var(--border); }
   .preview-wrap .toolbar .dots { display: flex; gap: 0.35rem; }
-  .preview-wrap .toolbar .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--rule); }
-  .preview-wrap .toolbar .url { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--ink-3); }
+  .preview-wrap .toolbar .dots span { width: 11px; height: 11px; border-radius: 50%; }
+  .preview-wrap .toolbar .dots span:nth-child(1) { background: #FF5F57; }
+  .preview-wrap .toolbar .dots span:nth-child(2) { background: #FEBC2E; }
+  .preview-wrap .toolbar .dots span:nth-child(3) { background: #28C840; }
+  .preview-wrap .toolbar .url { font-size: 0.82rem; color: var(--text-3); font-weight: 500; }
   .preview-wrap iframe { width: 100%; height: 70vh; border: 0; display: block; background: #fff; min-height: 500px; }
 
-  .sidebar-card { background: #fff; border: 1px solid var(--rule); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
-  .sidebar-card h4 { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.75rem; font-weight: 600; }
-  .sidebar-card .kv { display: flex; justify-content: space-between; padding: 0.45rem 0; font-size: 0.85rem; border-bottom: 1px dashed var(--rule); }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1rem; }
+  .sidebar-card h4 { font-size: 0.82rem; font-weight: 600; color: var(--text-3); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.02em; }
+  .sidebar-card .kv { display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.88rem; border-bottom: 1px solid var(--border); gap: 0.5rem; }
   .sidebar-card .kv:last-child { border-bottom: 0; }
-  .sidebar-card .kv .k { color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
-  .sidebar-card .kv .v { font-weight: 500; }
+  .sidebar-card .kv .k { color: var(--text-3); font-size: 0.85rem; }
+  .sidebar-card .kv .v { font-weight: 500; text-align: right; }
 
-  .publish-card { background: var(--ink); color: var(--paper); border-radius: var(--radius-lg); padding: 1.5rem; }
-  .publish-card h4 { color: var(--paper); font-size: 1.1rem; margin-bottom: 0.4rem; text-transform: none; letter-spacing: -0.01em; }
-  .publish-card p { color: #c8c4b5; font-size: 0.85rem; margin-bottom: 1rem; }
-  .publish-card .btn { background: var(--paper); color: var(--ink); border-color: var(--paper); width: 100%; justify-content: center; }
-  .publish-card .btn:hover { background: #fff; }
-  .publish-card .published-url { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius); padding: 0.85rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; word-break: break-all; margin-top: 0.75rem; }
-  .publish-card .published-url a { color: var(--paper); text-decoration: underline; text-underline-offset: 2px; }
+  .publish-card { background: var(--text); color: var(--bg); border-radius: var(--radius-md); padding: 1.5rem; }
+  .publish-card h4 { color: var(--bg); font-size: 1.1rem; margin-bottom: 0.4rem; text-transform: none; letter-spacing: -0.01em; font-weight: 700; }
+  .publish-card p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem; }
+  .publish-card .btn { background: var(--accent); color: var(--accent-text); border-color: var(--accent); width: 100%; justify-content: center; }
+  .publish-card .btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .publish-card .published-url { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius); padding: 0.85rem; font-size: 0.82rem; word-break: break-all; margin-top: 0.75rem; }
+  .publish-card .published-url a { color: var(--bg); text-decoration: underline; text-underline-offset: 2px; }
+  .publish-card .published-url a:hover { color: var(--accent); }
 
-  .deploy-progress { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #c8c4b5; margin-top: 0.75rem; }
-  .deploy-progress .line { padding: 0.2rem 0; display: flex; align-items: center; gap: 0.5rem; }
-  .deploy-progress .line .dot { width: 8px; height: 8px; border-radius: 50%; background: #6b685d; flex-shrink: 0; }
-  .deploy-progress .line.active .dot { background: var(--paper); animation: pulse 1.2s infinite; }
-  .deploy-progress .line.done .dot { background: #7eb87e; }
+  .deploy-progress { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem; }
+  .deploy-progress .line { padding: 0.25rem 0; display: flex; align-items: center; gap: 0.5rem; }
+  .deploy-progress .line .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+  .deploy-progress .line.active .dot { background: var(--accent); animation: pulse 1.2s infinite; }
+  .deploy-progress .line.done .dot { background: var(--success); }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-  .file-browser { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
-  .file-browser .file { padding: 0.5rem 0.65rem; cursor: pointer; border-radius: var(--radius); display: flex; align-items: center; gap: 0.5rem; }
-  .file-browser .file:hover { background: var(--paper-2); }
-  .file-browser .file.active { background: var(--ink); color: var(--paper); }
-  .file-browser .file i { width: 14px; }
+  .file-browser { font-size: 0.85rem; }
+  .file-browser .file { padding: 0.55rem 0.7rem; cursor: pointer; border-radius: var(--radius); display: flex; align-items: center; gap: 0.5rem; color: var(--text-2); font-weight: 500; transition: background .15s, color .15s; }
+  .file-browser .file:hover { background: var(--surface-2); }
+  .file-browser .file.active { background: var(--accent); color: var(--accent-text); }
+  .file-browser .file i { width: 16px; }
 
-  .code-viewer { background: #1a1a17; color: #e8e5db; border-radius: var(--radius); padding: 1rem; overflow: auto; max-height: 460px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.6; white-space: pre; }
+  .code-viewer { background: #1C1917; color: #ECEAE4; border-radius: var(--radius); padding: 1rem; overflow: auto; max-height: 460px; font-size: 0.78rem; line-height: 1.6; white-space: pre; font-family: 'SF Mono', 'Monaco', 'Menlo', monospace; }
   .code-viewer::-webkit-scrollbar { width: 8px; height: 8px; }
   .code-viewer::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+  .code-viewer::-webkit-scrollbar-track { background: transparent; }
 
-  .info-banner { background: #f5f7fb; border: 1px solid #c9d4e8; border-radius: var(--radius); padding: 0.85rem 1rem; font-size: 0.85rem; color: #1c2e5e; margin-top: 1rem; }
-  .info-banner i { margin-right: 0.4rem; }
-  .info-banner.warn { background: #fdf8ec; border-color: #e8d79c; color: #6b540d; }
-
-  .hard-refresh-note { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.5rem; line-height: 1.5; }
-  .hard-refresh-note kbd { background: var(--paper-3); border: 1px solid var(--rule); border-radius: 3px; padding: 1px 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
+  .hard-refresh-note { font-size: 0.8rem; color: var(--text-3); margin-top: 0.5rem; line-height: 1.6; }
+  .hard-refresh-note kbd { background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 1px 6px; font-size: 0.75rem; font-family: monospace; }
 </style>
 </head>
 <body>
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a href="./index.html" class="brand"><span class="mark"></span> Clay <span class="sub">/ build</span></a>
+    <a href="./index.html" class="brand">
+      <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
+    </a>
     <nav>
       <a href="./dashboard.html"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
     </nav>
@@ -76,16 +80,16 @@
 
   <div id="loading" style="padding:5rem 0; text-align:center;">
     <div class="spinner spinner-lg" style="margin:0 auto;"></div>
-    <div style="margin-top:1rem; color:var(--ink-3); font-size:0.85rem;">Loading your project…</div>
+    <div style="margin-top:1rem; color:var(--text-3); font-size:0.9rem;">Loading your project…</div>
   </div>
 
   <div id="content" class="hidden">
 
     <section class="proj-header">
       <div class="row1">
-        <div>
-          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.4rem;">
-            <span class="stamp" id="slug-stamp">slug</span>
+        <div class="head-left">
+          <div class="badges">
+            <span class="badge" id="slug-badge">slug</span>
             <span class="status-pill draft" id="status-pill">DRAFT</span>
           </div>
           <h1 id="proj-name">Project name</h1>
@@ -107,9 +111,9 @@
       <!-- LEFT: PREVIEW -->
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-          <span class="kicker" style="margin:0;">— Live preview</span>
+          <span class="eyebrow" style="margin:0;">Live preview</span>
           <div style="display:flex; gap:0.4rem;">
-            <button class="btn btn-ghost btn-sm" id="refresh-preview"><i class="fa-solid fa-rotate"></i></button>
+            <button class="btn btn-ghost btn-sm" id="refresh-preview" title="Refresh preview"><i class="fa-solid fa-rotate"></i></button>
             <button class="btn btn-ghost btn-sm" id="fullscreen-preview"><i class="fa-solid fa-expand"></i> Fullscreen</button>
           </div>
         </div>
@@ -123,7 +127,7 @@
         </div>
 
         <div style="margin-top:2rem;">
-          <span class="kicker">— Files</span>
+          <span class="eyebrow">Files</span>
           <div style="display:grid; grid-template-columns: 200px 1fr; gap:1rem; margin-top:0.75rem;">
             <div class="file-browser" id="file-browser"></div>
             <div class="code-viewer" id="code-viewer">Select a file</div>
@@ -151,11 +155,6 @@
           <h4>Questionnaire</h4>
           <div id="qa-list"></div>
         </div>
-
-        <div class="sidebar-card" id="deploy-history-card" style="display:none;">
-          <h4>Deployment history</h4>
-          <div id="deploy-history"></div>
-        </div>
       </aside>
     </div>
 
@@ -171,7 +170,7 @@
     <div class="field">
       <label>Website URL</label>
       <div class="input-group">
-        <span style="display:flex; align-items:center; padding:0 0.85rem; background:var(--paper-2); border-right:1px solid var(--rule); font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--ink-3);">claybuild.github.io/</span>
+        <span style="display:flex; align-items:center; padding:0 0.85rem; background:var(--surface-2); border-right:1px solid var(--border); font-size:0.82rem; color:var(--text-3); font-weight: 500;">claybuild.github.io/</span>
         <input class="input" id="publish-slug" type="text" placeholder="your-project">
       </div>
       <div class="field-hint" id="slug-status">Lowercase letters, numbers, and hyphens. 2–40 characters.</div>
@@ -195,20 +194,20 @@
     <h3 id="deploy-title">Deploying your website…</h3>
     <p class="modal-sub" id="deploy-sub" style="text-align:center;">This usually takes 45–60 seconds. Your site will appear at the URL below.</p>
 
-    <div style="background:var(--paper-2); border:1px solid var(--rule); border-radius:var(--radius); padding:0.85rem; font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--ink-2); margin:1rem 0;" id="deploy-url">—</div>
+    <div style="background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:0.85rem; font-size:0.82rem; color:var(--text-2); margin:1rem 0; word-break: break-all;" id="deploy-url">—</div>
 
     <div class="deploy-progress" id="deploy-progress" style="text-align:left;">
-      <div class="line active" data-stage="push"><span class="dot"></span>Pushing files to GitHub</div>
-      <div class="line" data-stage="build"><span class="dot"></span>Triggering Pages build</div>
-      <div class="line" data-stage="ready"><span class="dot"></span>Waiting for deployment to go live</div>
+      <div class="line active" data-stage="push"><span class="dot"></span> Pushing files to GitHub</div>
+      <div class="line" data-stage="build"><span class="dot"></span> Triggering Pages build</div>
+      <div class="line" data-stage="ready"><span class="dot"></span> Waiting for deployment to go live</div>
     </div>
 
     <div id="deploy-success" class="hidden" style="margin-top:1.25rem;">
-      <div class="alert alert-success">
+      <div class="alert alert-success" style="text-align:left;">
         <strong>Your site is live!</strong><br>
-        <a id="deploy-success-url" href="#" target="_blank" rel="noopener" style="color:#1c5e1c; text-decoration:underline;"></a>
+        <a id="deploy-success-url" href="#" target="_blank" rel="noopener" style="color:#166534; text-decoration:underline; word-break: break-all;"></a>
       </div>
-      <div class="hard-refresh-note">
+      <div class="hard-refresh-note" style="text-align:left;">
         <strong>First time opening the URL?</strong> If you see a 404, do a hard refresh:
         <br>· <strong>Windows:</strong> <kbd>Ctrl</kbd> + <kbd>F5</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
         <br>· <strong>Mac:</strong> <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
