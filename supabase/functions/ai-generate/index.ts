@@ -83,54 +83,38 @@ Return the JSON object of files now.`;
       { role: "user",   content: userContent },
     ];
 
-    let lastError = "";
-    // Only 2 attempts (down from 3) to stay within the Supabase Edge Function
-    // 150-second timeout. Each attempt can take 30-60s, so 2 attempts + 1s
-    // delay = ~120s max, safely under the limit.
-    for (let attempt = 0; attempt < 2; attempt++) {
-      let raw: string;
-      try {
-        // max_tokens reduced from 16000 to 8000 — a complete website
-        // (index.html + styles.css + script.js) typically fits in 4000-6000
-        // tokens. 8000 gives headroom without making generation take too long.
-        raw = await callOpenRouter(apiKey, "poolside/laguna-xs.2:free", messages, {
-          temperature: attempt === 0 ? 0.4 : 0.3,
-          max_tokens: 8000,
-        });
-      } catch (e) {
-        lastError = String(e?.message || e);
-        console.warn(`[ai-generate] Attempt ${attempt + 1} API error: ${lastError}`);
-        if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
-        continue;
-      }
-
-      if (!raw || !raw.trim()) {
-        lastError = "Empty response from model.";
-        if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
-        continue;
-      }
-
-      try {
-        const files = extractJSON<Record<string, string>>(raw);
-        if (!files["index.html"]) {
-          lastError = "Model response missing index.html.";
-          if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
-          continue;
-        }
-        return json({ files });
-      } catch (parseErr) {
-        lastError = String(parseErr?.message || parseErr);
-        console.warn(`[ai-generate] Attempt ${attempt + 1} parse error: ${lastError}`);
-        console.warn(`[ai-generate] Raw response length: ${raw.length}, first 200 chars: ${raw.slice(0, 200)}`);
-        if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
-        continue;
-      }
+    // SINGLE attempt only — the client handles retries. This keeps the edge
+    // function well within its wall-clock timeout. If the model times out or
+    // returns bad JSON, we return an error and the client (new-project.js)
+    // will retry by calling this function again.
+    let raw: string;
+    try {
+      raw = await callOpenRouter(apiKey, "poolside/laguna-xs.2:free", messages, {
+        temperature: 0.4,
+        max_tokens: 8000,
+      });
+    } catch (e) {
+      const msg = String(e?.message || e);
+      console.warn(`[ai-generate] API error: ${msg}`);
+      return errorJson("Model request failed: " + msg + " — click Try Again to retry.", 502);
     }
 
-    return errorJson(
-      "Could not generate website code after 2 attempts. This is usually a timeout or rate-limit on the free tier — wait 10 seconds and try again. Last error: " + lastError,
-      502
-    );
+    if (!raw || !raw.trim()) {
+      return errorJson("Model returned an empty response. Click Try Again to retry.", 502);
+    }
+
+    try {
+      const files = extractJSON<Record<string, string>>(raw);
+      if (!files["index.html"]) {
+        return errorJson("Model response missing index.html. Click Try Again to retry.", 502);
+      }
+      return json({ files });
+    } catch (parseErr) {
+      const msg = String(parseErr?.message || parseErr);
+      console.warn(`[ai-generate] Parse error: ${msg}`);
+      console.warn(`[ai-generate] Raw response length: ${raw.length}, first 200 chars: ${raw.slice(0, 200)}`);
+      return errorJson("Could not parse the generated code. Click Try Again to retry. Error: " + msg, 502);
+    }
   } catch (e) {
     return errorJson(String(e?.message || e), 500);
   }

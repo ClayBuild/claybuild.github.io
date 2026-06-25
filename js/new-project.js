@@ -166,18 +166,42 @@ function step1Next() {
     toast('Please describe your idea in at least a sentence.');
     return;
   }
+  // If the idea changed, mark it so step2Next knows to re-generate questions
+  if (idea !== STATE.business_idea) {
+    STATE._ideaChanged = true;
+    // Clear existing questions/answers/palettes since they're stale
+    STATE.questions = [];
+    STATE.answers = {};
+    STATE.color_palettes = [];
+    STATE.design_styles = [];
+  }
   STATE.business_idea = idea;
   goToStep(2);
 }
 
 // ============================================================================
-// STEP 2: NAME → call ai-init
+// STEP 2: NAME → call ai-init (only if questions don't already exist or idea changed)
 // ============================================================================
 async function step2Next() {
   const name = document.getElementById('proj-name').value.trim();
   STATE.project_name = name; // may be ""
 
   goToStep(3);
+
+  // If we already have questions AND the idea hasn't changed, just re-render
+  // the existing questions instead of calling the AI again. This makes the
+  // edit flow much smoother — the user can go back, tweak answers, and
+  // continue without waiting for a new AI call.
+  if (STATE.questions && STATE.questions.length > 0 && !STATE._ideaChanged) {
+    renderQuestions();
+    renderPalettes();
+    renderStyles();
+    document.getElementById('step3-next').disabled = false;
+    return;
+  }
+
+  // Otherwise, call the AI to generate fresh questions
+  STATE._ideaChanged = false; // reset the flag
   await runAiInit();
 }
 
@@ -557,7 +581,7 @@ function renderReview() {
 
   container.innerHTML = `
     <div class="review-section">
-      <div class="head"><h4>Identity</h4><a href="#" data-edit="2">Edit</a></div>
+      <div class="head"><h4>Identity</h4><a href="#" data-edit="1">Edit</a></div>
       <dl>
         <dt>Name</dt><dd>${escapeHtml(finalName)}</dd>
         <dt>Idea</dt><dd>${escapeHtml(STATE.business_idea)}</dd>
@@ -692,14 +716,40 @@ async function generate() {
     updateGenStage('design', 'done');
 
     // ---- 3. Generate the website code ----
+    // Client-side retry loop: the edge function does a single call (to stay
+    // within its timeout), and we retry here if it fails. This avoids the
+    // 546 timeout error that happens when the edge function tries to retry
+    // internally and exceeds its wall-clock limit.
     updateGenStage('code', 'active');
     updateGenTitle('Writing your HTML, CSS & JavaScript…');
 
-    const genResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_GENERATE, {
-      generation_prompt: STATE.generation_prompt,
-      design_doc: STATE.design_doc,
-      slug: STATE.slug,
-    });
+    let genResult = null;
+    let genError = null;
+    for (let genAttempt = 0; genAttempt < 3; genAttempt++) {
+      if (genAttempt > 0) {
+        updateGenTitle('Retrying code generation (attempt ' + (genAttempt + 1) + ' of 3)…');
+        await new Promise(r => setTimeout(r, 2000)); // 2s delay between retries
+      }
+      try {
+        genResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_GENERATE, {
+          generation_prompt: STATE.generation_prompt,
+          design_doc: STATE.design_doc,
+          slug: STATE.slug,
+        });
+        if (genResult && genResult.files && genResult.files['index.html']) {
+          break; // success
+        }
+        genError = 'Model response missing index.html.';
+        genResult = null;
+      } catch (e) {
+        genError = e.message || String(e);
+        console.warn('[Clay] Generate attempt ' + (genAttempt + 1) + ' failed:', genError);
+      }
+    }
+
+    if (!genResult || !genResult.files) {
+      throw new Error('Code generation failed after 3 attempts. ' + (genError || 'Unknown error.') + ' Click Try Again to retry.');
+    }
     STATE.website_files = genResult.files;
     updateGenStage('code', 'done');
 
