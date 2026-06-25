@@ -101,9 +101,18 @@ async function loadExistingProject(projectId) {
     STATE.questions = q.questions || [];
     STATE.answers = q.answers || {};
 
-    // Try to recover palette / design style from the design_doc or answers
-    // (we didn't save them as separate fields, so reconstruct from answers)
-    if (STATE.answers) {
+    // Recover design_style + palette from the enriched questionnaire
+    // (saved before generation starts, so they survive mid-generation errors)
+    if (q.design_style) STATE.design_style = q.design_style;
+    if (q.palette) STATE.palette = q.palette;
+    if (q.logo_info) {
+      // We have the logo analysis but not the actual file — that's OK,
+      // the generate function can still use logo_info for the design doc.
+      STATE.logo = { info: q.logo_info, file: null, dataUrl: null, mime: null, ext: null };
+    }
+
+    // Fallback: try to recover design_style from answers if not in questionnaire
+    if (!STATE.design_style && STATE.answers) {
       Object.keys(STATE.answers).forEach(k => {
         const v = STATE.answers[k];
         if (typeof v === 'string') {
@@ -488,7 +497,13 @@ function step4Next() {
 
 function renderStyles() {
   const grid = document.getElementById('style-grid');
-  grid.innerHTML = STATE.design_styles.map(style => `
+  // Always show ALL 10 styles — don't rely on the AI to shortlist.
+  const ALL_STYLES = ["minimalism","brutalism","swiss","neumorphism","editorial","glassmorphism","art-deco","corporate","playful","organic"];
+  // Use AI suggestions if available, otherwise show all
+  const styles = (STATE.design_styles && STATE.design_styles.length > 0) ? STATE.design_styles : ALL_STYLES;
+  // Merge: show AI suggestions first (if any), then the rest — but actually,
+  // just show ALL styles in a fixed order. The user requested this.
+  grid.innerHTML = ALL_STYLES.map(style => `
     <div class="style-card" data-style="${escapeAttr(style)}">
       <div class="thumb"><iframe src="./samples/${escapeAttr(style)}.html" loading="lazy" sandbox="allow-same-origin"></iframe></div>
       <div class="body">
@@ -639,6 +654,20 @@ async function generate() {
       }
     }
     STATE.project_id = projectId;
+
+    // ---- 1b. Save design_style + palette to the questionnaire JSON NOW ----
+    // This ensures they're persisted even if generation fails later.
+    // We store them inside the questionnaire JSON so they survive retries.
+    const enrichedQuestionnaire = {
+      answers: STATE.answers,
+      questions: STATE.questions,
+      design_style: STATE.design_style,
+      palette: STATE.logo ? null : STATE.palette,
+      logo_info: STATE.logo?.info || null,
+    };
+    await supabase.from('projects').update({
+      questionnaire: enrichedQuestionnaire,
+    }).eq('id', projectId);
 
     // ---- 2. Generate design doc + generation prompt ----
     updateGenStage('design', 'active');
