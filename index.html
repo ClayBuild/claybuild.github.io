@@ -6,7 +6,7 @@
 <title>Clay — Build a website by talking to AI</title>
 <meta name="description" content="Clay helps non-tech people build, host, and ship a real website by answering a few simple questions. No code. No templates. No friction.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css">
+<link rel="stylesheet" href="./css/main.css?v=6">
 <style>
   /* ---- Hero ---- */
   .hero { padding: 4rem 0 5rem; position: relative; overflow: hidden; }
@@ -93,10 +93,10 @@
   .cta-band { background: var(--grey-900); color: #FFF; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-lg); margin: 0 1.5rem; }
   .cta-band h2 { color: #FFF; font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 0.75rem; }
   .cta-band p { color: var(--grey-400); font-size: 1.05rem; max-width: 480px; margin: 0 auto 1.75rem; }
-  .cta-band .btn { background: #FFF; color: var(--grey-900); border-color: #FFF; }
-  .cta-band .btn:hover { background: var(--grey-100); border-color: var(--grey-100); color: var(--grey-900); }
-  .cta-band .btn-ghost { background: transparent; color: #FFF; border-color: var(--grey-600); }
-  .cta-band .btn-ghost:hover { background: #FFF; color: var(--grey-900); border-color: #FFF; }
+  .cta-band .btn { background: #FFF !important; color: var(--grey-900) !important; border-color: #FFF !important; }
+  .cta-band .btn:hover { background: var(--grey-100) !important; border-color: var(--grey-100) !important; color: var(--grey-900) !important; }
+  .cta-band .btn-ghost { background: transparent !important; color: #FFF !important; border-color: var(--grey-600) !important; }
+  .cta-band .btn-ghost:hover { background: #FFF !important; color: var(--grey-900) !important; border-color: #FFF !important; }
 </style>
 </head>
 <body>
@@ -303,8 +303,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js"></script>
-<script src="./js/supabase.js"></script>
+<script src="./js/config.js?v=6"></script>
+<script src="./js/supabase.js?v=6"></script>
 <script>
   (async () => {
     const { data } = await supabase.auth.getSession();

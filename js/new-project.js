@@ -112,6 +112,12 @@ async function step2Next() {
 
 async function runAiInit() {
   const container = document.getElementById('questions-container');
+  // Show loading spinner immediately so the user sees feedback (especially on retry)
+  container.innerHTML = `
+    <div style="text-align:center; padding:3rem;">
+      <div class="spinner spinner-lg" style="margin:0 auto;"></div>
+      <div style="margin-top:1rem; color:var(--grey-500); font-size:0.9rem;">Preparing your questions…</div>
+    </div>`;
   try {
     const result = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_INIT, {
       idea: STATE.business_idea,
@@ -137,11 +143,17 @@ async function runAiInit() {
   } catch (e) {
     container.innerHTML = `
       <div class="alert alert-error">
-        Couldn't prepare your questions: ${escapeHtml(e.message || e)}.
-        <br><button class="btn btn-sm" style="margin-top:0.75rem;" id="retry-ai-init">Try again</button>
+        <strong>Couldn't prepare your questions.</strong><br>
+        ${escapeHtml(e.message || e)}
+        <div style="margin-top:0.85rem; display:flex; gap:0.5rem;">
+          <button class="btn btn-sm" id="retry-ai-init"><i class="fa-solid fa-rotate"></i> Try again</button>
+          <button class="btn btn-ghost btn-sm" id="retry-ai-init-back">Back to idea</button>
+        </div>
       </div>`;
     const retryBtn = container.querySelector('#retry-ai-init');
     if (retryBtn) retryBtn.addEventListener('click', runAiInit);
+    const backBtn = container.querySelector('#retry-ai-init-back');
+    if (backBtn) backBtn.addEventListener('click', () => goToStep(2));
   }
 }
 

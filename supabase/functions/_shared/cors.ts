@@ -102,8 +102,22 @@ export function extractJSON<T = any>(raw: string): T {
     fixed = fixed.replace(/[\u2018\u2019]/g, "'");
     try {
       return JSON.parse(fixed) as T;
-    } catch (e) {
-      throw new Error("Invalid JSON: " + (e as Error).message);
+    } catch (_) {
+      // Attempt 3: more aggressive repairs
+      let fixed2 = fixed;
+      // Fix missing colons: "key" "value" → "key": "value"
+      // (a closing quote followed by whitespace and an opening quote, not preceded by : or ,)
+      fixed2 = fixed2.replace(/"(\s+)"(?!\s*[,:}\]])/g, '": "');
+      // Fix missing commas between array elements: "a" "b" → "a", "b"
+      // This is handled by the colon fix above for objects; for arrays we need:
+      fixed2 = fixed2.replace(/"\s+"(?=\s*[,\]])/g, '", "');
+      // Remove any leading/trailing whitespace inside the JSON
+      fixed2 = fixed2.trim();
+      try {
+        return JSON.parse(fixed2) as T;
+      } catch (e) {
+        throw new Error("Invalid JSON: " + (e as Error).message);
+      }
     }
   }
 }
