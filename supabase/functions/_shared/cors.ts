@@ -136,18 +136,80 @@ export function extractJSON<T = any>(raw: string): T {
       // Attempt 3: more aggressive repairs
       let fixed2 = fixed;
       // Fix missing colons: "key" "value" → "key": "value"
-      // (a closing quote followed by whitespace and an opening quote, not preceded by : or ,)
       fixed2 = fixed2.replace(/"(\s+)"(?!\s*[,:}\]])/g, '": "');
       // Fix missing commas between array elements: "a" "b" → "a", "b"
-      // This is handled by the colon fix above for objects; for arrays we need:
       fixed2 = fixed2.replace(/"\s+"(?=\s*[,\]])/g, '", "');
-      // Remove any leading/trailing whitespace inside the JSON
+      // Remove any leading/trailing whitespace
       fixed2 = fixed2.trim();
       try {
         return JSON.parse(fixed2) as T;
-      } catch (e) {
-        throw new Error("Invalid JSON: " + (e as Error).message);
+      } catch (_) {
+        // Attempt 4: character-by-character re-serialization.
+        // Walk through the JSON string and re-emit it with proper escaping.
+        // This handles unescaped quotes, literal newlines, and other issues
+        // inside string values that cause "Expected ',' or '}'" errors.
+        const repaired = repairJSONStrings(fixed2);
+        try {
+          return JSON.parse(repaired) as T;
+        } catch (e) {
+          throw new Error("Invalid JSON after repair: " + (e as Error).message);
+        }
       }
     }
   }
+}
+
+// Walk through a JSON string character by character. When inside a string
+// value (between unescaped double-quotes), escape any characters that would
+// break parsing: literal newlines, tabs, unescaped double-quotes, backslashes.
+// This is a last-resort repair for malformed LLM JSON output.
+function repairJSONStrings(input: string): string {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (escaped) {
+      // Previous char was a backslash — emit this one as-is
+      out += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === "\\") {
+      out += ch;
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      if (inString) {
+        // Check if this quote ends the string or is unescaped inside it.
+        // A string-ending quote is followed by (optionally whitespace then)
+        // one of: : , } ] or end-of-input.
+        let j = i + 1;
+        while (j < input.length && /\s/.test(input[j])) j++;
+        const nextCh = input[j];
+        if (nextCh === undefined || nextCh === ":" || nextCh === "," || nextCh === "}" || nextCh === "]") {
+          // This quote ends the string
+          out += ch;
+          inString = false;
+        } else {
+          // This is an unescaped quote inside a string — escape it
+          out += '\\"';
+        }
+      } else {
+        // Opening a string
+        out += ch;
+        inString = true;
+      }
+      continue;
+    }
+    if (inString) {
+      // Inside a string — escape control characters
+      if (ch === "\n") { out += "\\n"; continue; }
+      if (ch === "\r") { out += "\\r"; continue; }
+      if (ch === "\t") { out += "\\t"; continue; }
+    }
+    out += ch;
+  }
+  return out;
 }

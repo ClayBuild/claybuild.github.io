@@ -67,9 +67,71 @@ const STYLE_DESCRIPTIONS = {
   // Custom palette
   setupCustomPalette();
 
-  // Populate step 1 with placeholder focus
-  setTimeout(() => document.getElementById('idea').focus(), 100);
+  // Check if we're reusing an existing project (from project.html "Regenerate")
+  const reuseId = new URLSearchParams(location.search).get('reuse');
+  if (reuseId) {
+    await loadExistingProject(reuseId);
+  } else {
+    // Populate step 1 with placeholder focus
+    setTimeout(() => document.getElementById('idea').focus(), 100);
+  }
 })();
+
+// Load an existing project's saved data and skip to the review step.
+// This is used when the user clicks "Regenerate" on the project page.
+async function loadExistingProject(projectId) {
+  showLoadingScreen('Loading your project…');
+  try {
+    const { data: proj, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .single();
+    if (error) throw error;
+    if (!proj) throw new Error('Project not found');
+
+    // Populate STATE from the saved project
+    STATE.project_id = proj.id;
+    STATE.business_idea = proj.business_idea || '';
+    STATE.project_name = proj.name || '';
+    STATE.ai_name = proj.name || '';
+    STATE.slug = proj.slug || claySlugify(proj.name);
+
+    const q = proj.questionnaire || {};
+    STATE.questions = q.questions || [];
+    STATE.answers = q.answers || {};
+
+    // Try to recover palette / design style from the design_doc or answers
+    // (we didn't save them as separate fields, so reconstruct from answers)
+    if (STATE.answers) {
+      Object.keys(STATE.answers).forEach(k => {
+        const v = STATE.answers[k];
+        if (typeof v === 'string') {
+          if (['minimalism','brutalism','swiss','neumorphism','editorial','glassmorphism','art-deco','corporate','playful','organic'].includes(v.toLowerCase())) {
+            STATE.design_style = v;
+          }
+        }
+      });
+    }
+
+    // Populate the idea + name fields in case the user goes back
+    document.getElementById('idea').value = STATE.business_idea;
+    document.getElementById('proj-name').value = STATE.project_name;
+
+    hideLoadingScreen();
+
+    // Skip directly to the review step (step 6)
+    // We need to render the review even if palette/styles aren't fully loaded
+    // (the user can still regenerate from here)
+    goToStep(6);
+    renderReview();
+    toast('Review your saved answers and click Generate to rebuild the website.');
+  } catch (e) {
+    hideLoadingScreen();
+    toast('Could not load project: ' + (e.message || e), 5000);
+    setTimeout(() => document.getElementById('idea').focus(), 100);
+  }
+}
 
 // ============================================================================
 // STEP NAVIGATION
@@ -469,9 +531,14 @@ function renderReview() {
   const finalName = STATE.project_name || STATE.ai_name || 'Untitled project';
   STATE.slug = claySlugify(finalName);
 
-  const brandSection = STATE.logo
-    ? `<dt>Logo</dt><dd>Uploaded — ${escapeHtml(STATE.logo.file.name)}. Colors extracted: ${(STATE.logo.info?.colors || []).join(', ')}</dd>`
-    : `<dt>Palette</dt><dd>${escapeHtml(STATE.palette?.name || '')} — ${(STATE.palette?.colors || []).join(', ')}</dd>`;
+  let brandSection;
+  if (STATE.logo) {
+    brandSection = `<dt>Logo</dt><dd>Uploaded — ${escapeHtml(STATE.logo.file.name)}. Colors extracted: ${(STATE.logo.info?.colors || []).join(', ')}</dd>`;
+  } else if (STATE.palette && STATE.palette.name) {
+    brandSection = `<dt>Palette</dt><dd>${escapeHtml(STATE.palette.name)} — ${(STATE.palette.colors || []).join(', ')}</dd>`;
+  } else {
+    brandSection = `<dt>Brand</dt><dd><em style="color:var(--grey-500);">Not set — click Edit to choose a palette or upload a logo.</em></dd>`;
+  }
 
   container.innerHTML = `
     <div class="review-section">
@@ -528,32 +595,48 @@ async function generate() {
     if (!user) throw new Error('Not authenticated. Please sign in again.');
 
     // ---- 1. Ensure project row exists in DB (silent — no stage update) ----
-    const { data: existing } = await supabase
-      .from('projects')
-      .select('id')
-      .eq('slug', STATE.slug)
-      .maybeSingle();
-
+    // If we're reusing an existing project (STATE.project_id is set), update it.
+    // Otherwise, check by slug and insert if new.
     let projectId;
-    if (existing?.id) {
-      projectId = existing.id;
-      await supabase.from('projects').update({
+    if (STATE.project_id) {
+      // Reusing an existing project — just update it
+      projectId = STATE.project_id;
+      const { error: updErr } = await supabase.from('projects').update({
         name: finalName,
+        slug: STATE.slug,
         business_idea: STATE.business_idea,
         questionnaire: { answers: STATE.answers, questions: STATE.questions },
         status: 'draft',
       }).eq('id', projectId);
+      if (updErr) throw updErr;
     } else {
-      const { data: proj, error } = await supabase.from('projects').insert({
-        name: finalName,
-        slug: STATE.slug,
-        owner_id: user.id,
-        business_idea: STATE.business_idea,
-        questionnaire: { answers: STATE.answers, questions: STATE.questions },
-        status: 'draft',
-      }).select('id').single();
-      if (error) throw error;
-      projectId = proj.id;
+      // New project — check if slug exists first
+      const { data: existing } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('slug', STATE.slug)
+        .maybeSingle();
+
+      if (existing?.id) {
+        projectId = existing.id;
+        await supabase.from('projects').update({
+          name: finalName,
+          business_idea: STATE.business_idea,
+          questionnaire: { answers: STATE.answers, questions: STATE.questions },
+          status: 'draft',
+        }).eq('id', projectId);
+      } else {
+        const { data: proj, error } = await supabase.from('projects').insert({
+          name: finalName,
+          slug: STATE.slug,
+          owner_id: user.id,
+          business_idea: STATE.business_idea,
+          questionnaire: { answers: STATE.answers, questions: STATE.questions },
+          status: 'draft',
+        }).select('id').single();
+        if (error) throw error;
+        projectId = proj.id;
+      }
     }
     STATE.project_id = projectId;
 
