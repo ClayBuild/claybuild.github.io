@@ -82,21 +82,52 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("OPENROUTER_API_KEY");
     if (!apiKey) return errorJson("OPENROUTER_API_KEY secret not set.", 500);
 
-    const raw = await callOpenRouter(
-      apiKey,
-      "openai/gpt-oss-120b:free",
-      [
-        { role: "system", content: DESIGN_DOC_SYSTEM_PROMPT },
-        { role: "user",   content: USER_TEMPLATE(ctx) },
-      ],
-      { temperature: 0.6, max_tokens: 6000 }
-    );
+    const messages = [
+      { role: "system", content: DESIGN_DOC_SYSTEM_PROMPT },
+      { role: "user",   content: USER_TEMPLATE(ctx) },
+    ];
 
-    const parsed = extractJSON<{ design_doc: string; generation_prompt: string }>(raw);
-    if (!parsed.design_doc || !parsed.generation_prompt) {
-      return errorJson("Model response missing required fields.", 502);
+    let lastError = "";
+    for (let attempt = 0; attempt < 3; attempt++) {
+      let raw: string;
+      try {
+        raw = await callOpenRouter(apiKey, "openai/gpt-oss-120b:free", messages, {
+          temperature: attempt === 0 ? 0.6 : 0.4,
+          max_tokens: 8000,
+        });
+      } catch (e) {
+        lastError = String(e?.message || e);
+        console.warn(`[ai-design-doc] Attempt ${attempt + 1} API error: ${lastError}`);
+        if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+        continue;
+      }
+
+      if (!raw || !raw.trim()) {
+        lastError = "Empty response from model.";
+        if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+        continue;
+      }
+
+      try {
+        const parsed = extractJSON<{ design_doc: string; generation_prompt: string }>(raw);
+        if (!parsed.design_doc || !parsed.generation_prompt) {
+          lastError = "Model response missing required fields (design_doc or generation_prompt).";
+          if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
+          continue;
+        }
+        return json(parsed);
+      } catch (parseErr) {
+        lastError = String(parseErr?.message || parseErr);
+        console.warn(`[ai-design-doc] Attempt ${attempt + 1} parse error: ${lastError}`);
+        if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
+        continue;
+      }
     }
-    return json(parsed);
+
+    return errorJson(
+      "Could not generate the design document after 3 attempts. This is usually rate-limiting on the free tier — wait 10 seconds and try again. Last error: " + lastError,
+      502
+    );
   } catch (e) {
     return errorJson(String(e?.message || e), 500);
   }

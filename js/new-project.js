@@ -478,7 +478,6 @@ function renderReview() {
       <div class="head"><h4>Identity</h4><a href="#" data-edit="2">Edit</a></div>
       <dl>
         <dt>Name</dt><dd>${escapeHtml(finalName)}</dd>
-        <dt>Slug</dt><dd class="mono">${escapeHtml(STATE.slug)}</dd>
         <dt>Idea</dt><dd>${escapeHtml(STATE.business_idea)}</dd>
       </dl>
     </div>
@@ -617,10 +616,40 @@ async function generate() {
     }, 800);
 
   } catch (e) {
-    genScreen.classList.remove('show');
-    document.body.style.overflow = '';
-    toast('Generation failed: ' + (e.message || e), 8000);
-    console.error(e);
+    console.error('Generation failed:', e);
+    // Show the error ON the generating screen (don't just close it — the user
+    // needs to know what went wrong and have a way to retry).
+    const errMsg = e.message || String(e);
+    document.getElementById('gen-title').textContent = 'Generation failed';
+    document.getElementById('gen-sub').innerHTML =
+      '<span style="color:#DC2626; font-weight:500;">' + escapeHtml(errMsg) + '</span><br><br>' +
+      'If this is a rate-limit error, wait 10 seconds and try again. ' +
+      'Your project has been saved — you can retry generation without losing your answers.';
+    document.querySelector('.generating-screen .icon-wrap').innerHTML =
+      '<div style="width:48px; height:48px; border-radius:50%; background:#FEF2F2; color:#DC2626; display:flex; align-items:center; justify-content:center; font-size:1.5rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>';
+    document.getElementById('gen-steps').style.display = 'none';
+    // Add retry button
+    const actionsDiv = document.createElement('div');
+    actionsDiv.style.cssText = 'display:flex; gap:0.5rem; justify-content:center; margin-top:1rem;';
+    actionsDiv.innerHTML =
+      '<button class="btn" id="gen-retry"><i class="fa-solid fa-rotate"></i> Try again</button>' +
+      '<button class="btn btn-ghost" id="gen-back">Back to review</button>';
+    genScreen.appendChild(actionsDiv);
+    document.getElementById('gen-retry').addEventListener('click', () => {
+      // Reset the screen and retry
+      document.querySelector('.generating-screen .icon-wrap').innerHTML = '<div class="spinner"></div>';
+      document.getElementById('gen-steps').style.display = '';
+      actionsDiv.remove();
+      generate();
+    });
+    document.getElementById('gen-back').addEventListener('click', () => {
+      genScreen.classList.remove('show');
+      document.body.style.overflow = '';
+      actionsDiv.remove();
+      // Reset icon for next time
+      document.querySelector('.generating-screen .icon-wrap').innerHTML = '<div class="spinner"></div>';
+      document.getElementById('gen-steps').style.display = '';
+    });
   }
 }
 
