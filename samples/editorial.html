@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editorial — Clay Design Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --ink:#1a1a1a; --paper:#faf8f3; --accent:#8b1e3f; --muted:#6b6b6b; --rule:#d4d0c4; }
+body { font-family:'Source Serif Pro',Georgia,serif; background:var(--paper); color:var(--ink); line-height:1.65; }
+.tag { position:fixed; top:14px; right:14px; background:var(--ink); color:var(--paper); padding:6px 14px; font-size:11px; letter-spacing:0.2em; z-index:99; font-family:'Inter',sans-serif; }
+.masthead { border-bottom:3px double var(--ink); padding:1.5rem 3rem 0.75rem; display:flex; justify-content:space-between; align-items:flex-end; font-family:'Inter',sans-serif; }
+.masthead .vol { font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+.masthead .title { font-family:'Playfair Display',serif; font-size:2.5rem; font-weight:900; letter-spacing:-0.02em; }
+.masthead .title em { font-style:italic; color:var(--accent); }
+.masthead .date { font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); text-align:right; }
+.subnav { padding:0.5rem 3rem; border-bottom:1px solid var(--rule); display:flex; gap:1.5rem; justify-content:center; font-family:'Inter',sans-serif; font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; }
+.subnav a { color:var(--muted); text-decoration:none; }
+.subnav a:hover { color:var(--accent); }
+.lede-row { padding:2.5rem 3rem; display:grid; grid-template-columns:2fr 1fr; gap:3rem; border-bottom:1px solid var(--rule); }
+.lede-row .kicker { font-family:'Inter',sans-serif; font-size:0.7rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--accent); margin-bottom:0.75rem; }
+.lede-row h1 { font-family:'Playfair Display',serif; font-size:3.25rem; font-weight:700; line-height:1.05; letter-spacing:-0.015em; margin-bottom:1rem; }
+.lede-row h1 em { font-style:italic; }
+.lede-row .dek { font-size:1.15rem; font-style:italic; color:var(--muted); max-width:600px; }
+.lede-row .meta { font-family:'Inter',sans-serif; font-size:0.75rem; color:var(--muted); border-left:2px solid var(--accent); padding-left:1rem; }
+.lede-row .meta strong { display:block; color:var(--ink); font-size:0.85rem; margin-bottom:0.25rem; }
+.article { padding:3rem; max-width:780px; margin:0 auto; }
+.article p { margin-bottom:1.25rem; font-size:1.05rem; }
+.article p:first-of-type::first-letter { font-family:'Playfair Display',serif; font-size:4.5rem; font-weight:900; float:left; line-height:0.9; padding:0.3rem 0.5rem 0 0; color:var(--accent); }
+.article blockquote { margin:2rem 0; padding:0 0 0 2rem; border-left:3px solid var(--accent); font-family:'Playfair Display',serif; font-style:italic; font-size:1.6rem; line-height:1.3; }
+.pullquote-grid { padding:3rem; display:grid; grid-template-columns:1fr 1fr; gap:2.5rem; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); background:#fff; }
+.pullquote-grid .item .cat { font-family:'Inter',sans-serif; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:0.5rem; }
+.pullquote-grid .item h3 { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; line-height:1.2; margin-bottom:0.5rem; }
+.pullquote-grid .item p { font-size:0.95rem; color:var(--muted); }
+.tail { padding:3rem; text-align:center; }
+.tail .rule { display:inline-block; width:40px; height:1px; background:var(--ink); margin:0 8px; vertical-align:middle; }
+.tail .end { font-family:'Inter',sans-serif; font-size:0.7rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--muted); }
+footer { padding:1.5rem 3rem; border-top:3px double var(--ink); display:flex; justify-content:space-between; font-family:'Inter',sans-serif; font-size:0.75rem; color:var(--muted); }
+@media (max-width:900px) {
+  .masthead,.subnav,.lede-row,.article,.pullquote-grid,.tail,footer { padding-left:1.5rem; padding-right:1.5rem; }
+  .lede-row { grid-template-columns:1fr; }
+  .pullquote-grid { grid-template-columns:1fr; }
+  .lede-row h1 { font-size:2rem; }
+  .subnav { flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+<div class="tag">EDITORIAL</div>
+<div class="masthead">
+  <div class="vol">Vol. XII · Issue 04</div>
+  <div class="title">The <em>Quarterly</em></div>
+  <div class="date">Winter 2026<br>— A Journal of Design</div>
+</div>
+<div class="subnav">
+  <a href="#">Essays</a><a href="#">Interviews</a><a href="#">Reviews</a><a href="#">Letters</a><a href="#">Archive</a>
+</div>
+<section class="lede-row">
+  <div>
+    <div class="kicker">— Feature · The Craft Issue</div>
+    <h1>On the quiet<br>power of <em>restraint</em>.</h1>
+    <div class="dek">In an age that rewards noise, the most radical act a designer can perform is to remove — not add. A meditation on what we choose to leave out.</div>
+  </div>
+  <div class="meta">
+    <strong>By Eleanor Vance</strong>
+    Senior Editor<br>
+    Photographs by Hiro Tanaka<br>
+    12 min read · Dec 14, 2026
+  </div>
+</section>
+<article class="article">
+  <p>There is a particular kind of confidence that comes from subtraction. You see it in the architecture of Carlo Scarpa, in the late typography of Massimo Vignelli, in a Hemingway sentence that ends before you expect it to. Each of these makers understood that the empty space is not the absence of design — it <em>is</em> the design.</p>
+  <blockquote>The blank page is not your enemy. It is the most honest collaborator you will ever have.</blockquote>
+  <p>We are trained, almost from childhood, to fill. To add another section, another button, another color, another feature. More, we assume, is more. But the editors of this journal have spent a decade arguing the opposite: that the work arrives only when you stop defending it. That restraint is not minimalism — minimalism is a style. Restraint is a discipline.</p>
+  <p>What follows, across the next forty pages, is a collection of designers, writers, and architects who have made careers out of saying less. Their work, gathered here, is not a manifesto. It is an argument by example.</p>
+</article>
+<section class="pullquote-grid">
+  <div class="item">
+    <div class="cat">— Essay</div>
+    <h3>The architecture of attention</h3>
+    <p>How museums learned to design emptiness as carefully as they design walls.</p>
+  </div>
+  <div class="item">
+    <div class="cat">— Interview</div>
+    <h3>A conversation with Iris Tanaka</h3>
+    <p>The book designer on why she spends three weeks choosing a single typeface.</p>
+  </div>
+</section>
+<section class="tail">
+  <span class="rule"></span><span class="end">— End of Feature —</span><span class="rule"></span>
+</section>
+<footer><span>© 2026 The Quarterly</span><span>Printed with care · Built with Clay</span></footer>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# This file tells GitHub Pages to NOT process the repo with Jekyll.
+# Critical: without this, files/folders starting with underscores (e.g. /supabase/functions/_shared/)
+# would be silently dropped by Jekyll and break Edge Function imports.

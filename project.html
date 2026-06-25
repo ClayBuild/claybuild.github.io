@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project — Clay</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="./css/main.css">
+<style>
+  .proj-header { padding: 1.5rem 0; border-bottom: 1px solid var(--rule); }
+  .proj-header .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+  .proj-header h1 { font-size: 1.9rem; margin-bottom: 0.25rem; }
+  .proj-header .meta { display: flex; gap: 1.5rem; font-size: 0.82rem; color: var(--ink-3); margin-top: 0.5rem; flex-wrap: wrap; }
+  .proj-header .meta .item { display: flex; align-items: center; gap: 0.4rem; }
+  .proj-header .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  .preview-wrap { border: 1px solid var(--rule-strong); border-radius: var(--radius-lg); overflow: hidden; background: #fff; box-shadow: var(--shadow); }
+  .preview-wrap .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.85rem; background: var(--paper-2); border-bottom: 1px solid var(--rule); }
+  .preview-wrap .toolbar .dots { display: flex; gap: 0.35rem; }
+  .preview-wrap .toolbar .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--rule); }
+  .preview-wrap .toolbar .url { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--ink-3); }
+  .preview-wrap iframe { width: 100%; height: 70vh; border: 0; display: block; background: #fff; min-height: 500px; }
+
+  .sidebar-card { background: #fff; border: 1px solid var(--rule); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .sidebar-card h4 { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.75rem; font-weight: 600; }
+  .sidebar-card .kv { display: flex; justify-content: space-between; padding: 0.45rem 0; font-size: 0.85rem; border-bottom: 1px dashed var(--rule); }
+  .sidebar-card .kv:last-child { border-bottom: 0; }
+  .sidebar-card .kv .k { color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+  .sidebar-card .kv .v { font-weight: 500; }
+
+  .publish-card { background: var(--ink); color: var(--paper); border-radius: var(--radius-lg); padding: 1.5rem; }
+  .publish-card h4 { color: var(--paper); font-size: 1.1rem; margin-bottom: 0.4rem; text-transform: none; letter-spacing: -0.01em; }
+  .publish-card p { color: #c8c4b5; font-size: 0.85rem; margin-bottom: 1rem; }
+  .publish-card .btn { background: var(--paper); color: var(--ink); border-color: var(--paper); width: 100%; justify-content: center; }
+  .publish-card .btn:hover { background: #fff; }
+  .publish-card .published-url { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius); padding: 0.85rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; word-break: break-all; margin-top: 0.75rem; }
+  .publish-card .published-url a { color: var(--paper); text-decoration: underline; text-underline-offset: 2px; }
+
+  .deploy-progress { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #c8c4b5; margin-top: 0.75rem; }
+  .deploy-progress .line { padding: 0.2rem 0; display: flex; align-items: center; gap: 0.5rem; }
+  .deploy-progress .line .dot { width: 8px; height: 8px; border-radius: 50%; background: #6b685d; flex-shrink: 0; }
+  .deploy-progress .line.active .dot { background: var(--paper); animation: pulse 1.2s infinite; }
+  .deploy-progress .line.done .dot { background: #7eb87e; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .file-browser { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+  .file-browser .file { padding: 0.5rem 0.65rem; cursor: pointer; border-radius: var(--radius); display: flex; align-items: center; gap: 0.5rem; }
+  .file-browser .file:hover { background: var(--paper-2); }
+  .file-browser .file.active { background: var(--ink); color: var(--paper); }
+  .file-browser .file i { width: 14px; }
+
+  .code-viewer { background: #1a1a17; color: #e8e5db; border-radius: var(--radius); padding: 1rem; overflow: auto; max-height: 460px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.6; white-space: pre; }
+  .code-viewer::-webkit-scrollbar { width: 8px; height: 8px; }
+  .code-viewer::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+  .info-banner { background: #f5f7fb; border: 1px solid #c9d4e8; border-radius: var(--radius); padding: 0.85rem 1rem; font-size: 0.85rem; color: #1c2e5e; margin-top: 1rem; }
+  .info-banner i { margin-right: 0.4rem; }
+  .info-banner.warn { background: #fdf8ec; border-color: #e8d79c; color: #6b540d; }
+
+  .hard-refresh-note { font-size: 0.78rem; color: var(--ink-3); margin-top: 0.5rem; line-height: 1.5; }
+  .hard-refresh-note kbd { background: var(--paper-3); border: 1px solid var(--rule); border-radius: 3px; padding: 1px 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="./index.html" class="brand"><span class="mark"></span> Clay <span class="sub">/ build</span></a>
+    <nav>
+      <a href="./dashboard.html"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container" id="root" style="padding: 1.5rem 1.5rem 4rem;">
+
+  <div id="loading" style="padding:5rem 0; text-align:center;">
+    <div class="spinner spinner-lg" style="margin:0 auto;"></div>
+    <div style="margin-top:1rem; color:var(--ink-3); font-size:0.85rem;">Loading your project…</div>
+  </div>
+
+  <div id="content" class="hidden">
+
+    <section class="proj-header">
+      <div class="row1">
+        <div>
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.4rem;">
+            <span class="stamp" id="slug-stamp">slug</span>
+            <span class="status-pill draft" id="status-pill">DRAFT</span>
+          </div>
+          <h1 id="proj-name">Project name</h1>
+          <p class="text-muted" id="proj-idea" style="margin-top:0.25rem; max-width:600px;"></p>
+          <div class="meta">
+            <span class="item"><i class="fa-regular fa-clock"></i> Created <span id="created-at">—</span></span>
+            <span class="item"><i class="fa-regular fa-clock"></i> Updated <span id="updated-at">—</span></span>
+            <span class="item"><i class="fa-regular fa-file-code"></i> <span id="file-count">0</span> files</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost" id="regenerate-btn"><i class="fa-solid fa-rotate"></i> Regenerate</button>
+          <button class="btn" id="publish-btn"><i class="fa-solid fa-rocket"></i> Publish</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="proj-view-grid">
+      <!-- LEFT: PREVIEW -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+          <span class="kicker" style="margin:0;">— Live preview</span>
+          <div style="display:flex; gap:0.4rem;">
+            <button class="btn btn-ghost btn-sm" id="refresh-preview"><i class="fa-solid fa-rotate"></i></button>
+            <button class="btn btn-ghost btn-sm" id="fullscreen-preview"><i class="fa-solid fa-expand"></i> Fullscreen</button>
+          </div>
+        </div>
+        <div class="preview-wrap">
+          <div class="toolbar">
+            <div class="dots"><span></span><span></span><span></span></div>
+            <div class="url" id="preview-url">preview</div>
+            <div style="width:48px;"></div>
+          </div>
+          <iframe id="preview-iframe" src="about:blank"></iframe>
+        </div>
+
+        <div style="margin-top:2rem;">
+          <span class="kicker">— Files</span>
+          <div style="display:grid; grid-template-columns: 200px 1fr; gap:1rem; margin-top:0.75rem;">
+            <div class="file-browser" id="file-browser"></div>
+            <div class="code-viewer" id="code-viewer">Select a file</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: SIDEBAR -->
+      <aside>
+        <div class="publish-card" id="publish-card">
+          <h4 id="publish-title">Ready to publish?</h4>
+          <p id="publish-desc">Your website will be live at a URL like claybuild.github.io/your-project/ in about 60 seconds.</p>
+          <button class="btn" id="publish-btn-2"><i class="fa-solid fa-rocket"></i> Publish now</button>
+          <div id="publish-detail"></div>
+        </div>
+
+        <div class="sidebar-card" id="design-card">
+          <h4>Design</h4>
+          <div class="kv"><span class="k">Style</span><span class="v" id="kv-style">—</span></div>
+          <div class="kv"><span class="k">Palette</span><span class="v" id="kv-palette">—</span></div>
+          <div class="kv"><span class="k">Logo</span><span class="v" id="kv-logo">—</span></div>
+        </div>
+
+        <div class="sidebar-card" id="qa-card">
+          <h4>Questionnaire</h4>
+          <div id="qa-list"></div>
+        </div>
+
+        <div class="sidebar-card" id="deploy-history-card" style="display:none;">
+          <h4>Deployment history</h4>
+          <div id="deploy-history"></div>
+        </div>
+      </aside>
+    </div>
+
+  </div>
+</div>
+
+<!-- PUBLISH MODAL -->
+<div class="modal-host" id="publish-modal">
+  <div class="modal" style="max-width:520px;">
+    <h3>Publish your website</h3>
+    <p class="modal-sub">Choose your URL. This is where your site will live.</p>
+
+    <div class="field">
+      <label>Website URL</label>
+      <div class="input-group">
+        <span style="display:flex; align-items:center; padding:0 0.85rem; background:var(--paper-2); border-right:1px solid var(--rule); font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--ink-3);">claybuild.github.io/</span>
+        <input class="input" id="publish-slug" type="text" placeholder="your-project">
+      </div>
+      <div class="field-hint" id="slug-status">Lowercase letters, numbers, and hyphens. 2–40 characters.</div>
+    </div>
+
+    <div id="publish-modal-error" class="alert alert-error hidden" style="margin-bottom:1rem;"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="publish-cancel">Cancel</button>
+      <button class="btn" id="publish-confirm"><i class="fa-solid fa-rocket"></i> Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEPLOYMENT PROGRESS MODAL -->
+<div class="modal-host" id="deploy-modal">
+  <div class="modal" style="max-width:480px; text-align:center;">
+    <div style="margin:0 auto 1rem; width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+      <div class="spinner spinner-lg"></div>
+    </div>
+    <h3 id="deploy-title">Deploying your website…</h3>
+    <p class="modal-sub" id="deploy-sub" style="text-align:center;">This usually takes 45–60 seconds. Your site will appear at the URL below.</p>
+
+    <div style="background:var(--paper-2); border:1px solid var(--rule); border-radius:var(--radius); padding:0.85rem; font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--ink-2); margin:1rem 0;" id="deploy-url">—</div>
+
+    <div class="deploy-progress" id="deploy-progress" style="text-align:left;">
+      <div class="line active" data-stage="push"><span class="dot"></span>Pushing files to GitHub</div>
+      <div class="line" data-stage="build"><span class="dot"></span>Triggering Pages build</div>
+      <div class="line" data-stage="ready"><span class="dot"></span>Waiting for deployment to go live</div>
+    </div>
+
+    <div id="deploy-success" class="hidden" style="margin-top:1.25rem;">
+      <div class="alert alert-success">
+        <strong>Your site is live!</strong><br>
+        <a id="deploy-success-url" href="#" target="_blank" rel="noopener" style="color:#1c5e1c; text-decoration:underline;"></a>
+      </div>
+      <div class="hard-refresh-note">
+        <strong>First time opening the URL?</strong> If you see a 404, do a hard refresh:
+        <br>· <strong>Windows:</strong> <kbd>Ctrl</kbd> + <kbd>F5</kbd> or <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
+        <br>· <strong>Mac:</strong> <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
+      </div>
+    </div>
+
+    <div class="modal-actions" id="deploy-actions">
+      <button class="btn btn-ghost" id="deploy-cancel-bg">Continue in background</button>
+    </div>
+    <div class="modal-actions hidden" id="deploy-done-actions">
+      <button class="btn btn-ghost" id="deploy-close">Close</button>
+      <a class="btn" id="deploy-open" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./js/config.js"></script>
+<script src="./js/supabase.js"></script>
+<script src="./js/project.js"></script>
+</body>
+</html>

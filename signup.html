@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign up — Clay</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+
+<div class="auth-wrap">
+  <!-- LEFT ASIDE -->
+  <aside class="auth-aside">
+    <a href="./index.html" class="brand"><span class="mark" style="background:var(--paper)"></span> Clay <span class="sub" style="color:#a8a599">/ build</span></a>
+    <div class="quote">
+      "Clay felt less like using software and more like sitting with a <em>patient designer</em> who happened to write code."
+      <div style="margin-top:1.5rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.18em; color:#a8a599; text-transform:uppercase;">— A first-time founder, 2026</div>
+    </div>
+    <div class="meta">
+      DOSSIER · OPEN · 001 / 999
+    </div>
+  </aside>
+
+  <!-- RIGHT MAIN -->
+  <main class="auth-main">
+    <div class="auth-card">
+      <span class="kicker">— Create account</span>
+      <h1>Start building.</h1>
+      <p class="sub">No email verification. No credit card. Just answer a few questions and you're online.</p>
+
+      <div id="err" class="alert alert-error hidden" style="margin-bottom:1rem;"></div>
+
+      <form id="signup-form" autocomplete="on">
+        <div class="field">
+          <label for="name">Full name</label>
+          <input class="input" id="name" name="name" type="text" placeholder="Jamie Rivera" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="you@studio.com" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input class="input" id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required minlength="8">
+            <button type="button" class="pw-toggle" data-target="password" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+          </div>
+          <div class="field-hint">Min 8 characters. Mix in a number for safety.</div>
+        </div>
+        <div class="field">
+          <label for="confirm">Confirm password</label>
+          <div class="pw-wrap">
+            <input class="input" id="confirm" name="confirm" type="password" autocomplete="new-password" placeholder="Re-enter your password" required minlength="8">
+            <button type="button" class="pw-toggle" data-target="confirm" tabindex="-1"><i class="fa-regular fa-eye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-block btn-lg" id="submit-btn">
+          <span class="btn-label">Create account</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="alt">
+        Already have an account? <a href="./login.html">Sign in</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./js/config.js"></script>
+<script src="./js/supabase.js"></script>
+<script>
+(function () {
+  clayRedirectIfAuthed();
+
+  // Password visibility toggles
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      if (target.type === 'password') {
+        target.type = 'text';
+        btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
+      } else {
+        target.type = 'password';
+        btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
+      }
+    });
+  });
+
+  const form = document.getElementById('signup-form');
+  const err = document.getElementById('err');
+  const btn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.classList.add('hidden');
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm').value;
+
+    if (name.length < 2) return showError('Please enter your full name.');
+    if (password.length < 8) return showError('Password must be at least 8 characters.');
+    if (password !== confirm) return showError('Passwords do not match.');
+    if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+      // Soft requirement — we'll allow letters-only but warn
+    }
+
+    btn.disabled = true;
+    btn.querySelector('.btn-label').textContent = 'Creating…';
+    btn.querySelector('.spinner')?.remove();
+    btn.insertAdjacentHTML('afterbegin', '<span class="spinner"></span>');
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } },
+      });
+      if (error) throw error;
+      toast('Account created. Welcome to Clay.');
+      setTimeout(() => {
+        window.location.href = './dashboard.html';
+      }, 600);
+    } catch (e) {
+      showError(e.message || 'Sign-up failed. Please try again.');
+      btn.disabled = false;
+      btn.querySelector('.btn-label').textContent = 'Create account';
+      btn.querySelector('.spinner')?.remove();
+    }
+  });
+
+  function showError(msg) {
+    err.textContent = msg;
+    err.classList.remove('hidden');
+    err.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+})();
+</script>
+</body>
+</html>

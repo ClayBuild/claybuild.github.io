@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neumorphism — Clay Design Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#e0e5ec;
+  --shadow-dark:#a3b1c6;
+  --shadow-light:#ffffff;
+  --text:#4a5568;
+  --accent:#6e7f8f;
+}
+body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+.tag { position:fixed; top:14px; right:14px; background:var(--bg); color:var(--text); padding:6px 14px; font-size:11px; letter-spacing:0.1em; border-radius:8px; box-shadow:4px 4px 8px var(--shadow-dark),-4px -4px 8px var(--shadow-light); z-index:99; }
+.container { max-width:1100px; margin:0 auto; padding:2rem; }
+nav { display:flex; justify-content:space-between; align-items:center; padding:1.5rem 2rem; background:var(--bg); border-radius:20px; box-shadow:8px 8px 16px var(--shadow-dark),-8px -8px 16px var(--shadow-light); margin-bottom:3rem; }
+nav .brand { font-weight:600; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem; }
+nav .brand .icon { width:36px; height:36px; background:var(--bg); border-radius:10px; display:flex; align-items:center; justify-content:center; box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light); color:var(--accent); }
+nav .nav-links { display:flex; gap:0.5rem; }
+nav .nav-links a { padding:0.5rem 1rem; color:var(--text); text-decoration:none; font-size:0.85rem; border-radius:10px; transition:all .3s; }
+nav .nav-links a:hover { box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light); }
+nav .btn { padding:0.6rem 1.4rem; background:var(--bg); border-radius:12px; box-shadow:4px 4px 8px var(--shadow-dark),-4px -4px 8px var(--shadow-light); color:var(--accent); font-weight:500; cursor:pointer; font-size:0.85rem; border:none; font-family:inherit; }
+.hero { text-align:center; padding:4rem 2rem; }
+.hero h1 { font-size:3rem; font-weight:300; margin-bottom:1.5rem; letter-spacing:-0.02em; }
+.hero h1 b { font-weight:600; color:var(--accent); }
+.hero p { max-width:550px; margin:0 auto 2.5rem; font-size:1.05rem; font-weight:300; }
+.hero .cta-group { display:inline-flex; gap:1rem; background:var(--bg); padding:0.5rem; border-radius:18px; box-shadow:6px 6px 12px var(--shadow-dark),-6px -6px 12px var(--shadow-light); }
+.hero .cta-group a { padding:0.85rem 2rem; border-radius:14px; text-decoration:none; font-weight:500; font-size:0.9rem; color:var(--text); transition:all .3s; }
+.hero .cta-group a.primary { background:var(--bg); box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light); color:var(--accent); }
+.features { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; margin-top:3rem; }
+.card { background:var(--bg); border-radius:20px; padding:2rem; box-shadow:8px 8px 16px var(--shadow-dark),-8px -8px 16px var(--shadow-light); }
+.card .icon { width:60px; height:60px; border-radius:50%; background:var(--bg); display:flex; align-items:center; justify-content:center; box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light); color:var(--accent); font-size:1.4rem; margin-bottom:1.25rem; }
+.card h3 { font-weight:500; font-size:1.05rem; margin-bottom:0.5rem; color:var(--text); }
+.card p { font-size:0.85rem; font-weight:300; line-height:1.6; }
+.toggle-row { display:flex; justify-content:center; gap:2rem; margin-top:3rem; }
+.toggle { width:80px; height:40px; background:var(--bg); border-radius:20px; box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light); position:relative; cursor:pointer; }
+.toggle.on::after { transform:translateX(40px); background:var(--accent); }
+.toggle::after { content:''; position:absolute; top:4px; left:4px; width:32px; height:32px; background:var(--bg); border-radius:50%; box-shadow:2px 2px 4px var(--shadow-dark),-2px -2px 4px var(--shadow-light); transition:all .3s; }
+footer { text-align:center; padding:3rem 2rem; margin-top:3rem; font-size:0.85rem; font-weight:300; }
+@media (max-width:768px) {
+  .features { grid-template-columns:1fr; }
+  .hero h1 { font-size:2rem; }
+  nav .nav-links { display:none; }
+  .hero .cta-group { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+<div class="tag">Neumorphism</div>
+<div class="container">
+  <nav>
+    <div class="brand"><div class="icon"><i class="fas fa-circle"></i></div> software</div>
+    <div class="nav-links"><a href="#">Home</a><a href="#">Features</a><a href="#">Pricing</a><a href="#">Contact</a></div>
+    <button class="btn">Sign in</button>
+  </nav>
+  <section class="hero">
+    <h1>Interfaces that feel<br>like they belong <b>in your hand</b>.</h1>
+    <p>Soft shadows, gentle depth, and tactile elements that invite touch — design that feels physical without ever leaving the screen.</p>
+    <div class="cta-group">
+      <a href="#" class="primary">Get started</a>
+      <a href="#">Learn more</a>
+    </div>
+  </section>
+  <section class="features">
+    <div class="card"><div class="icon"><i class="fas fa-droplet"></i></div><h3>Soft depth</h3><p>Extruded and inset shadows create a sense of physical presence without harsh borders.</p></div>
+    <div class="card"><div class="icon"><i class="fas fa-hand-pointer"></i></div><h3>Tactile feedback</h3><p>Every element reacts to interaction — press, hover, focus — like a real button.</p></div>
+    <div class="card"><div class="icon"><i class="fas fa-circle-half-stroke"></i></div><h3>Monochrome harmony</h3><p>A single base color anchors the entire UI; shadows do the rest of the work.</p></div>
+  </section>
+  <div class="toggle-row">
+    <div class="toggle on" title="Notifications"></div>
+    <div class="toggle" title="Dark mode"></div>
+    <div class="toggle on" title="Auto-save"></div>
+  </div>
+  <footer>© 2026 software. Crafted with softness. Built with Clay.</footer>
+</div>
+</body>
+</html>

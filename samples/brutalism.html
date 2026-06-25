@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brutalism — Clay Design Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono',monospace; background:#fff; color:#000; }
+.tag { position:fixed; top:0; right:0; background:#000; color:#fff; padding:6px 14px; font-size:11px; letter-spacing:0.2em; z-index:99; }
+nav { border-bottom:4px solid #000; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; background:#fff; }
+.brand { font-family:'Archivo Black',sans-serif; font-size:1.5rem; letter-spacing:-0.02em; }
+.nav-links { display:flex; gap:1.5rem; }
+.nav-links a { color:#000; text-decoration:none; font-size:0.85rem; font-weight:700; text-transform:uppercase; border:2px solid #000; padding:6px 12px; }
+.nav-links a:hover { background:#000; color:#fff; }
+.hero { padding:5rem 2rem; border-bottom:4px solid #000; }
+.hero h1 { font-family:'Archivo Black',sans-serif; font-size:6rem; line-height:0.9; text-transform:uppercase; letter-spacing:-0.03em; }
+.hero h1 .accent { background:#000; color:#fff; padding:0 0.2em; }
+.hero p { font-size:1.1rem; max-width:600px; margin-top:2rem; line-height:1.4; }
+.hero .cta { display:inline-block; margin-top:2rem; background:#000; color:#fff; padding:1rem 2rem; font-weight:700; text-decoration:none; text-transform:uppercase; border:3px solid #000; }
+.hero .cta:hover { background:#fff; color:#000; }
+.strip { background:#000; color:#fff; padding:0.5rem 2rem; font-size:0.8rem; letter-spacing:0.3em; text-transform:uppercase; overflow:hidden; }
+.strip span { display:inline-block; animation:marquee 25s linear infinite; white-space:nowrap; }
+@keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.grid { display:grid; grid-template-columns:repeat(2,1fr); border-bottom:4px solid #000; }
+.grid > div { padding:3rem 2rem; border-right:4px solid #000; border-bottom:4px solid #000; }
+.grid > div:nth-child(2n) { border-right:none; }
+.grid > div:nth-last-child(-n+2) { border-bottom:none; }
+.grid .num { font-family:'Archivo Black',sans-serif; font-size:3rem; line-height:1; }
+.grid h3 { font-size:1.2rem; text-transform:uppercase; margin:1rem 0; }
+.grid p { font-size:0.9rem; line-height:1.5; }
+.banner { background:#000; color:#fff; padding:4rem 2rem; text-align:center; }
+.banner h2 { font-family:'Archivo Black',sans-serif; font-size:3rem; text-transform:uppercase; line-height:1; }
+.banner p { margin:1rem 0 2rem; font-size:1rem; }
+.banner a { display:inline-block; border:3px solid #fff; padding:1rem 2rem; color:#fff; text-decoration:none; text-transform:uppercase; font-weight:700; }
+.banner a:hover { background:#fff; color:#000; }
+footer { padding:2rem; display:flex; justify-content:space-between; font-size:0.8rem; text-transform:uppercase; }
+@media (max-width:768px) {
+  .hero h1 { font-size:3rem; }
+  .grid { grid-template-columns:1fr; }
+  .grid > div { border-right:none; }
+  .nav-links { display:none; }
+}
+</style>
+</head>
+<body>
+<div class="tag">BRUTALISM //</div>
+<nav>
+  <div class="brand">RAW//</div>
+  <div class="nav-links">
+    <a href="#">WORK</a><a href="#">INFO</a><a href="#">CONTACT</a>
+  </div>
+</nav>
+<section class="hero">
+  <h1>NO <span class="accent">BULLSHIT</span>.<br>JUST<br>DESIGN.</h1>
+  <p>// We make websites that hit you in the face. No soft gradients. No polite shadows. Type that screams. Layouts that don't ask permission.</p>
+  <a href="#" class="cta">ENTER →</a>
+</section>
+<div class="strip"><span>★ RAW HTML ★ NO FRAMEWORKS ★ NO TEMPLATES ★ PURE CSS ★ ZERO APOLOGIES ★ RAW HTML ★ NO FRAMEWORKS ★ NO TEMPLATES ★ PURE CSS ★ ZERO APOLOGIES ★&nbsp;</span></div>
+<section class="grid">
+  <div><div class="num">01</div><h3>// LOUD</h3><p>Big type. Bigger statements. We design for impact, not whisper.</p></div>
+  <div><div class="num">02</div><h3>// NAKED</h3><p>Exposed structure. Visible borders. The scaffolding IS the design.</p></div>
+  <div><div class="num">03</div><h3>// HONEST</h3><p>No skeuomorphism. No fake textures. What you see is what's there.</p></div>
+  <div><div class="num">04</div><h3>// UNFORGETTABLE</h3><p>You will remember this site. That's the entire point.</p></div>
+</section>
+<section class="banner">
+  <h2>READY?</h2>
+  <p>// Stop being polite. Start being heard.</p>
+  <a href="#">LET'S GO</a>
+</section>
+<footer><span>© 2026 RAW//</span><span>BUILT WITH CLAY</span></footer>
+</body>
+</html>

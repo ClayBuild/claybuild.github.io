@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swiss — Clay Design Preview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --red:#E63946; --black:#0A0A0A; --grey:#6B6B6B; --light:#F4F4F4; }
+body { font-family:'Inter',sans-serif; color:var(--black); background:#fff; }
+.tag { position:fixed; top:0; right:0; background:var(--red); color:#fff; padding:6px 14px; font-size:11px; letter-spacing:0.15em; z-index:99; font-weight:600; }
+.grid-bg { display:grid; grid-template-columns:repeat(12,1fr); max-width:1400px; margin:0 auto; padding:0 2rem; }
+nav { display:contents; }
+nav .brand { grid-column:1/4; padding:1.5rem 0; font-weight:700; font-size:1.1rem; letter-spacing:-0.02em; }
+nav .brand span { color:var(--red); }
+nav .nav-links { grid-column:5/11; padding:1.5rem 0; display:flex; gap:2rem; align-self:center; }
+nav .nav-links a { color:var(--black); text-decoration:none; font-size:0.85rem; font-weight:500; }
+nav .lang { grid-column:11/13; padding:1.5rem 0; text-align:right; font-size:0.8rem; color:var(--grey); align-self:center; }
+.divider { grid-column:1/13; height:1px; background:var(--black); }
+.hero { grid-column:1/13; padding:4rem 0 6rem; display:grid; grid-template-columns:repeat(12,1fr); gap:0; }
+.hero .num { grid-column:1/2; font-size:0.75rem; color:var(--red); font-weight:600; letter-spacing:0.1em; }
+.hero h1 { grid-column:2/12; font-size:5rem; font-weight:900; line-height:0.95; letter-spacing:-0.04em; }
+.hero h1 em { font-style:normal; color:var(--red); }
+.hero .meta { grid-column:2/6; margin-top:2rem; font-size:0.8rem; color:var(--grey); }
+.hero .lede { grid-column:7/12; margin-top:2rem; font-size:1.05rem; line-height:1.5; font-weight:400; }
+.features { grid-column:1/13; display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--black); }
+.feature { padding:2rem 1.5rem 2rem 0; border-right:1px solid var(--black); }
+.feature:last-child { border-right:none; padding-right:0; }
+.feature .ix { font-size:0.7rem; font-weight:600; color:var(--red); letter-spacing:0.15em; margin-bottom:0.75rem; }
+.feature h3 { font-size:1.3rem; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.5rem; }
+.feature p { font-size:0.9rem; color:var(--grey); line-height:1.5; }
+.banner { grid-column:1/13; background:var(--black); color:#fff; padding:5rem 0; margin-top:5rem; display:grid; grid-template-columns:repeat(12,1fr); }
+.banner h2 { grid-column:2/8; font-size:3.5rem; font-weight:900; line-height:1; letter-spacing:-0.03em; }
+.banner p { grid-column:2/8; margin-top:1rem; color:#aaa; }
+.banner .cta { grid-column:9/12; align-self:center; text-align:right; }
+.banner .cta a { color:#fff; text-decoration:none; font-weight:600; border-bottom:2px solid var(--red); padding-bottom:3px; font-size:0.9rem; }
+footer { grid-column:1/13; padding:2rem 0; border-top:1px solid var(--black); display:grid; grid-template-columns:repeat(12,1fr); font-size:0.75rem; color:var(--grey); }
+footer > div { padding:0; }
+footer .l { grid-column:1/5; }
+footer .c { grid-column:5/9; }
+footer .r { grid-column:9/13; text-align:right; }
+@media (max-width:900px) {
+  .hero h1 { font-size:2.5rem; }
+  .features { grid-template-columns:1fr; }
+  .feature { border-right:none; border-bottom:1px solid var(--black); padding:1.5rem 0; }
+  .hero .meta,.hero .lede { grid-column:2/12; }
+  .banner h2 { font-size:2rem; }
+  .banner .cta { grid-column:2/12; text-align:left; margin-top:1rem; }
+  nav .nav-links,nav .lang { display:none; }
+  nav .brand { grid-column:1/13; }
+}
+</style>
+</head>
+<body>
+<div class="tag">SWISS / GRID</div>
+<div class="grid-bg">
+  <nav>
+    <div class="brand">HELVETICA<span>.</span></div>
+    <div class="nav-links"><a href="#">Work</a><a href="#">Studio</a><a href="#">Journal</a><a href="#">Contact</a></div>
+    <div class="lang">EN / DE / FR</div>
+    <div class="divider"></div>
+  </nav>
+  <section class="hero">
+    <div class="num">— 01</div>
+    <h1>Grids are<br>not <em>limiting</em>.<br>They are<br>liberating.</h1>
+    <div class="meta">EST. 1957<br>ZÜRICH, CH</div>
+    <div class="lede">A design system built on mathematical rigour, where every element snaps to a 12-column grid and every typographic choice obeys a strict modular scale. The result: clarity at any size, on any device.</div>
+  </section>
+  <section class="features">
+    <div class="feature"><div class="ix">— A</div><h3>Modular Scale</h3><p>Typography sized by ratio, not feeling. 1.250 perfect fourth.</p></div>
+    <div class="feature"><div class="ix">— B</div><h3>12-Column Grid</h3><p>Every layout decision snaps to the same invisible scaffolding.</p></div>
+    <div class="feature"><div class="ix">— C</div><h3>Asymmetric Balance</h3><p>Visual weight distributed with intention, never by accident.</p></div>
+  </section>
+  <section class="banner">
+    <h2>Design is<br>problem-solving.</h2>
+    <p>Not decoration.</p>
+    <div class="cta"><a href="#">Read the manifesto →</a></div>
+  </section>
+  <footer>
+    <div class="l">© 2026 HELVETICA.</div>
+    <div class="c">ZÜRICH · TOKYO · NEW YORK</div>
+    <div class="r">BUILT WITH CLAY</div>
+  </footer>
+</div>
+</body>
+</html>

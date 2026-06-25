@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Clay</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="./index.html" class="brand"><span class="mark"></span> Clay <span class="sub">/ build</span></a>
+    <nav>
+      <a href="./dashboard.html" style="font-weight:600;">Dashboard</a>
+      <a href="#" id="sign-out"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+
+  <section class="dash-header">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <span class="kicker">— Dashboard</span>
+        <h1 style="margin-top:0.4rem;" id="welcome">Your projects</h1>
+        <p class="text-muted" id="welcome-sub" style="margin-top:0.3rem;">Pick up where you left off, or start something new.</p>
+      </div>
+      <a href="./new-project.html" class="btn btn-lg" id="new-project-btn">
+        <i class="fa-solid fa-plus"></i> New project
+      </a>
+    </div>
+  </section>
+
+  <div id="projects-area">
+    <!-- loading skeleton -->
+    <div class="dash-grid" id="skeleton">
+      <div class="proj-card" style="opacity:0.5;"><div class="name">Loading…</div><div class="desc">Fetching your projects</div></div>
+      <div class="proj-card" style="opacity:0.3;"><div class="name">Loading…</div><div class="desc">Fetching your projects</div></div>
+      <div class="proj-card" style="opacity:0.2;"><div class="name">Loading…</div><div class="desc">Fetching your projects</div></div>
+    </div>
+
+    <div class="empty-state hidden" id="empty">
+      <div class="icon"><i class="fa-regular fa-folder-open"></i></div>
+      <h3>No projects yet</h3>
+      <p>When you build your first website with Clay, it'll show up here. It takes about 2 minutes from idea to URL.</p>
+      <a href="./new-project.html" class="btn"><i class="fa-solid fa-plus"></i> Start your first project</a>
+    </div>
+
+    <div class="dash-grid hidden" id="grid"></div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <a href="./index.html" class="brand"><span class="mark"></span> Clay <span class="sub">/ build</span></a>
+    <div class="mono" style="font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);">© 2026 Clay</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./js/config.js"></script>
+<script src="./js/supabase.js"></script>
+<script>
+(async function () {
+  const session = await clayRequireAuth();
+  if (!session) return;
+
+  // Personalize header
+  const fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'there';
+  document.getElementById('welcome').textContent = `Welcome back, ${fullName.split(' ')[0]}.`;
+  document.getElementById('welcome-sub').textContent = 'Pick up where you left off, or start something new.';
+
+  // Sign out
+  document.getElementById('sign-out').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await claySignOut();
+  });
+
+  // Load projects
+  try {
+    const { data: projects, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('updated_at', { ascending: false });
+
+    document.getElementById('skeleton').classList.add('hidden');
+
+    if (error) throw error;
+
+    if (!projects || projects.length === 0) {
+      document.getElementById('empty').classList.remove('hidden');
+      return;
+    }
+
+    const grid = document.getElementById('grid');
+    grid.innerHTML = projects.map(p => renderCard(p)).join('');
+    grid.classList.remove('hidden');
+
+    grid.querySelectorAll('.proj-card').forEach(card => {
+      card.addEventListener('click', () => {
+        window.location.href = `./project.html?id=${card.dataset.id}`;
+      });
+    });
+  } catch (e) {
+    document.getElementById('skeleton').classList.add('hidden');
+    toast('Could not load projects: ' + (e.message || e), 5000);
+  }
+
+  function renderCard(p) {
+    const idea = p.business_idea || 'No description provided';
+    const ideaShort = idea.length > 80 ? idea.slice(0, 80) + '…' : idea;
+    const status = p.status || 'draft';
+    const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+    const updatedAt = clayTimeAgo(p.updated_at || p.created_at);
+
+    let url = '';
+    if (p.published_url) {
+      url = `<div style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); margin-top:0.25rem; word-break:break-all;">${p.published_url.replace(/^https?:\/\//, '')}</div>`;
+    }
+
+    return `
+      <div class="proj-card" data-id="${p.id}">
+        <div class="meta-row">
+          <span class="stamp">${(p.slug || 'no-slug').slice(0, 18)}</span>
+          <span class="status-pill ${status}">${statusLabel}</span>
+        </div>
+        <div class="name">${escapeHtml(p.name || 'Untitled')}</div>
+        <div class="desc">${escapeHtml(ideaShort)}</div>
+        ${url}
+        <div class="footer-row">
+          <span><i class="fa-regular fa-clock"></i> ${updatedAt}</span>
+          <span>Open <i class="fa-solid fa-arrow-right" style="font-size:0.7rem;"></i></span>
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+})();
+</script>
+</body>
+</html>
