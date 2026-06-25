@@ -14,7 +14,14 @@ The JSON object MUST have AT LEAST these keys:
   "styles.css"
   "script.js"
 
-CRITICAL TECHNICAL REQUIREMENTS (apply to every site you generate):
+CRITICAL CONTENT RULES:
+1. ALL text content must accurately reflect the user's business as described in the brief. Read the business idea carefully and use it as the sole source of truth for what the business does.
+2. Do NOT invent services, products, or features the user did not mention. If the user teaches "AI tools for web development", the content must say "AI tools for web development" — NOT "Python, JavaScript, and Web Development" unless those were explicitly mentioned.
+3. Do NOT include joke content, memes, rickrolls, or any non-professional placeholder. All video/image placeholders must use a neutral gray box or a descriptive label — NEVER a real video URL (especially not YouTube rickrolls).
+4. If you need placeholder images, use a plain colored div with CSS or describe what image should go there in a comment. Do NOT use external image URLs.
+5. Social media links: only include the platforms the user explicitly requested. Use href="#" for all social links (they are placeholders). Do NOT embed any YouTube videos unless the user explicitly asked for a video section.
+
+CRITICAL TECHNICAL REQUIREMENTS:
 1. The site will be deployed at a SUBPATH (e.g. claybuild.github.io/my-project/). Therefore every internal reference MUST be relative:
    - <link rel="stylesheet" href="./styles.css">
    - <script src="./script.js" defer></script>

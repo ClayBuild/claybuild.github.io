@@ -32,6 +32,8 @@ CRITICAL RULES for the generation prompt:
 - It must include the chosen color palette as exact hex codes.
 - It must include the chosen design style and its core principles.
 - It must list every section the user wants, in order.
+- CRITICAL: The generation prompt MUST instruct the code model to use the EXACT business description from the brief. It must say: "All website copy must accurately reflect the user's business. Do not invent services or features not mentioned in the brief. Do not include joke content, memes, or unprofessional placeholders."
+- The generation prompt must include the original business idea verbatim so the code model has the source of truth.
 
 CRITICAL RULES for the design doc:
 - Real markdown, with # / ## / ### headings.

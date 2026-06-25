@@ -200,6 +200,41 @@ var palette = {
   accent:   params.get('accent')   || '#ff6b35',
   text:     params.get('text')     || '#1a1a1a',
 };
+
+// Contrast check: ensure text is readable on bg, and accent is readable on bg.
+// If the contrast is too low, swap to a sensible fallback.
+function luminance(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex.split('').map(function(c){return c+c;}).join('');
+  var r = parseInt(hex.substr(0,2),16)/255;
+  var g = parseInt(hex.substr(2,2),16)/255;
+  var b = parseInt(hex.substr(4,2),16)/255;
+  return 0.2126*r + 0.7152*g + 0.0722*b;
+}
+function contrastRatio(c1, c2) {
+  var l1 = luminance(c1), l2 = luminance(c2);
+  var lighter = Math.max(l1,l2), darker = Math.min(l1,l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+// If text contrast against bg is too low, flip text to black or white
+var bgLum = luminance(palette.bg);
+var textContrast = contrastRatio(palette.text, palette.bg);
+if (textContrast < 3) {
+  // Pick black or white text based on bg luminance
+  palette.text = bgLum > 0.5 ? '#000000' : '#FFFFFF';
+}
+// Same for accent against bg (accent is used for buttons/links on bg)
+var accentContrast = contrastRatio(palette.accent, palette.bg);
+if (accentContrast < 2.5) {
+  palette.accent = bgLum > 0.5 ? '#333333' : '#CCCCCC';
+}
+// Same for primary against bg (primary is used for headings on bg)
+var primaryContrast = contrastRatio(palette.primary, palette.bg);
+if (primaryContrast < 3) {
+  palette.primary = bgLum > 0.5 ? '#000000' : '#FFFFFF';
+}
+
 var root = document.documentElement.style;
 root.setProperty('--bg', palette.bg);
 root.setProperty('--primary', palette.primary);

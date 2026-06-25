@@ -143,24 +143,40 @@ function renderSidebar() {
   const answers = q.answers || {};
   const questions = q.questions || [];
 
-  // Try to find design style and palette
-  let style = '—', palette = '—', logo = '—';
-  if (PROJECT.design_doc) {
-    const styleMatch = PROJECT.design_doc.match(/design style[:\s]+([a-z]+)/i);
+  // Design style: check the enriched questionnaire field first, then fall back to answers
+  let style = q.design_style || '—';
+  let palette = '—', logo = '—';
+
+  // Palette: check the enriched questionnaire field
+  if (q.palette && q.palette.name) {
+    palette = q.palette.name;
+    if (q.palette.colors && q.palette.colors.length) {
+      palette += ' (' + q.palette.colors.join(', ') + ')';
+    }
+  }
+
+  // Fallback: look in answers for style
+  if (style === '—') {
+    Object.keys(answers).forEach(k => {
+      const v = answers[k];
+      if (typeof v === 'string') {
+        if (['minimalism','brutalism','swiss','neumorphism','editorial','glassmorphism','art-deco','corporate','playful','organic'].includes(v.toLowerCase())) {
+          style = v;
+        }
+      }
+    });
+  }
+
+  // Fallback: try to extract style from design_doc
+  if (style === '—' && PROJECT.design_doc) {
+    const styleMatch = PROJECT.design_doc.match(/design style[:\s]+([a-z-]+)/i);
     if (styleMatch) style = styleMatch[1];
   }
-  // Look in answers
-  Object.keys(answers).forEach(k => {
-    const v = answers[k];
-    if (typeof v === 'string') {
-      if (['minimalism','brutalism','swiss','neumorphism','editorial','glassmorphism','art-deco','corporate','playful','organic'].includes(v.toLowerCase())) {
-        style = v;
-      }
-    }
-  });
 
   if (PROJECT.logo_path) {
     logo = `<a href="#" id="view-logo"><i class="fa-regular fa-image"></i> View logo</a>`;
+  } else if (q.logo_info) {
+    logo = 'Uploaded (analyzed)';
   } else {
     logo = 'None uploaded';
   }
@@ -174,9 +190,13 @@ function renderSidebar() {
   if (questions.length === 0) {
     qaList.innerHTML = '<div style="font-size:0.85rem; color:var(--ink-3);">No questionnaire data.</div>';
   } else {
-    qaList.innerHTML = questions.map(q => `
-      <div class="kv"><span class="k">${escapeHtml(q.id)}</span><span class="v">${escapeHtml(answers[q.id] || '—')}</span></div>
-    `).join('');
+    qaList.innerHTML = questions.map(q => {
+      const answer = answers[q.id];
+      const display = Array.isArray(answer) ? answer.join(', ') : (answer || '—');
+      return `
+      <div class="kv"><span class="k">${escapeHtml(q.question || q.id)}</span><span class="v">${escapeHtml(display)}</span></div>
+    `;
+    }).join('');
   }
 }
 
@@ -338,13 +358,27 @@ async function openDeployModal(slug) {
 }
 
 async function pollDeployStatus() {
+  // Track how long we've been polling. After 90 seconds, assume the site
+  // is live (GitHub Pages builds typically take 30-60s, but the status
+  // API can be flaky) and show the URL with the hard-refresh disclaimer.
+  if (!window._deployPollStart) window._deployPollStart = Date.now();
+  const elapsed = Date.now() - window._deployPollStart;
+
   try {
     const result = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.PUBLISH_STATUS, {});
-    if (result.ready) {
+    console.log('[Clay] Deploy status:', result);
+
+    if (result.ready || elapsed > 90000) {
+      // Either the build is confirmed ready, OR we've waited 90s (timeout fallback)
       setDeployStage('build', 'done');
       setDeployStage('ready', 'done');
-      document.getElementById('deploy-title').textContent = 'Your site is live!';
-      document.getElementById('deploy-sub').textContent = 'Open it in a new tab. If you see a 404, do a hard refresh (instructions below).';
+      if (elapsed > 90000 && !result.ready) {
+        document.getElementById('deploy-title').textContent = 'Your site should be live!';
+        document.getElementById('deploy-sub').textContent = 'We timed out waiting for the build status, but your site is likely ready. If you see a 404, wait 30 seconds and do a hard refresh (instructions below).';
+      } else {
+        document.getElementById('deploy-title').textContent = 'Your site is live!';
+        document.getElementById('deploy-sub').textContent = 'Open it in a new tab. If you see a 404, do a hard refresh (instructions below).';
+      }
       document.getElementById('deploy-success').classList.remove('hidden');
       const url = PROJECT.published_url || `https://claybuild.github.io/${PROJECT.slug}/`;
       document.getElementById('deploy-success-url').textContent = url;
@@ -354,8 +388,11 @@ async function pollDeployStatus() {
       document.getElementById('deploy-done-actions').classList.remove('hidden');
 
       // Update deployment record
-      await supabase.from('deployments').update({ status: 'success' }).eq('project_id', PROJECT.id).order('created_at', { ascending: false }).limit(1);
+      try {
+        await supabase.from('deployments').update({ status: 'success' }).eq('project_id', PROJECT.id).order('created_at', { ascending: false }).limit(1);
+      } catch (e) { console.warn('Deploy record update failed:', e); }
       updatePublishCard();
+      window._deployPollStart = null;
       return;
     }
     setDeployStage('build', 'done');
@@ -364,6 +401,24 @@ async function pollDeployStatus() {
     publishPollTimer = setTimeout(pollDeployStatus, 5000);
   } catch (e) {
     console.warn('Status poll error:', e);
+    // On error, still check the timeout
+    if (elapsed > 90000) {
+      // Timeout — show the URL anyway
+      setDeployStage('build', 'done');
+      setDeployStage('ready', 'done');
+      document.getElementById('deploy-title').textContent = 'Your site should be live!';
+      document.getElementById('deploy-sub').textContent = 'We timed out waiting for the build status, but your site is likely ready. If you see a 404, wait 30 seconds and do a hard refresh.';
+      document.getElementById('deploy-success').classList.remove('hidden');
+      const url = PROJECT.published_url || `https://claybuild.github.io/${PROJECT.slug}/`;
+      document.getElementById('deploy-success-url').textContent = url;
+      document.getElementById('deploy-success-url').href = url;
+      document.getElementById('deploy-open').href = url;
+      document.getElementById('deploy-actions').classList.add('hidden');
+      document.getElementById('deploy-done-actions').classList.remove('hidden');
+      updatePublishCard();
+      window._deployPollStart = null;
+      return;
+    }
     publishPollTimer = setTimeout(pollDeployStatus, 8000);
   }
 }
