@@ -19,6 +19,7 @@ export function errorJson(message: string, status = 400): Response {
 
 // Call OpenRouter chat completions API.
 // Returns the raw assistant text content.
+// Throws a descriptive Error if the API fails or returns an empty response.
 export async function callOpenRouter(
   apiKey: string,
   model: string,
@@ -48,11 +49,40 @@ export async function callOpenRouter(
 
   if (!res.ok) {
     const txt = await res.text();
-    throw new Error(`OpenRouter ${res.status}: ${txt}`);
+    // Parse OpenRouter error format for a cleaner message
+    let detail = txt;
+    try {
+      const j = JSON.parse(txt);
+      detail = j.error?.message || j.error || j.message || txt;
+    } catch (_) {}
+    if (res.status === 429) {
+      throw new Error(`Rate limited by OpenRouter (free tier). Wait a few seconds and try again. Detail: ${detail}`);
+    }
+    throw new Error(`OpenRouter ${res.status}: ${detail}`);
   }
 
   const data = await res.json();
-  return data.choices?.[0]?.message?.content ?? "";
+
+  // Check for OpenRouter-level errors (they can return 200 with an error field)
+  if (data.error) {
+    throw new Error(`OpenRouter error: ${data.error.message || JSON.stringify(data.error)}`);
+  }
+
+  const content = data.choices?.[0]?.message?.content ?? "";
+
+  // Check finish_reason — if it's "length", the output was truncated
+  const finishReason = data.choices?.[0]?.finish_reason;
+  if (finishReason === "length") {
+    // Return what we have — extractJSON will try to handle it, and the retry
+    // loop in the caller will catch the parse error and retry with a fresh call.
+    console.warn("[Clay] Model response was truncated (finish_reason=length).");
+  }
+
+  if (!content || !content.trim()) {
+    throw new Error("Model returned an empty response. This is usually a temporary rate-limit on the free tier — please try again in a few seconds.");
+  }
+
+  return content;
 }
 
 // Try to parse JSON from a model response that might be wrapped in markdown
