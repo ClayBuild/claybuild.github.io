@@ -35,12 +35,11 @@ export async function callOpenRouter(
   if (options.response_format) {
     body.response_format = options.response_format;
   }
-  // For reasoning models (like gpt-oss), set reasoning effort to none so
-  // the model outputs content directly instead of spending tokens on
-  // internal reasoning that doesn't appear in the content field.
-  // This is supported by OpenRouter for models that use reasoning.
+  // For reasoning models (like gpt-oss), reasoning is mandatory and cannot
+  // be disabled. Set effort to "low" to minimize reasoning token usage so
+  // more of the token budget goes to actual content output.
   if (model.includes("gpt-oss") || model.includes("nemotron") || model.includes("reasoning")) {
-    body.reasoning = { effort: "none" };
+    body.reasoning = { effort: "low" };
   }
 
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
