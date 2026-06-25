@@ -84,23 +84,29 @@ Return the JSON object of files now.`;
     ];
 
     let lastError = "";
-    for (let attempt = 0; attempt < 3; attempt++) {
+    // Only 2 attempts (down from 3) to stay within the Supabase Edge Function
+    // 150-second timeout. Each attempt can take 30-60s, so 2 attempts + 1s
+    // delay = ~120s max, safely under the limit.
+    for (let attempt = 0; attempt < 2; attempt++) {
       let raw: string;
       try {
+        // max_tokens reduced from 16000 to 8000 — a complete website
+        // (index.html + styles.css + script.js) typically fits in 4000-6000
+        // tokens. 8000 gives headroom without making generation take too long.
         raw = await callOpenRouter(apiKey, "poolside/laguna-xs.2:free", messages, {
           temperature: attempt === 0 ? 0.4 : 0.3,
-          max_tokens: 16000,
+          max_tokens: 8000,
         });
       } catch (e) {
         lastError = String(e?.message || e);
         console.warn(`[ai-generate] Attempt ${attempt + 1} API error: ${lastError}`);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+        if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
         continue;
       }
 
       if (!raw || !raw.trim()) {
         lastError = "Empty response from model.";
-        if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+        if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
         continue;
       }
 
@@ -108,7 +114,7 @@ Return the JSON object of files now.`;
         const files = extractJSON<Record<string, string>>(raw);
         if (!files["index.html"]) {
           lastError = "Model response missing index.html.";
-          if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
+          if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
           continue;
         }
         return json({ files });
@@ -116,13 +122,13 @@ Return the JSON object of files now.`;
         lastError = String(parseErr?.message || parseErr);
         console.warn(`[ai-generate] Attempt ${attempt + 1} parse error: ${lastError}`);
         console.warn(`[ai-generate] Raw response length: ${raw.length}, first 200 chars: ${raw.slice(0, 200)}`);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
+        if (attempt < 1) await new Promise(r => setTimeout(r, 1000));
         continue;
       }
     }
 
     return errorJson(
-      "Could not generate website code after 3 attempts. This is usually rate-limiting on the free tier — wait 10 seconds and try again. Last error: " + lastError,
+      "Could not generate website code after 2 attempts. This is usually a timeout or rate-limit on the free tier — wait 10 seconds and try again. Last error: " + lastError,
       502
     );
   } catch (e) {

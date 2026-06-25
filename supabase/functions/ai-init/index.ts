@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
           apiKey,
           "openai/gpt-oss-120b:free",
           messages,
-          { temperature: attempt === 0 ? 0.85 : 0.5, max_tokens: 16000 }
+          { temperature: attempt === 0 ? 0.85 : 0.5, max_tokens: 12000 }
         );
       } catch (e) {
         lastError = String(e?.message || e);

@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
       try {
         raw = await callOpenRouter(apiKey, "openai/gpt-oss-120b:free", messages, {
           temperature: attempt === 0 ? 0.6 : 0.4,
-          max_tokens: 16000,
+          max_tokens: 12000,
         });
       } catch (e) {
         lastError = String(e?.message || e);
