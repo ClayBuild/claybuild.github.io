@@ -35,6 +35,13 @@ export async function callOpenRouter(
   if (options.response_format) {
     body.response_format = options.response_format;
   }
+  // For reasoning models (like gpt-oss), set reasoning effort to none so
+  // the model outputs content directly instead of spending tokens on
+  // internal reasoning that doesn't appear in the content field.
+  // This is supported by OpenRouter for models that use reasoning.
+  if (model.includes("gpt-oss") || model.includes("nemotron") || model.includes("reasoning")) {
+    body.reasoning = { effort: "none" };
+  }
 
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -68,17 +75,49 @@ export async function callOpenRouter(
     throw new Error(`OpenRouter error: ${data.error.message || JSON.stringify(data.error)}`);
   }
 
-  const content = data.choices?.[0]?.message?.content ?? "";
+  // Extract content from the response. The content field can be:
+  // 1. A plain string (most models): "content": "Hello"
+  // 2. An array of parts (newer OpenAI format): "content": [{"type":"text","text":"Hello"}]
+  // 3. null (some models put output in a "reasoning" field instead)
+  const message = data.choices?.[0]?.message;
+  let content: string = "";
 
-  // Check finish_reason — if it's "length", the output was truncated
+  if (message) {
+    if (typeof message.content === "string") {
+      content = message.content;
+    } else if (Array.isArray(message.content)) {
+      // Array of parts — concatenate all text parts
+      content = message.content
+        .filter((part: any) => part.type === "text" && part.text)
+        .map((part: any) => part.text)
+        .join("\n");
+    }
+    // If content is still empty, try the reasoning field (some models like
+    // gpt-oss output there)
+    if (!content && message.reasoning) {
+      if (typeof message.reasoning === "string") {
+        content = message.reasoning;
+      } else if (Array.isArray(message.reasoning)) {
+        content = message.reasoning
+          .filter((part: any) => part.type === "text" && part.text)
+          .map((part: any) => part.text)
+          .join("\n");
+      }
+    }
+  }
+
+  // Check finish_reason for debugging
   const finishReason = data.choices?.[0]?.finish_reason;
+  const usage = data.usage;
+  console.log(`[Clay] Response: finish_reason=${finishReason}, content_length=${content.length}, usage=${JSON.stringify(usage)}`);
+
   if (finishReason === "length") {
-    // Return what we have — extractJSON will try to handle it, and the retry
-    // loop in the caller will catch the parse error and retry with a fresh call.
     console.warn("[Clay] Model response was truncated (finish_reason=length).");
   }
 
   if (!content || !content.trim()) {
+    // Log the full response structure for debugging
+    console.warn("[Clay] Empty content. Full response:", JSON.stringify(data).slice(0, 500));
     throw new Error("Model returned an empty response. This is usually a temporary rate-limit on the free tier — please try again in a few seconds.");
   }
 
