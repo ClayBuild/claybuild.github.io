@@ -53,29 +53,6 @@ Clay is a single platform where non-technical people can use AI to create websit
 └── SETUP.md                # Full setup guide — READ THIS FIRST
 ```
 
-## Quick start
-
-1. Follow `SETUP.md` end-to-end. It covers:
-   - Initializing the GitHub repo + Pages.
-   - Running `SCHEMA.sql` in Supabase.
-   - Deploying the 6 Edge Functions.
-   - Setting secrets (`OPENROUTER_API_KEY`, `GITHUB_PAT`, etc.).
-   - Pushing this code to the repo.
-
-2. Visit `https://claybuild.github.io/` and create your first project.
-
-## Where do my secrets go?
-
-| Secret | Where to set |
-|---|---|
-| `OPENROUTER_API_KEY` | `supabase secrets set OPENROUTER_API_KEY=sk-or-v1-…` |
-| `GITHUB_PAT` | `supabase secrets set GITHUB_PAT=github_pat_…` |
-| `GITHUB_OWNER` | `supabase secrets set GITHUB_OWNER=ClayBuild` |
-| `GITHUB_REPO` | `supabase secrets set GITHUB_REPO=claybuild.github.io` |
-| `CLAY_DOMAIN` | `supabase secrets set CLAY_DOMAIN=claybuild.github.io` |
-
-**Never** put any of these in frontend code. The Supabase anon key in `js/config.js` is safe to expose — Row Level Security protects all data.
-
 ## License
 
 MIT.
