@@ -91,6 +91,20 @@ CONTENT FOR SHOPPING/MENU:
 - For "team": generate 2-4 team members with names and roles. Photos are placeholders (icon).
 - For "faq": generate 3-5 Q&A pairs relevant to the business.
 - For "portfolio": generate 4-6 project entries with titles and categories.
+- For "gallery": generate 4-6 items with captions.
+- For "stats": generate 3-4 key statistics with values and labels.
+
+EXACT JSON STRUCTURE for each section type (follow this precisely):
+- portfolio: {"type":"portfolio","variant":"default","content":{"title":"Our Work","subtitle":"Selected projects","items":[{"title":"Project Name","category":"Category"},{"title":"Project Name","category":"Category"}]}}
+- gallery: {"type":"gallery","variant":"default","content":{"title":"Gallery","subtitle":"A look at our work","items":[{"caption":"Image description"},{"caption":"Image description"}]}}
+- products: {"type":"products","variant":"default","content":{"title":"Our Products","subtitle":"Shop our collection","products":[{"name":"Product Name","description":"Short description","price":"$12.99"}]}}
+- menu: {"type":"menu","variant":"default","content":{"title":"Our Menu","subtitle":"Freshly made","items":[{"name":"Item Name","description":"Description","price":"$8.99"}]}}
+- team: {"type":"team","variant":"default","content":{"title":"Our Team","subtitle":"Meet the people","members":[{"name":"Person Name","role":"Their role"}]}}
+- faq: {"type":"faq","variant":"default","content":{"title":"FAQ","subtitle":"Common questions","faqs":[{"question":"Question?","answer":"Answer."}]}}
+- stats: {"type":"stats","variant":"default","content":{"stats":[{"value":"500+","label":"Happy clients"},{"value":"10","label":"Years experience"}]}}
+- pricing: {"type":"pricing","variant":"default","content":{"title":"Pricing","subtitle":"Choose your plan","plans":[{"name":"Basic","price":"$29","period":"mo","features":["Feature 1","Feature 2"],"cta":"Choose Basic"}]}}
+
+CRITICAL: Every section MUST have a "content" object with the items/products/members/faqs/stats/plans array populated with real data. NEVER output an empty items array. If you include a section, fill it with realistic content.
 
 JSON ESCAPING: ALL double-quotes inside strings MUST be escaped as \\". Output ONLY the JSON object.`;
 

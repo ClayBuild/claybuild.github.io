@@ -713,7 +713,7 @@ section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:ho
 // NEW COMPONENTS — gallery, pricing, stats (for variety + business types)
 // ============================================================================
 function renderGallery(c, style, palette) {
-  const items = c.items || [];
+  const items = c.items || [{caption:'Image 1'},{caption:'Image 2'},{caption:'Image 3'},{caption:'Image 4'},{caption:'Image 5'},{caption:'Image 6'}];
   const r = style === 'organic' ? '24px' : style === 'playful' ? '20px' : '8px';
   const itemsHtml = items.map(function(item, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
@@ -733,7 +733,7 @@ function renderGallery(c, style, palette) {
 }
 
 function renderPricing(c, style) {
-  const plans = c.plans || [];
+  const plans = c.plans || [{name:'Basic',price:'$29',period:'mo',features:['Core features','Email support','1 project'],cta:'Choose'},{name:'Pro',price:'$59',period:'mo',features:['Everything in Basic','Priority support','5 projects','Custom branding'],cta:'Choose'},{name:'Premium',price:'$99',period:'mo',features:['Everything in Pro','24/7 support','Unlimited projects','Dedicated manager'],cta:'Choose'}];
   return `<section id="pricing" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
     <h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">${c.title||'Pricing'}</h2>
     <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">${c.subtitle||''}</p>
@@ -751,7 +751,7 @@ function renderPricing(c, style) {
 }
 
 function renderStats(c, style) {
-  const stats = c.stats || [];
+  const stats = c.stats || [{value:'100+',label:'Projects'},{value:'50+',label:'Clients'},{value:'10',label:'Years'}];
   const statsHtml = stats.map(function(s, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
     return '<div class="' + animClass + '">' +
@@ -769,7 +769,7 @@ function renderStats(c, style) {
 // SHOPPING / E-COMMERCE COMPONENTS
 // ============================================================================
 function renderProducts(c, style, palette) {
-  const products = c.products || [];
+  const products = c.products || [{name:'Product One',description:'Great quality item',price:'$19.99'},{name:'Product Two',description:'Another fine item',price:'$29.99'},{name:'Product Three',description:'Premium selection',price:'$39.99'},{name:'Product Four',description:'Best value item',price:'$14.99'}];
   const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : style === 'organic' ? '16px' : '8px';
   const productsHtml = products.map(function(p, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
@@ -797,7 +797,7 @@ function renderProducts(c, style, palette) {
 }
 
 function renderMenu(c, style) {
-  const items = c.items || [];
+  const items = c.items || [{name:'Signature Item',description:'Our most popular choice',price:'$12.99'},{name:'Classic Option',description:'A timeless favorite',price:'$9.99'},{name:'Premium Selection',description:'For the discerning palate',price:'$18.99'},{name:'Daily Special',description:'Fresh and seasonal',price:'$14.99'}];
   const r = style === 'playful' ? '16px' : style === 'brutalism' ? '0' : '8px';
   const itemsHtml = items.map(function(item, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
@@ -820,7 +820,7 @@ function renderMenu(c, style) {
 }
 
 function renderTeam(c, style, palette) {
-  const members = c.members || [];
+  const members = c.members || [{name:'Jane Doe',role:'Founder'},{name:'John Smith',role:'Designer'},{name:'Sarah Lee',role:'Developer'}];
   const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '50%';
   const membersHtml = members.map(function(m, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
@@ -841,7 +841,7 @@ function renderTeam(c, style, palette) {
 }
 
 function renderFAQ(c, style) {
-  const faqs = c.faqs || [];
+  const faqs = c.faqs || [{question:'How can I contact you?',answer:'You can reach us through the contact form on this page.'},{question:'What areas do you serve?',answer:'We serve clients locally and remotely.'},{question:'How long does a typical project take?',answer:'Project timelines vary depending on scope. Contact us for a quote.'}];
   const faqsHtml = faqs.map(function(f, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
     return '<details class="' + animClass + '" style="border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:0.75rem;">' +
@@ -857,7 +857,7 @@ function renderFAQ(c, style) {
 }
 
 function renderPortfolio(c, style, palette) {
-  const items = c.items || [];
+  const items = c.items || [{title:'Project Alpha',category:'Category 1'},{title:'Project Beta',category:'Category 2'},{title:'Project Gamma',category:'Category 1'},{title:'Project Delta',category:'Category 3'},{title:'Project Epsilon',category:'Category 2'},{title:'Project Zeta',category:'Category 1'}];
   const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '8px';
   const itemsHtml = items.map(function(item, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
