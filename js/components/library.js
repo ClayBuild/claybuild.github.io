@@ -23,6 +23,36 @@ function withAlpha(hex, a) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
+// ---- Placeholder image generator (SVG data URI with gradient + icon) ----
+function placeholderImage(w, h, label, color1, color2, icon) {
+  w = w || 400; h = h || 300;
+  label = label || '';
+  color1 = color1 || '#E5E7EB';
+  color2 = color2 || '#F3F4F6';
+  icon = icon || 'fa-solid fa-image';
+  // Encode the SVG as a data URI
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' +
+    '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+    '<stop offset="0" stop-color="' + color1 + '"/>' +
+    '<stop offset="1" stop-color="' + color2 + '"/>' +
+    '</linearGradient></defs>' +
+    '<rect width="' + w + '" height="' + h + '" fill="url(#g)"/>' +
+    // We can't use FontAwesome in SVG data URIs (no font loading), so use a simple shape
+    '<circle cx="' + (w/2) + '" cy="' + (h/2 - 15) + '" r="25" fill="rgba(255,255,255,0.4)"/>' +
+    '<rect x="' + (w/2 - 30) + '" y="' + (h/2 + 20) + '" width="60" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>' +
+    (label ? '<text x="' + (w/2) + '" y="' + (h - 30) + '" text-anchor="middle" font-family="sans-serif" font-size="14" fill="rgba(255,255,255,0.7)" font-weight="600">' + label + '</text>' : '') +
+    '</svg>';
+  return 'data:image/svg+xml;base64,' + btoa(svg);
+}
+
+// Generate a pleasant gradient from the palette colors
+function gradientColors(palette, idx) {
+  if (!palette || palette.length < 4) return ['#E5E7EB', '#F3F4F6'];
+  var c1 = palette[idx % palette.length];
+  var c2 = palette[(idx + 1) % palette.length];
+  return [c1, c2];
+}
+
 // ---- Per-style font + meta config ----
 const STYLE_FONTS = {
   minimalism:   { body: "'Inter',sans-serif", head: "'Inter',sans-serif", hw: '800', gf: 'Inter:wght@300;400;500;600;700;800', ls: '-0.03em' },
@@ -588,14 +618,14 @@ document.querySelectorAll('form').forEach(function(f){
     else if (section.type === 'testimonial') html += renderTestimonial(section.content || content, designStyle);
     else if (section.type === 'cta') html += renderCTA(section.content || content, designStyle);
     else if (section.type === 'contact') html += renderContact(section.content || content, designStyle);
-    else if (section.type === 'gallery') html += renderGallery(section.content || content, designStyle);
+    else if (section.type === 'gallery') html += renderGallery(section.content || content, designStyle, palette);
     else if (section.type === 'pricing') html += renderPricing(section.content || content, designStyle);
     else if (section.type === 'stats') html += renderStats(section.content || content, designStyle);
-    else if (section.type === 'products') html += renderProducts(section.content || content, designStyle);
+    else if (section.type === 'products') html += renderProducts(section.content || content, designStyle, palette);
     else if (section.type === 'menu') html += renderMenu(section.content || content, designStyle);
-    else if (section.type === 'team') html += renderTeam(section.content || content, designStyle);
+    else if (section.type === 'team') html += renderTeam(section.content || content, designStyle, palette);
     else if (section.type === 'faq') html += renderFAQ(section.content || content, designStyle);
-    else if (section.type === 'portfolio') html += renderPortfolio(section.content || content, designStyle);
+    else if (section.type === 'portfolio') html += renderPortfolio(section.content || content, designStyle, palette);
     else if (section.type === 'cta-compact') html += renderCTACompact(section.content || content, designStyle);
   });
 
@@ -682,17 +712,24 @@ section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:ho
 // ============================================================================
 // NEW COMPONENTS — gallery, pricing, stats (for variety + business types)
 // ============================================================================
-function renderGallery(c, style) {
+function renderGallery(c, style, palette) {
   const items = c.items || [];
-  return `<section id="gallery" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
-    <h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">${c.title||'Gallery'}</h2>
-    <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">${c.subtitle||''}</p>
-    <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
-      ${items.map((item,i)=>`<div class="anim-${(i%3)+1}" style="aspect-ratio:1;background:var(--secondary);border-radius:${style==='organic'?'24px':style==='playful'?'20px':'8px'};display:flex;align-items:center;justify-content:center;color:var(--on-primary);font-size:0.85rem;opacity:0.85;overflow:hidden;position:relative;">
-        <span style="text-align:center;padding:1rem;"><i class="fa-regular fa-image" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>${item.caption||'Image'}</span>
-      </div>`).join('')}
-    </div>
-  </section>`;
+  const r = style === 'organic' ? '24px' : style === 'playful' ? '20px' : '8px';
+  const itemsHtml = items.map(function(item, i) {
+    var animClass = 'anim-' + ((i % 3) + 1);
+    var colors = gradientColors(palette, i);
+    var img = placeholderImage(400, 400, item.caption || '', colors[0], colors[1]);
+    return '<div class="' + animClass + '" style="aspect-ratio:1;border-radius:' + r + ';overflow:hidden;position:relative;">' +
+      '<img src="' + img + '" alt="' + (item.caption || 'Gallery image') + '" style="width:100%;height:100%;object-fit:cover;">' +
+      (item.caption ? '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.6));padding:1rem 0.75rem 0.75rem;color:#fff;font-size:0.82rem;font-weight:600;">' + item.caption + '</div>' : '') +
+    '</div>';
+  }).join('');
+  return '<section id="gallery" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'Gallery') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">' + (c.subtitle || '') + '</p>' +
+    '<div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">' +
+    itemsHtml +
+    '</div></section>';
 }
 
 function renderPricing(c, style) {
@@ -731,15 +768,15 @@ function renderStats(c, style) {
 // ============================================================================
 // SHOPPING / E-COMMERCE COMPONENTS
 // ============================================================================
-function renderProducts(c, style) {
+function renderProducts(c, style, palette) {
   const products = c.products || [];
   const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : style === 'organic' ? '16px' : '8px';
   const productsHtml = products.map(function(p, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
+    var colors = gradientColors(palette, i);
+    var img = placeholderImage(300, 300, p.name || '', colors[0], colors[1]);
     return '<div class="' + animClass + '" style="background:var(--bg);border:1px solid var(--border);border-radius:' + r + ';overflow:hidden;display:flex;flex-direction:column;">' +
-      '<div style="aspect-ratio:1;background:var(--secondary);display:flex;align-items:center;justify-content:center;color:var(--on-primary);font-size:2rem;opacity:0.4;">' +
-        '<i class="fa-regular fa-image"></i>' +
-      '</div>' +
+      '<img src="' + img + '" alt="' + (p.name || 'Product') + '" style="width:100%;aspect-ratio:1;object-fit:cover;">' +
       '<div style="padding:1rem;display:flex;flex-direction:column;gap:0.5rem;flex:1;">' +
         '<h3 style="font-size:1rem;margin:0;">' + (p.name || 'Product') + '</h3>' +
         '<p style="font-size:0.82rem;color:var(--muted);margin:0;flex:1;">' + (p.description || '') + '</p>' +
@@ -782,15 +819,15 @@ function renderMenu(c, style) {
     '</section>';
 }
 
-function renderTeam(c, style) {
+function renderTeam(c, style, palette) {
   const members = c.members || [];
   const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '50%';
   const membersHtml = members.map(function(m, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
+    var colors = gradientColors(palette, i);
+    var img = placeholderImage(200, 200, '', colors[0], colors[1]);
     return '<div class="' + animClass + '" style="text-align:center;">' +
-      '<div style="width:120px;height:120px;border-radius:' + r + ';background:var(--secondary);margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;color:var(--on-primary);font-size:2.5rem;opacity:0.4;">' +
-        '<i class="fa-regular fa-user"></i>' +
-      '</div>' +
+      '<img src="' + img + '" alt="' + (m.name || 'Team member') + '" style="width:120px;height:120px;border-radius:' + r + ';object-fit:cover;margin:0 auto 1rem;display:block;">' +
       '<h3 style="font-size:1.05rem;margin-bottom:0.2rem;">' + (m.name || 'Team member') + '</h3>' +
       '<p style="font-size:0.85rem;color:var(--muted);">' + (m.role || '') + '</p>' +
     '</div>';
@@ -819,13 +856,16 @@ function renderFAQ(c, style) {
     '</section>';
 }
 
-function renderPortfolio(c, style) {
+function renderPortfolio(c, style, palette) {
   const items = c.items || [];
   const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '8px';
   const itemsHtml = items.map(function(item, i) {
     var animClass = 'anim-' + ((i % 3) + 1);
-    return '<div class="' + animClass + '" style="position:relative;aspect-ratio:4/3;background:var(--secondary);border-radius:' + r + ';overflow:hidden;display:flex;align-items:flex-end;padding:1rem;color:var(--on-primary);">' +
-      '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent 50%);"></div>' +
+    var colors = gradientColors(palette, i);
+    var img = placeholderImage(400, 300, '', colors[0], colors[1]);
+    return '<div class="' + animClass + '" style="position:relative;aspect-ratio:4/3;border-radius:' + r + ';overflow:hidden;display:flex;align-items:flex-end;padding:1rem;color:#fff;">' +
+      '<img src="' + img + '" alt="' + (item.title || 'Project') + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">' +
+      '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent 50%);"></div>' +
       '<div style="position:relative;">' +
         '<h3 style="font-size:1rem;margin:0;">' + (item.title || 'Project') + '</h3>' +
         '<p style="font-size:0.8rem;opacity:0.8;margin:0;">' + (item.category || '') + '</p>' +
