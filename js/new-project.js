@@ -352,8 +352,11 @@ function step3Next() {
     return;
   }
   goToStep(4);
-  // Initialize palette preview with first palette
-  if (!STATE.palette && STATE.color_palettes[0]) {
+  // If a palette was already selected (edit flow), re-select it to show
+  // the correct preview. Otherwise, default to the first palette.
+  if (STATE.palette) {
+    selectPalette(STATE.palette);
+  } else if (STATE.color_palettes[0]) {
     selectPalette(STATE.color_palettes[0]);
   }
 }
@@ -361,7 +364,7 @@ function step3Next() {
 function renderPalettes() {
   const grid = document.getElementById('palette-grid');
   grid.innerHTML = STATE.color_palettes.map((p, idx) => `
-    <div class="palette-card" data-idx="${idx}">
+    <div class="palette-card ${STATE.palette === p ? 'selected' : ''}" data-idx="${idx}">
       <div class="name">${escapeHtml(p.name)}</div>
       <div class="palette-swatches">
         ${p.colors.map(c => `<div style="background:${escapeAttr(c)}"></div>`).join('')}
@@ -523,13 +526,9 @@ function renderStyles() {
   const grid = document.getElementById('style-grid');
   // Always show ALL 10 styles — don't rely on the AI to shortlist.
   const ALL_STYLES = ["minimalism","brutalism","swiss","neumorphism","editorial","glassmorphism","art-deco","corporate","playful","organic"];
-  // Use AI suggestions if available, otherwise show all
-  const styles = (STATE.design_styles && STATE.design_styles.length > 0) ? STATE.design_styles : ALL_STYLES;
-  // Merge: show AI suggestions first (if any), then the rest — but actually,
-  // just show ALL styles in a fixed order. The user requested this.
   grid.innerHTML = ALL_STYLES.map(style => `
-    <div class="style-card" data-style="${escapeAttr(style)}">
-      <div class="thumb"><iframe src="./samples/${escapeAttr(style)}.html" loading="lazy" sandbox="allow-same-origin"></iframe></div>
+    <div class="style-card ${STATE.design_style === style ? 'selected' : ''}" data-style="${escapeAttr(style)}">
+      <div class="thumb"><iframe src="./samples/${escapeAttr(style)}.html" loading="lazy" sandbox="allow-same-origin allow-scripts"></iframe></div>
       <div class="body">
         <div class="name">${escapeHtml(style)}</div>
         <div class="desc">${escapeHtml(STYLE_DESCRIPTIONS[style] || '')}</div>
@@ -540,6 +539,14 @@ function renderStyles() {
   grid.querySelectorAll('.style-card').forEach(card => {
     card.addEventListener('click', () => selectStyle(card.dataset.style));
   });
+
+  // If a style was already selected (edit flow), show its preview
+  if (STATE.design_style) {
+    document.getElementById('style-preview').src = `./samples/${STATE.design_style}.html`;
+    document.getElementById('style-preview-label').textContent = STATE.design_style.charAt(0).toUpperCase() + STATE.design_style.slice(1);
+    document.getElementById('style-preview-url').textContent = 'Design style · ' + STATE.design_style.charAt(0).toUpperCase() + STATE.design_style.slice(1);
+    document.getElementById('step5-next').disabled = false;
+  }
 }
 
 function selectStyle(style) {
