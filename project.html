@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Project — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=12">
+<link rel="stylesheet" href="./css/main.css?v=13">
 <style>
   .proj-header { padding: 1.5rem 0; }
   .proj-header .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
@@ -102,6 +102,8 @@
         </div>
         <div class="actions">
           <button class="btn btn-ghost" id="regenerate-btn"><i class="fa-solid fa-rotate"></i> Regenerate</button>
+          <button class="btn btn-ghost" id="edit-btn"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button class="btn btn-ghost" id="delete-btn" style="color:var(--error); border-color:var(--error-border);"><i class="fa-solid fa-trash"></i> Delete</button>
           <button class="btn" id="publish-btn"><i class="fa-solid fa-rocket"></i> Publish</button>
         </div>
       </div>
@@ -125,35 +127,45 @@
           </div>
           <iframe id="preview-iframe" src="about:blank"></iframe>
         </div>
-
-        <div style="margin-top:2rem;">
-          <span class="eyebrow">Files</span>
-          <div style="display:grid; grid-template-columns: 200px 1fr; gap:1rem; margin-top:0.75rem;">
-            <div class="file-browser" id="file-browser"></div>
-            <div class="code-viewer" id="code-viewer">Select a file</div>
-          </div>
-        </div>
       </div>
 
       <!-- RIGHT: SIDEBAR -->
       <aside>
-        <div class="publish-card" id="publish-card">
+        <div class="publish-card" id="publish-card" style="margin-bottom:1rem;">
           <h4 id="publish-title">Ready to publish?</h4>
           <p id="publish-desc">Your website will be live at a URL like claybuild.github.io/your-project/ in about 60 seconds.</p>
           <button class="btn" id="publish-btn-2"><i class="fa-solid fa-rocket"></i> Publish now</button>
           <div id="publish-detail"></div>
         </div>
 
-        <div class="sidebar-card" id="design-card">
+        <div class="sidebar-card" id="design-card" style="margin-bottom:1rem;">
           <h4>Design</h4>
           <div class="kv"><span class="k">Style</span><span class="v" id="kv-style">—</span></div>
           <div class="kv"><span class="k">Palette</span><span class="v" id="kv-palette">—</span></div>
           <div class="kv"><span class="k">Logo</span><span class="v" id="kv-logo">—</span></div>
         </div>
 
-        <div class="sidebar-card" id="qa-card">
-          <h4>Questionnaire</h4>
-          <div id="qa-list"></div>
+        <div class="sidebar-card" id="qa-card" style="margin-bottom:1rem;">
+          <details>
+            <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+              <span>Questionnaire</span>
+              <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
+            </summary>
+            <div id="qa-list" style="margin-top:0.5rem;"></div>
+          </details>
+        </div>
+
+        <div class="sidebar-card" style="margin-bottom:1rem;">
+          <details>
+            <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+              <span>Files</span>
+              <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
+            </summary>
+            <div style="display:grid; grid-template-columns: 200px 1fr; gap:1rem; margin-top:0.75rem;">
+              <div class="file-browser" id="file-browser"></div>
+              <div class="code-viewer" id="code-viewer">Select a file</div>
+            </div>
+          </details>
         </div>
       </aside>
     </div>
@@ -188,7 +200,7 @@
 <!-- DEPLOYMENT PROGRESS MODAL -->
 <div class="modal-host" id="deploy-modal">
   <div class="modal" style="max-width:480px; text-align:center;">
-    <div style="margin:0 auto 1rem; width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+    <div id="deploy-spinner-wrap" style="margin:0 auto 1rem; width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
       <div class="spinner spinner-lg"></div>
     </div>
     <h3 id="deploy-title">Deploying your website…</h3>
@@ -197,9 +209,9 @@
     <div style="background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius); padding:0.85rem; font-size:0.82rem; color:var(--text-2); margin:1rem 0; word-break: break-all;" id="deploy-url">—</div>
 
     <div class="deploy-progress" id="deploy-progress" style="text-align:left;">
-      <div class="line active" data-stage="push"><span class="dot"></span> Pushing files to GitHub</div>
-      <div class="line" data-stage="build"><span class="dot"></span> Triggering Pages build</div>
-      <div class="line" data-stage="ready"><span class="dot"></span> Waiting for deployment to go live</div>
+      <div class="line active" data-stage="push"><span class="dot"></span> Publishing your website</div>
+      <div class="line" data-stage="build"><span class="dot"></span> Preparing your live link</div>
+      <div class="line" data-stage="ready"><span class="dot"></span> Making it live on the internet</div>
     </div>
 
     <div id="deploy-success" class="hidden" style="margin-top:1.25rem;">
@@ -225,8 +237,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=12"></script>
-<script src="./js/supabase.js?v=12"></script>
-<script src="./js/project.js?v=12"></script>
+<script src="./js/config.js?v=13"></script>
+<script src="./js/supabase.js?v=13"></script>
+<script src="./js/project.js?v=13"></script>
 </body>
 </html>

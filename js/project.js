@@ -96,6 +96,10 @@ function renderProject() {
       location.href = `./new-project.html?reuse=${PROJECT.id}`;
     }
   });
+  document.getElementById('edit-btn').addEventListener('click', () => {
+    location.href = `./new-project.html?reuse=${PROJECT.id}&edit=1`;
+  });
+  document.getElementById('delete-btn').addEventListener('click', deleteProject);
 
   // Deploy modal buttons
   document.getElementById('deploy-cancel-bg').addEventListener('click', () => {
@@ -209,9 +213,18 @@ function updatePublishCard() {
     card.innerHTML = `
       <h4>Your site is live</h4>
       <p>Open it, share it, or republish if you've made changes.</p>
-      <a class="btn" href="${escapeAttr(PROJECT.published_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>
-      <div class="published-url"><a href="${escapeAttr(PROJECT.published_url)}" target="_blank" rel="noopener">${escapeHtml(PROJECT.published_url)}</a></div>
+      <div style="display:flex; gap:0.5rem;">
+        <a class="btn" href="${escapeAttr(PROJECT.published_url)}" target="_blank" rel="noopener" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>
+        <button class="btn btn-on-dark" id="copy-link-btn" style="flex:1;"><i class="fa-solid fa-link"></i> Copy link</button>
+      </div>
     `;
+    document.getElementById('copy-link-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(PROJECT.published_url).then(() => {
+        toast('Link copied to clipboard!');
+      }).catch(() => {
+        toast('Could not copy link. Here it is: ' + PROJECT.published_url);
+      });
+    });
   } else if (PROJECT.website_files && PROJECT.website_files['index.html']) {
     card.innerHTML = `
       <h4>Ready to publish?</h4>
@@ -225,6 +238,41 @@ function updatePublishCard() {
       <p>Generate your website first, then you can publish it.</p>
       <a class="btn" href="./new-project.html?reuse=${PROJECT.id}">Generate website</a>
     `;
+  }
+}
+
+async function deleteProject() {
+  if (!confirm('Delete this project? This will permanently remove it from your dashboard and delete the published folder from GitHub. This cannot be undone.')) return;
+
+  try {
+    // If the project was published, delete the folder from the GitHub repo
+    if (PROJECT.slug) {
+      try {
+        await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.PUBLISH, {
+          action: 'delete',
+          slug: PROJECT.slug,
+        });
+      } catch (e) {
+        console.warn('Folder deletion failed (non-fatal):', e);
+        // Continue with DB deletion even if folder deletion fails
+      }
+    }
+
+    // Delete from Supabase Storage if there's a logo
+    if (PROJECT.logo_path) {
+      try {
+        await supabase.storage.from('project-assets').remove([PROJECT.logo_path]);
+      } catch (e) { console.warn('Logo deletion failed:', e); }
+    }
+
+    // Delete the project row (cascades to project_assets, deployments, etc.)
+    const { error } = await supabase.from('projects').delete().eq('id', PROJECT.id);
+    if (error) throw error;
+
+    toast('Project deleted.');
+    setTimeout(() => { window.location.href = './dashboard.html'; }, 800);
+  } catch (e) {
+    toast('Could not delete project: ' + (e.message || e), 5000);
   }
 }
 
@@ -293,7 +341,13 @@ async function openDeployModal(slug) {
   document.getElementById('deploy-success').classList.add('hidden');
   document.getElementById('deploy-done-actions').classList.add('hidden');
   document.getElementById('deploy-actions').classList.remove('hidden');
+  // Reset the spinner (in case it was replaced with a checkmark on a previous deploy)
+  var spinWrap = document.getElementById('deploy-spinner-wrap');
+  if (spinWrap) spinWrap.innerHTML = '<div class="spinner spinner-lg"></div>';
+  document.getElementById('deploy-title').textContent = 'Publishing your website…';
+  document.getElementById('deploy-sub').textContent = 'This usually takes 45–60 seconds. Your site will appear at the link below.';
   setDeployStage('push', 'active');
+  window._deployPollStart = null;
 
   const files = PROJECT.website_files;
   let logo_base64 = null, logo_ext = null;
@@ -372,6 +426,9 @@ async function pollDeployStatus() {
       // Either the build is confirmed ready, OR we've waited 90s (timeout fallback)
       setDeployStage('build', 'done');
       setDeployStage('ready', 'done');
+      // Hide the spinner — replace with a checkmark icon
+      var spinWrap = document.getElementById('deploy-spinner-wrap');
+      if (spinWrap) spinWrap.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;background:var(--success-light);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto;"><i class="fa-solid fa-check"></i></div>';
       if (elapsed > 90000 && !result.ready) {
         document.getElementById('deploy-title').textContent = 'Your site should be live!';
         document.getElementById('deploy-sub').textContent = 'We timed out waiting for the build status, but your site is likely ready. If you see a 404, wait 30 seconds and do a hard refresh (instructions below).';
@@ -406,6 +463,8 @@ async function pollDeployStatus() {
       // Timeout — show the URL anyway
       setDeployStage('build', 'done');
       setDeployStage('ready', 'done');
+      var spinWrap2 = document.getElementById('deploy-spinner-wrap');
+      if (spinWrap2) spinWrap2.innerHTML = '<div style="width:48px;height:48px;border-radius:50%;background:var(--success-light);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto;"><i class="fa-solid fa-check"></i></div>';
       document.getElementById('deploy-title').textContent = 'Your site should be live!';
       document.getElementById('deploy-sub').textContent = 'We timed out waiting for the build status, but your site is likely ready. If you see a 404, wait 30 seconds and do a hard refresh.';
       document.getElementById('deploy-success').classList.remove('hidden');

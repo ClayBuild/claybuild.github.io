@@ -67,19 +67,21 @@ const STYLE_DESCRIPTIONS = {
   // Custom palette
   setupCustomPalette();
 
-  // Check if we're reusing an existing project (from project.html "Regenerate")
+  // Check if we're reusing an existing project (from project.html "Regenerate" or "Edit")
   const reuseId = new URLSearchParams(location.search).get('reuse');
+  const editMode = new URLSearchParams(location.search).get('edit') === '1';
   if (reuseId) {
-    await loadExistingProject(reuseId);
+    await loadExistingProject(reuseId, editMode);
   } else {
     // Populate step 1 with placeholder focus
     setTimeout(() => document.getElementById('idea').focus(), 100);
   }
 })();
 
-// Load an existing project's saved data and skip to the review step.
-// This is used when the user clicks "Regenerate" on the project page.
-async function loadExistingProject(projectId) {
+// Load an existing project's saved data.
+// If editMode is true, start from step 1 (idea) so the user can walk through
+// each step with pre-filled values. Otherwise, jump to the review step (step 6).
+async function loadExistingProject(projectId, editMode) {
   showLoadingScreen('Loading your project…');
   try {
     const { data: proj, error } = await supabase
@@ -102,12 +104,9 @@ async function loadExistingProject(projectId) {
     STATE.answers = q.answers || {};
 
     // Recover design_style + palette from the enriched questionnaire
-    // (saved before generation starts, so they survive mid-generation errors)
     if (q.design_style) STATE.design_style = q.design_style;
     if (q.palette) STATE.palette = q.palette;
     if (q.logo_info) {
-      // We have the logo analysis but not the actual file — that's OK,
-      // the generate function can still use logo_info for the design doc.
       STATE.logo = { info: q.logo_info, file: null, dataUrl: null, mime: null, ext: null };
     }
 
@@ -123,18 +122,22 @@ async function loadExistingProject(projectId) {
       });
     }
 
-    // Populate the idea + name fields in case the user goes back
+    // Populate the idea + name fields
     document.getElementById('idea').value = STATE.business_idea;
     document.getElementById('proj-name').value = STATE.project_name;
 
     hideLoadingScreen();
 
-    // Skip directly to the review step (step 6)
-    // We need to render the review even if palette/styles aren't fully loaded
-    // (the user can still regenerate from here)
-    goToStep(6);
-    renderReview();
-    toast('Review your saved answers and click Generate to rebuild the website.');
+    if (editMode) {
+      // Edit mode: start from step 1 so the user can walk through each step
+      goToStep(1);
+      toast('Edit your choices and click Generate when ready.');
+    } else {
+      // Regenerate mode: jump to review
+      goToStep(6);
+      renderReview();
+      toast('Review your saved answers and click Generate to rebuild the website.');
+    }
   } catch (e) {
     hideLoadingScreen();
     toast('Could not load project: ' + (e.message || e), 5000);
@@ -702,7 +705,7 @@ async function generate() {
 
     // ---- 2. Generate design doc + generation prompt ----
     updateGenStage('design', 'active');
-    updateGenTitle('Designing your design system…');
+    updateGenTitle('Planning your design…');
 
     const designPayload = {
       business_idea: STATE.business_idea,
@@ -728,13 +731,13 @@ async function generate() {
     // 546 timeout error that happens when the edge function tries to retry
     // internally and exceeds its wall-clock limit.
     updateGenStage('code', 'active');
-    updateGenTitle('Writing your HTML, CSS & JavaScript…');
+    updateGenTitle('Creating your website…');
 
     let genResult = null;
     let genError = null;
     for (let genAttempt = 0; genAttempt < 3; genAttempt++) {
       if (genAttempt > 0) {
-        updateGenTitle('Retrying code generation (attempt ' + (genAttempt + 1) + ' of 3)…');
+        updateGenTitle('Still creating your website (attempt ' + (genAttempt + 1) + ' of 3)…');
         await new Promise(r => setTimeout(r, 2000)); // 2s delay between retries
       }
       try {
@@ -758,10 +761,14 @@ async function generate() {
       throw new Error('Code generation failed after 3 attempts. ' + (genError || 'Unknown error.') + ' Click Try Again to retry.');
     }
     STATE.website_files = genResult.files;
+    // Ensure all 3 files exist — the AI sometimes forgets script.js even
+    // though the HTML references it. Create empty fallbacks if missing.
+    if (!STATE.website_files['script.js']) STATE.website_files['script.js'] = '// No additional scripts needed.\n';
+    if (!STATE.website_files['styles.css']) STATE.website_files['styles.css'] = '/* No additional styles needed. */\n';
     updateGenStage('code', 'done');
 
     // ---- 4. Save files + (optional) upload logo to storage ----
-    updateGenTitle('Saving to your project…');
+    updateGenTitle('Saving your project…');
     await supabase.from('projects').update({
       website_files: STATE.website_files,
       status: 'generated',
@@ -779,7 +786,7 @@ async function generate() {
     updateGenStage('save', 'done');
 
     // ---- 5. Redirect to project view ----
-    updateGenTitle('Done. Taking you to your preview…');
+    updateGenTitle('Done! Taking you to your preview…');
     setTimeout(() => {
       window.location.href = `./project.html?id=${projectId}&fresh=1`;
     }, 800);

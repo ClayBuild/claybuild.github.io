@@ -57,12 +57,11 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
   try {
-    const { slug, files, logo_base64, logo_ext } = await req.json();
+    const body = await req.json();
+    const { slug, files, logo_base64, logo_ext, action } = body;
+
     if (!slug || !/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug)) {
       return errorJson("Invalid slug. Use 2-40 chars: lowercase letters, digits, hyphens.", 400);
-    }
-    if (!files || typeof files !== "object") {
-      return errorJson("Missing 'files' object.", 400);
     }
 
     const token = Deno.env.get("GITHUB_PAT");
@@ -71,6 +70,34 @@ Deno.serve(async (req) => {
     const domain = Deno.env.get("CLAY_DOMAIN") || "claybuild.github.io";
     const branch = "main";
     if (!token) return errorJson("GITHUB_PAT secret not set.", 500);
+
+    // ---- DELETE mode ----
+    if (action === "delete") {
+      // List all files in the folder and delete them
+      const listRes = await gh(`/repos/${owner}/${repo}/contents/${encodeURIComponent(slug)}?ref=${branch}`, { method: "GET", token });
+      if (!listRes.ok) {
+        // Folder might not exist (never published or already deleted)
+        return json({ status: "deleted", slug });
+      }
+      const fileList = await listRes.json();
+      if (Array.isArray(fileList)) {
+        for (const f of fileList) {
+          await gh(`/repos/${owner}/${repo}/contents/${encodeURIComponent(f.path)}`, {
+            method: "DELETE",
+            token,
+            body: JSON.stringify({ message: `clay: delete ${f.path}`, branch, sha: f.sha }),
+          });
+        }
+      }
+      // Trigger a Pages rebuild
+      await gh(`/repos/${owner}/${repo}/pages/builds`, { method: "POST", token });
+      return json({ status: "deleted", slug });
+    }
+
+    // ---- PUBLISH mode (default) ----
+    if (!files || typeof files !== "object") {
+      return errorJson("Missing 'files' object.", 400);
+    }
 
     // 1. Push every file into /<slug>/...
     const commitShaList: string[] = [];

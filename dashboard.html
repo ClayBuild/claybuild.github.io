@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=12">
+<link rel="stylesheet" href="./css/main.css?v=13">
 <style>
   .welcome-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
   .welcome-row h1 { font-size: 1.85rem; }
@@ -71,8 +71,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=12"></script>
-<script src="./js/supabase.js?v=12"></script>
+<script src="./js/config.js?v=13"></script>
+<script src="./js/supabase.js?v=13"></script>
 <script>
 (async function () {
   var session = await clayRequireAuth();
@@ -128,7 +128,10 @@
 
     var url = '';
     if (p.published_url) {
-      url = '<div class="url-line">' + escapeHtml(p.published_url.replace(/^https?:\/\//, '')) + '</div>';
+      url = '<div style="display:flex; gap:0.4rem; margin-top:0.5rem;">' +
+            '<a class="btn btn-sm" href="' + escapeAttr(p.published_url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>' +
+            '<button class="btn btn-ghost btn-sm copy-link-dash" data-url="' + escapeAttr(p.published_url) + '" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-link"></i> Copy link</button>' +
+            '</div>';
     }
 
     return '' +
@@ -150,6 +153,22 @@
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; });
   }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  // Wire up copy-link buttons after rendering
+  setTimeout(function() {
+    document.querySelectorAll('.copy-link-dash').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var url = btn.dataset.url;
+        navigator.clipboard.writeText(url).then(function() {
+          toast('Link copied to clipboard!');
+        }).catch(function() {
+          toast('Could not copy. Here it is: ' + url);
+        });
+      });
+    });
+  }, 100);
 })();
 </script>
 </body>
