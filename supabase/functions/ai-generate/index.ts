@@ -59,22 +59,38 @@ Do NOT always use the same sections in the same order. Vary which sections you i
 - "about" (variant: "standard"): about the business
 - "testimonial" (variant: "single"): a customer quote
 - "cta" (variant: "band"): call-to-action band
+- "cta-compact" (variant: "default"): smaller accent-colored CTA
 - "contact" (variant: "standard"): contact form
 - "gallery" (variant: "default"): image grid (for portfolios, bakeries, photographers, etc.)
 - "pricing" (variant: "default"): pricing tiers (for services, SaaS, tutoring, etc.)
 - "stats" (variant: "default"): key numbers (e.g. "500+ students", "10 years")
+- "products" (variant: "default"): product grid with prices and Buy buttons (for shops, retail, e-commerce)
+- "menu" (variant: "default"): menu items with prices and Order buttons (for restaurants, bakeries, cafes)
+- "team" (variant: "default"): team member cards with photos (placeholders)
+- "faq" (variant: "default"): expandable FAQ questions
+- "portfolio" (variant: "default"): portfolio/project grid with overlay labels
 
-BUSINESS-SPECIFIC SECTIONS:
-- Bakery/restaurant/food: include "gallery" (menu items), "pricing" (menu packages)
-- Photography/portfolio: include "gallery" prominently
-- Tutoring/education: include "pricing" (course tiers), "stats" (students taught)
-- SaaS/tech: include "pricing", "stats"
-- Law/finance: include "stats" (years experience), skip "gallery"
-- Retail/shop: include "gallery" (products), "pricing"
+DOMAIN-SPECIFIC SECTIONS (include based on business type):
+- Bakery/restaurant/food/cafe: include "menu" (with 4-6 items, prices), "gallery" (food photos), skip "products"
+- Photography/portfolio/creative: include "portfolio" (6 projects), "gallery"
+- Tutoring/education: include "pricing" (course tiers), "stats", "team" (instructors)
+- SaaS/tech/software: include "pricing", "stats", "faq"
+- Law/finance/consulting: include "stats", "team" (partners), "faq", skip "gallery"
+- Retail/shop/e-commerce/store: include "products" (4-8 products with prices and Buy buttons), "pricing" (shipping tiers)
+- Gym/fitness/wellness: include "pricing" (membership tiers), "stats", "team" (trainers)
+- Real estate: include "gallery" (listings), "stats", "team" (agents)
+- Agency/studio: include "portfolio", "team", "stats"
 
-VARIETY RULE: Even for the same business type, vary the section order and which sections you include. Don't always do features → about → testimonial → cta → contact. Mix it up. Sometimes start with stats, sometimes put about before features, sometimes skip testimonial, etc.
+VARIETY RULE: Even for the same business type, vary the section order and which sections you include. Don't always do the same structure. Mix it up. Sometimes start with stats, sometimes put about before features, sometimes skip testimonial, use cta-compact instead of cta, etc. Pick 4-6 sections (plus contact) and order them differently each time.
 
 Always include "contact" last (before footer).
+
+CONTENT FOR SHOPPING/MENU:
+- For "products": generate 4-8 realistic products with names, descriptions, and prices (e.g. $12.99). Include a "Buy" button (href="#contact").
+- For "menu": generate 4-6 menu items with names, descriptions, and prices. Include an "Order" button.
+- For "team": generate 2-4 team members with names and roles. Photos are placeholders (icon).
+- For "faq": generate 3-5 Q&A pairs relevant to the business.
+- For "portfolio": generate 4-6 project entries with titles and categories.
 
 JSON ESCAPING: ALL double-quotes inside strings MUST be escaped as \\". Output ONLY the JSON object.`;
 

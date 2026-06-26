@@ -86,8 +86,12 @@ img{max-width:100%;display:block;}
   .nav-links{display:none!important;}
   .grid-3{grid-template-columns:1fr!important;}
   .grid-2{grid-template-columns:1fr!important;}
+  .grid-4{grid-template-columns:1fr!important;}
   .hero-split{grid-template-columns:1fr!important;}
   .footer-grid{grid-template-columns:1fr!important;}
+}
+@media(max-width:1024px){
+  .grid-4{grid-template-columns:repeat(2,1fr)!important;}
 }
 `;
 }
@@ -587,6 +591,12 @@ document.querySelectorAll('form').forEach(function(f){
     else if (section.type === 'gallery') html += renderGallery(section.content || content, designStyle);
     else if (section.type === 'pricing') html += renderPricing(section.content || content, designStyle);
     else if (section.type === 'stats') html += renderStats(section.content || content, designStyle);
+    else if (section.type === 'products') html += renderProducts(section.content || content, designStyle);
+    else if (section.type === 'menu') html += renderMenu(section.content || content, designStyle);
+    else if (section.type === 'team') html += renderTeam(section.content || content, designStyle);
+    else if (section.type === 'faq') html += renderFAQ(section.content || content, designStyle);
+    else if (section.type === 'portfolio') html += renderPortfolio(section.content || content, designStyle);
+    else if (section.type === 'cta-compact') html += renderCTACompact(section.content || content, designStyle);
   });
 
   // Footer
@@ -610,45 +620,61 @@ document.querySelectorAll('form').forEach(function(f){
 // HOVER CSS — per-style interactive hover states
 // ============================================================================
 function hoverCSS(style) {
-  // Generic hover effects that apply to all <a> buttons and card-like divs
-  // based on the design style. Uses element selectors so we don't need to
-  // add specific class names to every component.
+  // Hover effects for ALL buttons (a[href] and button[type]) and cards.
+  // Targets every interactive element, not just specific hrefs.
   const hovers = {
     playful: `
-a[href]:not(.anim-1):not(.anim-2):not(.anim-3){transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s;}
-a[href^="#contact"]:hover,a[href^="#about"]:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 7px 0 var(--text);}
-a[href^="#contact"]:active,a[href^="#about"]:active{transform:translateY(3px) scale(0.98);box-shadow:0 1px 0 var(--text);}
-section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-4px) rotate(-1deg);box-shadow:0 8px 0 var(--accent);transition:transform 0.2s,box-shadow 0.2s;}`,
+a[href],button[type],.clay-btn{transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 7px 0 var(--text);}
+a[href]:active,button[type]:active,.clay-btn:active{transform:translateY(3px) scale(0.98);box-shadow:0 1px 0 var(--text);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-4px) rotate(-1deg);box-shadow:0 8px 0 var(--accent);}`,
     brutalism: `
-a[href]:not(.anim-1):not(.anim-2):not(.anim-3){transition:transform 0.1s,box-shadow 0.1s;}
-a[href^="#contact"]:hover,a[href^="#about"]:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--accent);}
-a[href^="#contact"]:active,a[href^="#about"]:active{transform:translate(0,0);box-shadow:0 0 0 var(--accent);}
-section .grid-3 > div:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--accent);transition:transform 0.1s,box-shadow 0.1s;}`,
+a[href],button[type],.clay-btn{transition:transform 0.1s,box-shadow 0.1s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--accent);}
+a[href]:active,button[type]:active,.clay-btn:active{transform:translate(0,0);box-shadow:0 0 0 var(--accent);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.1s,box-shadow 0.1s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--accent);}`,
     neumorphism: `
-section .grid-3 > div,section .grid-2 > div{transition:box-shadow 0.3s ease;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);}`,
+a[href],button[type],.clay-btn{transition:box-shadow 0.3s ease;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:box-shadow 0.3s ease;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);}`,
     glassmorphism: `
-section .grid-3 > div,section .grid-2 > div{transition:transform 0.3s,background 0.3s;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-4px);}
-a[href^="#contact"]:hover,a[href^="#about"]:hover{transform:translateY(-2px);transition:transform 0.2s;}`,
+a[href],button[type],.clay-btn{transition:transform 0.2s,background 0.2s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-2px);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.3s,background 0.3s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-4px);}`,
     'art-deco': `
-section .grid-3 > div,section .grid-2 > div{transition:transform 0.3s,box-shadow 0.3s;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.2);}`,
+a[href],button[type],.clay-btn{transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-2px);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.2);}`,
     editorial: `
-section .grid-3 > div,section .grid-2 > div{transition:transform 0.2s;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-2px);}`,
+a[href],button[type],.clay-btn{transition:transform 0.2s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-1px);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.2s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-2px);}`,
     swiss: `
-section .grid-3 > div,section .grid-2 > div{transition:border-color 0.2s,background 0.2s;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{border-left-color:var(--text);}`,
+a[href],button[type],.clay-btn{transition:background 0.2s,color 0.2s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{opacity:0.8;}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:border-color 0.2s,background 0.2s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{border-left-color:var(--text);}`,
     organic: `
-section .grid-3 > div,section .grid-2 > div{transition:transform 0.3s,box-shadow 0.3s;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.1);}`,
+a[href],button[type],.clay-btn{transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-2px);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.1);}`,
     minimalism: `
-section .grid-3 > div,section .grid-2 > div{transition:transform 0.2s,box-shadow 0.2s;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.06);}`,
+a[href],button[type],.clay-btn{transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-1px);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.06);}`,
     corporate: `
-section .grid-3 > div,section .grid-2 > div{transition:transform 0.2s,box-shadow 0.2s;}
-section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.1);}`,
+a[href],button[type],.clay-btn{transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-2px);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.1);}`,
   };
   return hovers[style] || hovers.minimalism;
 }
@@ -700,6 +726,126 @@ function renderStats(c, style) {
     '<div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(' + Math.min(stats.length, 4) + ',1fr);gap:2rem;text-align:center;">' +
     statsHtml +
     '</div></section>';
+}
+
+// ============================================================================
+// SHOPPING / E-COMMERCE COMPONENTS
+// ============================================================================
+function renderProducts(c, style) {
+  const products = c.products || [];
+  const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : style === 'organic' ? '16px' : '8px';
+  const productsHtml = products.map(function(p, i) {
+    var animClass = 'anim-' + ((i % 3) + 1);
+    return '<div class="' + animClass + '" style="background:var(--bg);border:1px solid var(--border);border-radius:' + r + ';overflow:hidden;display:flex;flex-direction:column;">' +
+      '<div style="aspect-ratio:1;background:var(--secondary);display:flex;align-items:center;justify-content:center;color:var(--on-primary);font-size:2rem;opacity:0.4;">' +
+        '<i class="fa-regular fa-image"></i>' +
+      '</div>' +
+      '<div style="padding:1rem;display:flex;flex-direction:column;gap:0.5rem;flex:1;">' +
+        '<h3 style="font-size:1rem;margin:0;">' + (p.name || 'Product') + '</h3>' +
+        '<p style="font-size:0.82rem;color:var(--muted);margin:0;flex:1;">' + (p.description || '') + '</p>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">' +
+          '<span style="font-size:1.15rem;font-weight:800;color:var(--accent);">' + (p.price || '$0') + '</span>' +
+          '<a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.45rem 0.9rem;border-radius:' + r + ';font-size:0.82rem;font-weight:600;">' +
+            '<i class="fa-solid fa-cart-plus" style="margin-right:0.3rem;"></i>Buy</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<section id="shop" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'Our products') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">' + (c.subtitle || '') + '</p>' +
+    '<div class="grid-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;">' +
+    productsHtml +
+    '</div></section>';
+}
+
+function renderMenu(c, style) {
+  const items = c.items || [];
+  const r = style === 'playful' ? '16px' : style === 'brutalism' ? '0' : '8px';
+  const itemsHtml = items.map(function(item, i) {
+    var animClass = 'anim-' + ((i % 3) + 1);
+    return '<div class="' + animClass + '" style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid var(--border);gap:1rem;">' +
+      '<div style="flex:1;">' +
+        '<div style="font-weight:700;font-size:1rem;">' + (item.name || 'Item') + '</div>' +
+        '<div style="font-size:0.85rem;color:var(--muted);margin-top:0.2rem;">' + (item.description || '') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:1rem;">' +
+        '<span style="font-weight:700;color:var(--accent);font-size:1.05rem;">' + (item.price || '') + '</span>' +
+        '<a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.35rem 0.8rem;border-radius:' + r + ';font-size:0.78rem;font-weight:600;">Order</a>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<section id="menu" class="anim-fade" style="padding:4rem 2rem;max-width:780px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'Menu') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2rem;">' + (c.subtitle || '') + '</p>' +
+    itemsHtml +
+    '</section>';
+}
+
+function renderTeam(c, style) {
+  const members = c.members || [];
+  const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '50%';
+  const membersHtml = members.map(function(m, i) {
+    var animClass = 'anim-' + ((i % 3) + 1);
+    return '<div class="' + animClass + '" style="text-align:center;">' +
+      '<div style="width:120px;height:120px;border-radius:' + r + ';background:var(--secondary);margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;color:var(--on-primary);font-size:2.5rem;opacity:0.4;">' +
+        '<i class="fa-regular fa-user"></i>' +
+      '</div>' +
+      '<h3 style="font-size:1.05rem;margin-bottom:0.2rem;">' + (m.name || 'Team member') + '</h3>' +
+      '<p style="font-size:0.85rem;color:var(--muted);">' + (m.role || '') + '</p>' +
+    '</div>';
+  }).join('');
+  return '<section id="team" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'Our team') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">' + (c.subtitle || '') + '</p>' +
+    '<div class="grid-' + Math.min(members.length, 4) + '" style="display:grid;grid-template-columns:repeat(' + Math.min(members.length, 4) + ',1fr);gap:2rem;">' +
+    membersHtml +
+    '</div></section>';
+}
+
+function renderFAQ(c, style) {
+  const faqs = c.faqs || [];
+  const faqsHtml = faqs.map(function(f, i) {
+    var animClass = 'anim-' + ((i % 3) + 1);
+    return '<details class="' + animClass + '" style="border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:0.75rem;">' +
+      '<summary style="font-weight:600;cursor:pointer;font-size:0.95rem;">' + (f.question || 'Question') + '</summary>' +
+      '<p style="margin-top:0.75rem;color:var(--muted);font-size:0.9rem;line-height:1.6;">' + (f.answer || '') + '</p>' +
+    '</details>';
+  }).join('');
+  return '<section id="faq" class="anim-fade" style="padding:4rem 2rem;max-width:780px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'FAQ') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2rem;">' + (c.subtitle || '') + '</p>' +
+    faqsHtml +
+    '</section>';
+}
+
+function renderPortfolio(c, style) {
+  const items = c.items || [];
+  const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '8px';
+  const itemsHtml = items.map(function(item, i) {
+    var animClass = 'anim-' + ((i % 3) + 1);
+    return '<div class="' + animClass + '" style="position:relative;aspect-ratio:4/3;background:var(--secondary);border-radius:' + r + ';overflow:hidden;display:flex;align-items:flex-end;padding:1rem;color:var(--on-primary);">' +
+      '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent 50%);"></div>' +
+      '<div style="position:relative;">' +
+        '<h3 style="font-size:1rem;margin:0;">' + (item.title || 'Project') + '</h3>' +
+        '<p style="font-size:0.8rem;opacity:0.8;margin:0;">' + (item.category || '') + '</p>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<section id="portfolio" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'Our work') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">' + (c.subtitle || '') + '</p>' +
+    '<div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">' +
+    itemsHtml +
+    '</div></section>';
+}
+
+function renderCTACompact(c, style) {
+  return '<section class="anim-fade" style="padding:3rem 2rem;text-align:center;background:var(--accent);color:var(--on-accent);">' +
+    '<h2 style="font-size:1.5rem;margin-bottom:0.5rem;">' + (c.headline || 'Ready?') + '</h2>' +
+    '<p style="margin-bottom:1.5rem;opacity:0.9;">' + (c.subtitle || '') + '</p>' +
+    '<a href="#contact" style="display:inline-block;background:var(--on-accent);color:var(--accent);padding:0.75rem 1.75rem;border-radius:' + (style === 'playful' ? '16px' : '8px') + ';font-weight:700;">' + (c.button_text || 'Get started') + '</a>' +
+  '</section>';
 }
 
 window.CLAY_COMPONENTS = { renderSite, STYLE_FONTS };
