@@ -1,120 +1,116 @@
 // ============================================================================
-// ai-generate — Sends the prepared generation prompt + DESIGN.md to the
-// Laguna XS.2 code-generation model and returns the parsed JSON of files.
-// Uses: poolside/laguna-xs.2:free via OpenRouter.
+// ai-generate — Generates a STRUCTURED SPEC (not raw code) for the website.
+// The client-side renderer assembles the final HTML/CSS/JS from pre-built
+// components using this spec.
+//
+// This is faster (~300 tokens of output vs 8000), more reliable (no JSON
+// escaping issues with HTML content), and produces consistently polished
+// results (components are hand-built, not AI-generated).
 // ============================================================================
 import { corsHeaders, json, errorJson, callOpenRouter, extractJSON } from "../_shared/cors.ts";
 
-const GENERATE_SYSTEM_PROMPT = `You are an expert front-end engineer. You generate complete, production-quality websites using ONLY Vanilla HTML, CSS, and JavaScript — no frameworks, no build tools, no imports.
+const GENERATE_SYSTEM_PROMPT = `You are Clay's website planner. Given the user's business idea, questionnaire answers, and design choices, you produce a STRUCTURED SPEC that a renderer will use to assemble the final website.
 
-The user will give you a detailed brief. You must respond with a SINGLE JSON object mapping file names to file contents.
+Output ONLY valid JSON. No markdown, no prose. Use this exact shape:
 
-The JSON object MUST have EXACTLY these three keys — all three are required, no more, no less:
-  "index.html"
-  "styles.css"
-  "script.js"
-If you think no JavaScript is needed, still include "script.js" with a comment like "// No additional scripts needed". NEVER omit it — the HTML will reference ./script.js and the site will break if the file is missing.
-
-CRITICAL CONTENT RULES:
-1. ALL text content must accurately reflect the user's business as described in the brief. Read the business idea carefully and use it as the sole source of truth for what the business does.
-2. Do NOT invent services, products, or features the user did not mention. If the user teaches "AI tools for web development", the content must say "AI tools for web development" — NOT "Python, JavaScript, and Web Development" unless those were explicitly mentioned.
-3. Do NOT include joke content, memes, rickrolls, or any non-professional placeholder. All video/image placeholders must use a neutral gray box or a descriptive label — NEVER a real video URL (especially not YouTube rickrolls).
-4. If you need placeholder images, use a plain colored div with CSS or describe what image should go there in a comment. Do NOT use external image URLs.
-5. Social media links: only include the platforms the user explicitly requested. Use href="#" for all social links (they are placeholders). Do NOT embed any YouTube videos unless the user explicitly asked for a video section.
-
-CRITICAL TECHNICAL REQUIREMENTS:
-1. The site will be deployed at a SUBPATH (e.g. claybuild.github.io/my-project/). Therefore every internal reference MUST be relative:
-   - <link rel="stylesheet" href="./styles.css">
-   - <script src="./script.js" defer></script>
-   - <img src="./logo.png"> (if a logo was requested)
-   - Internal links should be "#section-id" or "./" — NEVER "/about" or "/index.html".
-2. Use semantic HTML5 (header, nav, main, section, footer, article).
-3. Use CSS custom properties (variables) at :root for the entire color palette and spacing scale.
-4. Use CSS Grid and Flexbox for layout. Make the site fully responsive (mobile-first).
-5. Include FontAwesome 6 via CDN in the <head>: <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-6. Use Google Fonts via <link> in the <head>.
-7. Include a working contact form (front-end only). On submit, prevent default, show a success message, and do NOT actually send data anywhere.
-8. Add smooth scroll behavior (html { scroll-behavior: smooth; }) and subtle fade-in animations on scroll (via IntersectionObserver in script.js).
-9. Add a sticky/responsive navigation that collapses to a hamburger menu on mobile.
-10. The HTML must be a complete <!DOCTYPE html> document.
-11. All text content must be realistic and tailored to the business — no lorem ipsum.
-
-OUTPUT FORMAT — STRICTLY:
 {
-  "index.html": "<!DOCTYPE html>...",
-  "styles.css": "/* ... */",
-  "script.js": "// ..."
+  "content": {
+    "brand_name": "string",
+    "tagline": "string",
+    "headline": "string — the hero headline (6-12 words, impactful)",
+    "subheadline": "string — 1-2 sentences expanding on the headline",
+    "cta_text": "string — the main call-to-action button text (2-4 words)",
+    "nav_links": ["string", "string", "string"],
+    "about_body": "string — 2-3 sentences about the business, derived from the idea",
+    "social_links": ["string"],
+    "contact_details": { "email": "string or null", "phone": "string or null", "address": "string or null" }
+  },
+  "components": {
+    "nav": "topbar | sidebar | minimal",
+    "hero": "centered | split | bold",
+    "footer": "minimal | rich"
+  },
+  "sections": [
+    { "type": "features", "variant": "3-col | 2-col", "content": { "title": "string", "subtitle": "string", "cards": [{"title":"string","description":"string","icon":"fa-solid fa-xxx"}] } },
+    { "type": "about", "variant": "standard", "content": { "title": "string", "body": "string" } },
+    { "type": "testimonial", "variant": "single", "content": { "quote": "string", "author": "string" } },
+    { "type": "cta", "variant": "band", "content": { "headline": "string", "subtitle": "string", "button_text": "string" } },
+    { "type": "contact", "variant": "standard", "content": { "title": "string", "subtitle": "string", "contact_details": {} } }
+  ]
 }
 
-- Do NOT include any prose, explanations, or markdown code fences.
-- Do NOT include any keys other than file names.
-- Make sure every quote inside file contents is properly escaped so the whole response is valid JSON.
-- The "index.html" value MUST be a single JSON string with all newlines escaped as \\n and all double quotes inside the HTML escaped as \\".`;
+CONTENT RULES:
+1. ALL text must accurately reflect the user's business as described in the idea. Do NOT invent services or products not mentioned.
+2. If the user said "AI tools for web development", write that — NOT "Python and JavaScript".
+3. Do NOT include joke content, memes, or rickrolls.
+4. Feature cards: generate 3-4 cards based on what the business actually offers. Use relevant FontAwesome icons.
+5. Testimonial: generate a realistic-sounding testimonial with a plausible name. If the business is new/small, make the testimonial sound genuine, not over-the-top.
+6. About body: expand on the user's idea in 2-3 sentences. Mention their location if provided.
+7. Contact details: only include what's reasonable for the business type. Use placeholder@example.com if no real email was provided.
+
+COMPONENT CHOICES:
+- nav: "topbar" for most sites. "sidebar" for portfolios/agency sites. "minimal" for very simple sites.
+- hero: "centered" for most. "split" for sites with a visual element. "bold" for sites that want a strong first impression.
+- footer: "rich" if there are social links or multiple nav items. "minimal" for simple sites.
+
+SECTIONS:
+Include a sensible set based on the business:
+- Always include "features" (3-col or 2-col) showcasing what the business offers.
+- Always include "about" with the about_body.
+- Always include "contact" at the end.
+- Include "cta" before the contact section for most sites.
+- Include "testimonial" only if it feels appropriate (skip for very small/new businesses).
+
+JSON ESCAPING: ALL double-quotes inside strings MUST be escaped as \\". Output ONLY the JSON object.`;
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const { generation_prompt, design_doc, slug } = await req.json();
-    if (!generation_prompt) return errorJson("Missing 'generation_prompt'.", 400);
-    if (!slug) return errorJson("Missing 'slug'.", 400);
+    const { generation_prompt, design_doc, slug, business_idea, questionnaire, design_style, palette, logo_info } = await req.json();
 
     const apiKey = Deno.env.get("OPENROUTER_API_KEY");
     if (!apiKey) return errorJson("OPENROUTER_API_KEY secret not set.", 500);
 
-    const userContent = `Here is the DESIGN.md (design system spec) for reference:
+    // Build a clean context for the AI — we don't need the generation_prompt
+    // anymore since the AI is outputting a spec, not code.
+    const userContent = `Business idea: """${business_idea || ''}"""
 
------ BEGIN DESIGN.md -----
-${design_doc || "(no design doc provided)"}
------ END DESIGN.md -----
+Questionnaire answers:
+${JSON.stringify(questionnaire?.answers || {}, null, 2)}
 
-And here is the full website brief (already filled-in by the previous step):
+Design style: "${design_style || 'minimalism'}"
+${palette ? `Color palette: ${JSON.stringify(palette)}` : (logo_info ? `Logo colors: ${JSON.stringify(logo_info)}` : '')}
 
------ BEGIN BRIEF -----
-${generation_prompt}
------ END BRIEF -----
-
-The site will deploy at: https://claybuild.github.io/${slug}/
-
-Return the JSON object of files now.`;
+Generate the structured spec JSON now. All content must accurately reflect the business idea above.`;
 
     const messages = [
       { role: "system", content: GENERATE_SYSTEM_PROMPT },
-      { role: "user",   content: userContent },
+      { role: "user", content: userContent },
     ];
 
-    // SINGLE attempt only — the client handles retries. This keeps the edge
-    // function well within its wall-clock timeout. If the model times out or
-    // returns bad JSON, we return an error and the client (new-project.js)
-    // will retry by calling this function again.
     let raw: string;
     try {
-      raw = await callOpenRouter(apiKey, "poolside/laguna-xs.2:free", messages, {
-        temperature: 0.4,
-        max_tokens: 8000,
+      raw = await callOpenRouter(apiKey, "openai/gpt-oss-120b:free", messages, {
+        temperature: 0.5, max_tokens: 4000
       });
     } catch (e) {
       const msg = String(e?.message || e);
-      console.warn(`[ai-generate] API error: ${msg}`);
-      return errorJson("Model request failed: " + msg + " — click Try Again to retry.", 502);
+      return errorJson("Model request failed: " + msg, 502);
     }
 
-    if (!raw || !raw.trim()) {
-      return errorJson("Model returned an empty response. Click Try Again to retry.", 502);
-    }
+    if (!raw || !raw.trim()) return errorJson("Empty response from model.", 502);
 
     try {
-      const files = extractJSON<Record<string, string>>(raw);
-      if (!files["index.html"]) {
-        return errorJson("Model response missing index.html. Click Try Again to retry.", 502);
+      const spec = extractJSON(raw);
+      // Basic validation
+      if (!spec.content || !spec.content.brand_name || !spec.sections) {
+        return errorJson("Spec missing required fields.", 502);
       }
-      return json({ files });
-    } catch (parseErr) {
-      const msg = String(parseErr?.message || parseErr);
+      return json({ spec });
+    } catch (e) {
+      const msg = String(e?.message || e);
       console.warn(`[ai-generate] Parse error: ${msg}`);
-      console.warn(`[ai-generate] Raw response length: ${raw.length}, first 200 chars: ${raw.slice(0, 200)}`);
-      return errorJson("Could not parse the generated code. Click Try Again to retry. Error: " + msg, 502);
+      return errorJson("Could not parse spec. Error: " + msg, 502);
     }
   } catch (e) {
     return errorJson(String(e?.message || e), 500);

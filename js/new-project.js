@@ -703,8 +703,6 @@ async function generate() {
     STATE.project_id = projectId;
 
     // ---- 1b. Save design_style + palette to the questionnaire JSON NOW ----
-    // This ensures they're persisted even if generation fails later.
-    // We store them inside the questionnaire JSON so they survive retries.
     const enrichedQuestionnaire = {
       answers: STATE.answers,
       questions: STATE.questions,
@@ -716,74 +714,69 @@ async function generate() {
       questionnaire: enrichedQuestionnaire,
     }).eq('id', projectId);
 
-    // ---- 2. Generate design doc + generation prompt ----
+    // ---- 2. Generate the website spec (structured JSON, not raw code) ----
     updateGenStage('design', 'active');
-    updateGenTitle('Planning your design…');
+    updateGenTitle('Planning your website…');
 
-    const designPayload = {
-      business_idea: STATE.business_idea,
-      project_name: finalName,
-      slug: STATE.slug,
-      questionnaire: { answers: STATE.answers, questions: STATE.questions },
-      design_style: STATE.design_style,
-      logo_info: STATE.logo?.info || null,
-      palette: STATE.logo ? null : STATE.palette,
-    };
+    let specResult = null;
+    let specError = null;
+    for (let specAttempt = 0; specAttempt < 3; specAttempt++) {
+      if (specAttempt > 0) {
+        updateGenTitle('Still planning (attempt ' + (specAttempt + 1) + ' of 3)…');
+        await new Promise(r => setTimeout(r, 2000));
+      }
+      try {
+        specResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_GENERATE, {
+          business_idea: STATE.business_idea,
+          questionnaire: { answers: STATE.answers, questions: STATE.questions },
+          design_style: STATE.design_style,
+          palette: STATE.logo ? null : STATE.palette,
+          logo_info: STATE.logo?.info || null,
+          slug: STATE.slug,
+        });
+        if (specResult && specResult.spec && specResult.spec.content) break;
+        specError = 'Spec missing content field.';
+        specResult = null;
+      } catch (e) {
+        specError = e.message || String(e);
+        console.warn('[Clay] Spec attempt ' + (specAttempt + 1) + ' failed:', specError);
+      }
+    }
 
-    const designResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_DESIGN_DOC, designPayload);
-    STATE.design_doc = designResult.design_doc;
-    STATE.generation_prompt = designResult.generation_prompt;
-
-    // Save design_doc to DB
-    await supabase.from('projects').update({ design_doc: STATE.design_doc }).eq('id', projectId);
+    if (!specResult || !specResult.spec) {
+      throw new Error('Could not plan your website after 3 attempts. ' + (specError || 'Unknown error.') + ' Click Try Again to retry.');
+    }
     updateGenStage('design', 'done');
 
-    // ---- 3. Generate the website code ----
-    // Client-side retry loop: the edge function does a single call (to stay
-    // within its timeout), and we retry here if it fails. This avoids the
-    // 546 timeout error that happens when the edge function tries to retry
-    // internally and exceeds its wall-clock limit.
+    // ---- 3. Render the website from the spec using pre-built components ----
     updateGenStage('code', 'active');
     updateGenTitle('Creating your website…');
 
-    let genResult = null;
-    let genError = null;
-    for (let genAttempt = 0; genAttempt < 3; genAttempt++) {
-      if (genAttempt > 0) {
-        updateGenTitle('Still creating your website (attempt ' + (genAttempt + 1) + ' of 3)…');
-        await new Promise(r => setTimeout(r, 2000)); // 2s delay between retries
-      }
-      try {
-        genResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_GENERATE, {
-          generation_prompt: STATE.generation_prompt,
-          design_doc: STATE.design_doc,
-          slug: STATE.slug,
-        });
-        if (genResult && genResult.files && genResult.files['index.html']) {
-          break; // success
-        }
-        genError = 'Model response missing index.html.';
-        genResult = null;
-      } catch (e) {
-        genError = e.message || String(e);
-        console.warn('[Clay] Generate attempt ' + (genAttempt + 1) + ' failed:', genError);
-      }
+    const spec = specResult.spec;
+    // If a logo was uploaded, tell the renderer to use it
+    if (STATE.logo) {
+      spec.logo = true;
+      spec.logo_ext = STATE.logo.ext;
     }
 
-    if (!genResult || !genResult.files) {
-      throw new Error('Code generation failed after 3 attempts. ' + (genError || 'Unknown error.') + ' Click Try Again to retry.');
-    }
-    STATE.website_files = genResult.files;
-    // Ensure all 3 files exist — the AI sometimes forgets script.js even
-    // though the HTML references it. Create empty fallbacks if missing.
-    if (!STATE.website_files['script.js']) STATE.website_files['script.js'] = '// No additional scripts needed.\n';
-    if (!STATE.website_files['styles.css']) STATE.website_files['styles.css'] = '/* No additional styles needed. */\n';
+    const palette = STATE.logo?.info ? [
+      STATE.logo.info.recommended_background || '#FFFFFF',
+      (STATE.logo.info.colors || ['#000000'])[0],
+      (STATE.logo.info.colors || ['#555555'])[1] || '#555555',
+      STATE.logo.info.recommended_accent || '#3B82F6',
+      STATE.logo.info.recommended_text_color || '#1A1A1A',
+    ] : (STATE.palette ? STATE.palette.colors : ['#FFFFFF', '#000000', '#555555', '#3B82F6', '#1A1A1A']);
+
+    // Use the component library to render the final HTML
+    STATE.website_files = window.CLAY_COMPONENTS.renderSite(spec, palette, STATE.design_style);
+
     updateGenStage('code', 'done');
 
     // ---- 4. Save files + (optional) upload logo to storage ----
     updateGenTitle('Saving your project…');
     await supabase.from('projects').update({
       website_files: STATE.website_files,
+      design_doc: JSON.stringify(spec, null, 2), // save the spec as the design_doc for reference
       status: 'generated',
     }).eq('id', projectId);
 
