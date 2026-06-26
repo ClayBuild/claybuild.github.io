@@ -826,6 +826,29 @@ async function generate() {
 
     const spec = specResult.spec;
 
+    // ---- 2b. Shuffle sections for structural variety ----
+    // The AI tends to always output the same section order. We shuffle the
+    // middle sections (keeping contact last) so every generation looks different.
+    if (spec.sections && spec.sections.length > 2) {
+      // Find the contact section (always last)
+      const contactIdx = spec.sections.findIndex(s => s.type === 'contact');
+      let contactSection = null;
+      let middleSections = [...spec.sections];
+
+      if (contactIdx >= 0) {
+        contactSection = middleSections.splice(contactIdx, 1)[0];
+      }
+
+      // Shuffle the middle sections
+      for (let i = middleSections.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [middleSections[i], middleSections[j]] = [middleSections[j], middleSections[i]];
+      }
+
+      // Reassemble: shuffled middle sections + contact at the end
+      spec.sections = contactSection ? [...middleSections, contactSection] : middleSections;
+    }
+
     const palette = STATE.logo?.info ? [
       STATE.logo.info.recommended_background || '#FFFFFF',
       (STATE.logo.info.colors || ['#000000'])[0],

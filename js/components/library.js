@@ -75,12 +75,12 @@ img{max-width:100%;display:block;}
 @keyframes scaleIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
 @keyframes bounceIn{0%{opacity:0;transform:scale(0.7) translateY(20px);}60%{opacity:1;transform:scale(1.03) translateY(-5px);}100%{transform:scale(1) translateY(0);}}
 
-.anim-1{animation:fadeUp 0.7s ease forwards;animation-delay:0.1s;opacity:0;}
-.anim-2{animation:fadeUp 0.7s ease forwards;animation-delay:0.25s;opacity:0;}
-.anim-3{animation:fadeUp 0.7s ease forwards;animation-delay:0.4s;opacity:0;}
-.anim-4{animation:fadeUp 0.7s ease forwards;animation-delay:0.55s;opacity:0;}
-.anim-5{animation:fadeUp 0.7s ease forwards;animation-delay:0.7s;opacity:0;}
-.anim-fade{animation:fadeIn 1s ease forwards;opacity:0;}
+.anim-1{animation:fadeUp 0.7s ease both;animation-delay:0.1s;}
+.anim-2{animation:fadeUp 0.7s ease both;animation-delay:0.25s;}
+.anim-3{animation:fadeUp 0.7s ease both;animation-delay:0.4s;}
+.anim-4{animation:fadeUp 0.7s ease both;animation-delay:0.55s;}
+.anim-5{animation:fadeUp 0.7s ease both;animation-delay:0.7s;}
+.anim-fade{animation:fadeIn 1s ease both;}
 
 @media(max-width:768px){
   .nav-links{display:none!important;}
@@ -610,49 +610,45 @@ document.querySelectorAll('form').forEach(function(f){
 // HOVER CSS — per-style interactive hover states
 // ============================================================================
 function hoverCSS(style) {
+  // Generic hover effects that apply to all <a> buttons and card-like divs
+  // based on the design style. Uses element selectors so we don't need to
+  // add specific class names to every component.
   const hovers = {
     playful: `
-.btn-3d{transition:transform 0.1s,box-shadow 0.1s;}
-.btn-3d:hover{transform:translateY(-1px);box-shadow:0 6px 0 var(--text);}
-.btn-3d:active{transform:translateY(3px);box-shadow:0 1px 0 var(--text);}
-.card-3d{transition:transform 0.2s,box-shadow 0.2s;}
-.card-3d:hover{transform:translateY(-4px) rotate(-1deg);box-shadow:0 8px 0 var(--accent);}
-.card-3d:active{transform:translateY(0) rotate(0);box-shadow:0 4px 0 var(--text);}`,
+a[href]:not(.anim-1):not(.anim-2):not(.anim-3){transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.15s;}
+a[href^="#contact"]:hover,a[href^="#about"]:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 7px 0 var(--text);}
+a[href^="#contact"]:active,a[href^="#about"]:active{transform:translateY(3px) scale(0.98);box-shadow:0 1px 0 var(--text);}
+section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-4px) rotate(-1deg);box-shadow:0 8px 0 var(--accent);transition:transform 0.2s,box-shadow 0.2s;}`,
     brutalism: `
-.btn-brutal{transition:transform 0.1s,box-shadow 0.1s;}
-.btn-brutal:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--accent);}
-.btn-brutal:active{transform:translate(0,0);box-shadow:0 0 0 var(--accent);}
-.card-brutal{transition:transform 0.1s,box-shadow 0.1s;}
-.card-brutal:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--accent);}`,
+a[href]:not(.anim-1):not(.anim-2):not(.anim-3){transition:transform 0.1s,box-shadow 0.1s;}
+a[href^="#contact"]:hover,a[href^="#about"]:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--accent);}
+a[href^="#contact"]:active,a[href^="#about"]:active{transform:translate(0,0);box-shadow:0 0 0 var(--accent);}
+section .grid-3 > div:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--accent);transition:transform 0.1s,box-shadow 0.1s;}`,
     neumorphism: `
-.neu-card{transition:box-shadow 0.3s ease;}
-.neu-card:hover{box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);}
-.neu-btn{transition:box-shadow 0.3s ease;}
-.neu-btn:hover{box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light);}`,
+section .grid-3 > div,section .grid-2 > div{transition:box-shadow 0.3s ease;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);}`,
     glassmorphism: `
-.glass-card{transition:transform 0.3s,background 0.3s;}
-.glass-card:hover{transform:translateY(-4px);background:rgba(255,255,255,0.15);}
-.glass-btn{transition:transform 0.2s,background 0.2s;}
-.glass-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,0.25);}`,
+section .grid-3 > div,section .grid-2 > div{transition:transform 0.3s,background 0.3s;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-4px);}
+a[href^="#contact"]:hover,a[href^="#about"]:hover{transform:translateY(-2px);transition:transform 0.2s;}`,
     'art-deco': `
-.deco-card{transition:transform 0.3s,box-shadow 0.3s;}
-.deco-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.2);}
-.deco-card:hover::before{opacity:0.6;}`,
+section .grid-3 > div,section .grid-2 > div{transition:transform 0.3s,box-shadow 0.3s;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.2);}`,
     editorial: `
-.edit-card{transition:transform 0.2s;}
-.edit-card:hover{transform:translateY(-2px);}`,
+section .grid-3 > div,section .grid-2 > div{transition:transform 0.2s;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-2px);}`,
     swiss: `
-.swiss-card{transition:border-color 0.2s,background 0.2s;}
-.swiss-card:hover{border-left-color:var(--text);background:var(--bg);}`,
+section .grid-3 > div,section .grid-2 > div{transition:border-color 0.2s,background 0.2s;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{border-left-color:var(--text);}`,
     organic: `
-.organic-card{transition:transform 0.3s,box-shadow 0.3s;}
-.organic-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.1);}`,
+section .grid-3 > div,section .grid-2 > div{transition:transform 0.3s,box-shadow 0.3s;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.1);}`,
     minimalism: `
-.min-card{transition:transform 0.2s,box-shadow 0.2s;}
-.min-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.06);}`,
+section .grid-3 > div,section .grid-2 > div{transition:transform 0.2s,box-shadow 0.2s;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.06);}`,
     corporate: `
-.corp-card{transition:transform 0.2s,box-shadow 0.2s;}
-.corp-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.1);}`,
+section .grid-3 > div,section .grid-2 > div{transition:transform 0.2s,box-shadow 0.2s;}
+section .grid-3 > div:hover,section .grid-2 > div:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.1);}`,
   };
   return hovers[style] || hovers.minimalism;
 }
