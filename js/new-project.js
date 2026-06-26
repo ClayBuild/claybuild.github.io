@@ -374,8 +374,9 @@ function step3Next() {
 
 function renderPalettes() {
   const grid = document.getElementById('palette-grid');
+  const paletteMatches = (a, b) => a && b && a.name === b.name && JSON.stringify(a.colors) === JSON.stringify(b.colors);
   grid.innerHTML = STATE.color_palettes.map((p, idx) => `
-    <div class="palette-card ${STATE.palette === p ? 'selected' : ''}" data-idx="${idx}">
+    <div class="palette-card ${paletteMatches(STATE.palette, p) ? 'selected' : ''}" data-idx="${idx}">
       <div class="name">${escapeHtml(p.name)}</div>
       <div class="palette-swatches">
         ${p.colors.map(c => `<div style="background:${escapeAttr(c)}"></div>`).join('')}
@@ -398,8 +399,11 @@ function selectPalette(p) {
     return;
   }
   STATE.palette = p;
+  // Compare by value (name + colors) not by reference, so it works when
+  // palettes are restored from the database (different object instances)
+  const paletteMatches = (a, b) => a && b && a.name === b.name && JSON.stringify(a.colors) === JSON.stringify(b.colors);
   document.querySelectorAll('.palette-card').forEach((card, idx) => {
-    card.classList.toggle('selected', STATE.color_palettes[idx] === p);
+    card.classList.toggle('selected', paletteMatches(STATE.color_palettes[idx], p));
   });
   // Update preview
   const url = clayPalettePreviewUrl(p);

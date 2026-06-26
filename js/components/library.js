@@ -1,7 +1,7 @@
 // ============================================================================
-// CLAY — Component Library v2
-// Production-ready components with per-style polish, animations, and hover states.
-// Each of the 10 design styles gets its own distinct visual treatment.
+// CLAY — Component Library v3
+// Each design style produces DISTINCT HTML/CSS that matches its sample mock.
+// Animations use pure CSS (no IntersectionObserver) for reliability.
 // ============================================================================
 
 // ---- Color helpers ----
@@ -13,603 +13,544 @@ function luminance(hex) {
   const b = parseInt(hex.substr(4, 2), 16) / 255;
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
-function readableText(bg, light, dark) {
-  return luminance(bg) > 0.5 ? dark : light;
+function readableText(bg, light, dark) { return luminance(bg) > 0.5 ? dark : light; }
+function withAlpha(hex, a) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  return `rgba(${r},${g},${b},${a})`;
 }
 
-// ============================================================================
-// STYLE CONFIGURATION — defines each style's personality
-// ============================================================================
-const STYLE_CONFIG = {
-  minimalism: {
-    font: "'Inter', sans-serif",
-    headingFont: "'Inter', sans-serif",
-    headingWeight: '800',
-    googleFonts: 'Inter:wght@300;400;500;600;700;800',
-    radius: '4px',
-    cardBorder: '1px solid var(--border)',
-    cardShadow: 'none',
-    cardHoverShadow: '0 8px 24px rgba(0,0,0,0.06)',
-    cardHoverTransform: 'translateY(-2px)',
-    btnRadius: '4px',
-    btnTransition: 'all 0.2s ease',
-    navBg: 'var(--bg)',
-    navBorder: '1px solid var(--border)',
-    sectionPadding: '6rem 2rem',
-    maxWidth: '1100px',
-    animation: 'fade-up',
-    letterSpacing: '-0.03em',
-  },
-  brutalism: {
-    font: "'Space Mono', monospace",
-    headingFont: "'Archivo Black', sans-serif",
-    headingWeight: '400',
-    googleFonts: 'Space+Mono:wght@400;700|Archivo+Black',
-    radius: '0',
-    cardBorder: '3px solid var(--text)',
-    cardShadow: '6px 6px 0 var(--text)',
-    cardHoverShadow: '8px 8px 0 var(--accent)',
-    cardHoverTransform: 'translate(-2px,-2px)',
-    btnRadius: '0',
-    btnTransition: 'all 0.1s ease',
-    navBg: 'var(--bg)',
-    navBorder: '4px solid var(--text)',
-    sectionPadding: '5rem 2rem',
-    maxWidth: '1200px',
-    animation: 'slide-in',
-    letterSpacing: '-0.02em',
-  },
-  swiss: {
-    font: "'Inter', sans-serif",
-    headingFont: "'Inter', sans-serif",
-    headingWeight: '900',
-    googleFonts: 'Inter:wght@400;500;600;700;800;900',
-    radius: '0',
-    cardBorder: '1px solid var(--border)',
-    cardShadow: 'none',
-    cardHoverShadow: 'none',
-    cardHoverTransform: 'none',
-    btnRadius: '0',
-    btnTransition: 'background 0.2s, color 0.2s',
-    navBg: 'var(--bg)',
-    navBorder: '2px solid var(--text)',
-    sectionPadding: '5rem 2rem',
-    maxWidth: '1200px',
-    animation: 'fade-up',
-    letterSpacing: '-0.04em',
-  },
-  neumorphism: {
-    font: "'Poppins', sans-serif",
-    headingFont: "'Poppins', sans-serif",
-    headingWeight: '600',
-    googleFonts: 'Poppins:wght@300;400;500;600;700',
-    radius: '16px',
-    cardBorder: 'none',
-    cardShadow: '8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light)',
-    cardHoverShadow: 'inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light)',
-    cardHoverTransform: 'none',
-    btnRadius: '12px',
-    btnTransition: 'all 0.3s ease',
-    navBg: 'var(--bg)',
-    navBorder: 'none',
-    sectionPadding: '4rem 2rem',
-    maxWidth: '1100px',
-    animation: 'scale-in',
-    letterSpacing: '-0.02em',
-  },
-  editorial: {
-    font: "'Source Serif Pro', serif",
-    headingFont: "'Playfair Display', serif",
-    headingWeight: '700',
-    googleFonts: 'Playfair+Display:wght@400;700;900|Source+Serif+Pro:wght@400;600',
-    radius: '2px',
-    cardBorder: '1px solid var(--border)',
-    cardShadow: 'none',
-    cardHoverShadow: '0 4px 12px rgba(0,0,0,0.08)',
-    cardHoverTransform: 'translateY(-2px)',
-    btnRadius: '2px',
-    btnTransition: 'all 0.2s ease',
-    navBg: 'var(--bg)',
-    navBorder: '3px double var(--text)',
-    sectionPadding: '5rem 2rem',
-    maxWidth: '780px',
-    animation: 'fade-up',
-    letterSpacing: '-0.015em',
-  },
-  glassmorphism: {
-    font: "'Inter', sans-serif",
-    headingFont: "'Poppins', sans-serif",
-    headingWeight: '700',
-    googleFonts: 'Poppins:wght@400;500;600;700|Inter:wght@400;500;600',
-    radius: '16px',
-    cardBorder: '1px solid rgba(255,255,255,0.2)',
-    cardShadow: '0 8px 32px rgba(0,0,0,0.1)',
-    cardHoverShadow: '0 12px 40px rgba(0,0,0,0.15)',
-    cardHoverTransform: 'translateY(-4px)',
-    btnRadius: '12px',
-    btnTransition: 'all 0.3s ease',
-    navBg: 'rgba(255,255,255,0.1)',
-    navBorder: '1px solid rgba(255,255,255,0.15)',
-    sectionPadding: '5rem 2rem',
-    maxWidth: '1100px',
-    animation: 'scale-in',
-    letterSpacing: '-0.02em',
-  },
-  'art-deco': {
-    font: "'Inter', sans-serif",
-    headingFont: "'Playfair Display', serif",
-    headingWeight: '700',
-    googleFonts: 'Playfair+Display:wght@400;700;900|Inter:wght@400;500;600',
-    radius: '2px',
-    cardBorder: '2px solid var(--accent)',
-    cardShadow: '0 4px 20px rgba(0,0,0,0.15)',
-    cardHoverShadow: '0 8px 30px rgba(0,0,0,0.2)',
-    cardHoverTransform: 'translateY(-3px)',
-    btnRadius: '2px',
-    btnTransition: 'all 0.3s ease',
-    navBg: 'var(--bg)',
-    navBorder: '2px solid var(--accent)',
-    sectionPadding: '5rem 2rem',
-    maxWidth: '1100px',
-    animation: 'fade-up',
-    letterSpacing: '0.02em',
-  },
-  corporate: {
-    font: "'Inter', sans-serif",
-    headingFont: "'Inter', sans-serif",
-    headingWeight: '700',
-    googleFonts: 'Inter:wght@400;500;600;700;800',
-    radius: '8px',
-    cardBorder: '1px solid var(--border)',
-    cardShadow: '0 1px 3px rgba(0,0,0,0.05)',
-    cardHoverShadow: '0 8px 25px rgba(0,0,0,0.1)',
-    cardHoverTransform: 'translateY(-3px)',
-    btnRadius: '8px',
-    btnTransition: 'all 0.2s ease',
-    navBg: 'var(--bg)',
-    navBorder: '1px solid var(--border)',
-    sectionPadding: '5rem 2rem',
-    maxWidth: '1140px',
-    animation: 'fade-up',
-    letterSpacing: '-0.02em',
-  },
-  playful: {
-    font: "'Nunito', sans-serif",
-    headingFont: "'Nunito', sans-serif",
-    headingWeight: '800',
-    googleFonts: 'Nunito:wght@400;600;700;800;900',
-    radius: '20px',
-    cardBorder: 'none',
-    cardShadow: '0 4px 0 var(--text)',
-    cardHoverShadow: '0 6px 0 var(--accent)',
-    cardHoverTransform: 'translateY(-2px)',
-    btnRadius: '16px',
-    btnTransition: 'all 0.2s cubic-bezier(0.34,1.56,0.64,1)',
-    navBg: 'var(--bg)',
-    navBorder: 'none',
-    sectionPadding: '4rem 2rem',
-    maxWidth: '1100px',
-    animation: 'bounce-in',
-    letterSpacing: '-0.02em',
-  },
-  organic: {
-    font: "'Inter', sans-serif",
-    headingFont: "'Lora', serif",
-    headingWeight: '600',
-    googleFonts: 'Lora:wght@400;500;600;700|Inter:wght@400;500;600',
-    radius: '24px',
-    cardBorder: '1px solid var(--border)',
-    cardShadow: '0 4px 20px rgba(0,0,0,0.06)',
-    cardHoverShadow: '0 8px 30px rgba(0,0,0,0.1)',
-    cardHoverTransform: 'translateY(-3px)',
-    btnRadius: '24px',
-    btnTransition: 'all 0.3s ease',
-    navBg: 'var(--bg)',
-    navBorder: 'none',
-    sectionPadding: '5rem 2rem',
-    maxWidth: '1100px',
-    animation: 'fade-up',
-    letterSpacing: '-0.015em',
-  },
+// ---- Per-style font + meta config ----
+const STYLE_FONTS = {
+  minimalism:   { body: "'Inter',sans-serif", head: "'Inter',sans-serif", hw: '800', gf: 'Inter:wght@300;400;500;600;700;800', ls: '-0.03em' },
+  brutalism:    { body: "'Space Mono',monospace", head: "'Archivo Black',sans-serif", hw: '400', gf: 'Space+Mono:wght@400;700|Archivo+Black', ls: '-0.02em' },
+  swiss:        { body: "'Inter',sans-serif", head: "'Inter',sans-serif", hw: '900', gf: 'Inter:wght@400;500;600;700;800;900', ls: '-0.04em' },
+  neumorphism:  { body: "'Poppins',sans-serif", head: "'Poppins',sans-serif", hw: '600', gf: 'Poppins:wght@300;400;500;600;700', ls: '-0.02em' },
+  editorial:    { body: "'Source Serif Pro',serif", head: "'Playfair Display',serif", hw: '700', gf: 'Playfair+Display:wght@400;700;900|Source+Serif+Pro:wght@400;600', ls: '-0.015em' },
+  glassmorphism:{ body: "'Inter',sans-serif", head: "'Poppins',sans-serif", hw: '700', gf: 'Poppins:wght@400;500;600;700|Inter:wght@400;500;600', ls: '-0.02em' },
+  'art-deco':   { body: "'Inter',sans-serif", head: "'Playfair Display',serif", hw: '700', gf: 'Playfair+Display:wght@400;700;900|Inter:wght@400;500;600', ls: '0.02em' },
+  corporate:    { body: "'Inter',sans-serif", head: "'Inter',sans-serif", hw: '700', gf: 'Inter:wght@400;500;600;700;800', ls: '-0.02em' },
+  playful:      { body: "'Nunito',sans-serif", head: "'Nunito',sans-serif", hw: '800', gf: 'Nunito:wght@400;600;700;800;900', ls: '-0.02em' },
+  organic:      { body: "'Inter',sans-serif", head: "'Lora',serif", hw: '600', gf: 'Lora:wght@400;500;600;700|Inter:wght@400;500;600', ls: '-0.015em' },
 };
 
 // ============================================================================
-// CSS GENERATION — per-style CSS including animations and hover states
+// BASE CSS — shared reset + animation keyframes (pure CSS, no JS needed)
 // ============================================================================
-function generateCSS(p, style) {
-  const cfg = STYLE_CONFIG[style] || STYLE_CONFIG.minimalism;
+function baseCSS(p, style) {
+  const sf = STYLE_FONTS[style] || STYLE_FONTS.minimalism;
   const bg = p[0], primary = p[1], secondary = p[2], accent = p[3], text = p[4];
-  const textOnAccent = readableText(accent, '#FFFFFF', '#000000');
-  const textOnPrimary = readableText(primary, '#FFFFFF', '#000000');
+  const onAccent = readableText(accent, '#FFF', '#000');
+  const onPrimary = readableText(primary, '#FFF', '#000');
   const muted = luminance(bg) > 0.5 ? '#6B7280' : '#9CA3AF';
   const border = luminance(bg) > 0.5 ? '#E5E7EB' : '#374151';
-  const shadowDark = luminance(bg) > 0.5 ? '#D1D5DB' : '#1F2937';
-  const shadowLight = luminance(bg) > 0.5 ? '#FFFFFF' : '#374151';
 
   return `
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --bg:${bg}; --primary:${primary}; --secondary:${secondary}; --accent:${accent}; --text:${text};
-  --text-on-accent:${textOnAccent}; --text-on-primary:${textOnPrimary};
-  --muted:${muted}; --border:${border}; --shadow-dark:${shadowDark}; --shadow-light:${shadowLight};
-  --radius:${cfg.radius}; --btn-radius:${cfg.btnRadius};
-}
-html { scroll-behavior:smooth; }
-body {
-  font-family:${cfg.font};
-  background:var(--bg); color:var(--text);
-  line-height:1.6; -webkit-font-smoothing:antialiased;
-}
-h1,h2,h3,h4 { font-family:${cfg.headingFont}; font-weight:${cfg.headingWeight}; letter-spacing:${cfg.letterSpacing}; line-height:1.15; }
-a { color:inherit; text-decoration:none; transition:${cfg.btnTransition}; }
-img { max-width:100%; display:block; }
-.container { max-width:${cfg.maxWidth}; margin:0 auto; padding:0 2rem; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:${bg};--primary:${primary};--secondary:${secondary};--accent:${accent};--text:${text};
+--on-accent:${onAccent};--on-primary:${onPrimary};--muted:${muted};--border:${border};}
+html{scroll-behavior:smooth;}
+body{font-family:${sf.body};background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+h1,h2,h3,h4{font-family:${sf.head};font-weight:${sf.hw};letter-spacing:${sf.ls};line-height:1.15;}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
 
-/* ---- Animations ---- */
-@keyframes fadeUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
-@keyframes slideIn { from{opacity:0;transform:translateX(-30px);} to{opacity:1;transform:translateX(0);} }
-@keyframes scaleIn { from{opacity:0;transform:scale(0.95);} to{opacity:1;transform:scale(1);} }
-@keyframes bounceIn { 0%{opacity:0;transform:scale(0.8);} 60%{opacity:1;transform:scale(1.05);} 100%{transform:scale(1);} }
+/* Pure CSS load animations — no JS needed */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:translateX(0);}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+@keyframes bounceIn{0%{opacity:0;transform:scale(0.7) translateY(20px);}60%{opacity:1;transform:scale(1.03) translateY(-5px);}100%{transform:scale(1) translateY(0);}}
 
-[data-animate] { opacity:0; }
-[data-animate].visible { animation: ${cfg.animation} 0.6s ease forwards; }
-/* Fallback: if JS doesn't run or observer fails, make content visible after 2s */
-@keyframes clayFallbackShow { to { opacity:1; } }
-[data-animate] { animation: clayFallbackShow 0.01s ease 2s forwards; }
-[data-animate].visible { animation: ${cfg.animation} 0.6s ease forwards, clayFallbackShow 0.01s ease 2s forwards; }
+.anim-1{animation:fadeUp 0.7s ease forwards;animation-delay:0.1s;opacity:0;}
+.anim-2{animation:fadeUp 0.7s ease forwards;animation-delay:0.25s;opacity:0;}
+.anim-3{animation:fadeUp 0.7s ease forwards;animation-delay:0.4s;opacity:0;}
+.anim-4{animation:fadeUp 0.7s ease forwards;animation-delay:0.55s;opacity:0;}
+.anim-5{animation:fadeUp 0.7s ease forwards;animation-delay:0.7s;opacity:0;}
+.anim-fade{animation:fadeIn 1s ease forwards;opacity:0;}
 
-/* ---- Cards ---- */
-.clay-card {
-  background:var(--bg);
-  border:${cfg.cardBorder};
-  border-radius:var(--radius);
-  box-shadow:${cfg.cardShadow};
-  transition:transform 0.3s ease, box-shadow 0.3s ease;
-  padding:1.75rem;
-}
-.clay-card:hover {
-  transform:${cfg.cardHoverTransform};
-  box-shadow:${cfg.cardHoverShadow};
-}
-
-/* ---- Buttons ---- */
-.clay-btn {
-  display:inline-flex; align-items:center; gap:0.5rem;
-  background:var(--accent); color:var(--text-on-accent);
-  padding:0.85rem 1.75rem;
-  border-radius:var(--btn-radius);
-  font-weight:700; font-size:0.95rem;
-  border:none; cursor:pointer;
-  transition:${cfg.btnTransition};
-  font-family:${cfg.font};
-}
-.clay-btn:hover { transform:translateY(-2px); filter:brightness(1.1); }
-.clay-btn-ghost {
-  background:transparent; color:var(--text);
-  border:2px solid var(--text);
-}
-.clay-btn-ghost:hover { background:var(--text); color:var(--bg); }
-
-/* ---- Glassmorphism specific ---- */
-${style === 'glassmorphism' ? `
-.clay-glass { background:rgba(255,255,255,0.1); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.15); }
-.clay-card.clay-glass { background:rgba(255,255,255,0.08); }
-` : ''}
-
-/* ---- Neumorphism specific ---- */
-${style === 'neumorphism' ? `
-.clay-neu { background:var(--bg); box-shadow:8px 8px 16px var(--shadow-dark),-8px -8px 16px var(--shadow-light); border:none; }
-.clay-neu-inset { box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light); }
-.clay-card.clay-neu:hover { box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light); transform:none; }
-` : ''}
-
-/* ---- Brutalism specific ---- */
-${style === 'brutalism' ? `
-.clay-card { transition:transform 0.1s, box-shadow 0.1s; }
-.clay-card:hover { transform:translate(-3px,-3px); box-shadow:9px 9px 0 var(--accent); }
-.clay-btn { border:3px solid var(--text); }
-.clay-btn:hover { transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--text); filter:none; }
-` : ''}
-
-/* ---- Playful specific ---- */
-${style === 'playful' ? `
-.clay-card { border:3px solid var(--text); }
-.clay-card:hover { transform:translateY(-4px) rotate(-1deg); box-shadow:0 8px 0 var(--accent); }
-.clay-btn:hover { transform:translateY(-3px) scale(1.05); }
-` : ''}
-
-/* ---- Art Deco specific ---- */
-${style === 'art-deco' ? `
-.clay-card { position:relative; }
-.clay-card::before { content:''; position:absolute; top:8px; left:8px; right:8px; bottom:8px; border:1px solid var(--accent); pointer-events:none; opacity:0.3; }
-.clay-deco-line { display:flex; align-items:center; gap:1rem; margin:1rem 0; }
-.clay-deco-line::before, .clay-deco-line::after { content:''; flex:1; height:1px; background:var(--accent); }
-` : ''}
-
-/* ---- Editorial specific ---- */
-${style === 'editorial' ? `
-.clay-drop-cap::first-letter { font-family:${cfg.headingFont}; font-size:4rem; font-weight:900; float:left; line-height:0.9; padding:0.3rem 0.5rem 0 0; color:var(--accent); }
-` : ''}
-
-/* ---- Swiss specific ---- */
-${style === 'swiss' ? `
-.clay-card { border-left:4px solid var(--accent); border-radius:0; }
-.clay-card:hover { background:var(--bg); border-left-color:var(--text); }
-` : ''}
-
-/* ---- Responsive ---- */
-@media (max-width:768px) {
-  .clay-nav-links { display:none !important; }
-  .clay-grid-3 { grid-template-columns:1fr !important; }
-  .clay-grid-2 { grid-template-columns:1fr !important; }
-  .clay-hero-split { grid-template-columns:1fr !important; }
+@media(max-width:768px){
+  .nav-links{display:none!important;}
+  .grid-3{grid-template-columns:1fr!important;}
+  .grid-2{grid-template-columns:1fr!important;}
+  .hero-split{grid-template-columns:1fr!important;}
+  .footer-grid{grid-template-columns:1fr!important;}
 }
 `;
 }
 
 // ============================================================================
-// COMPONENT FUNCTIONS — each returns HTML string
+// NAV — style-specific
 // ============================================================================
-const NAV = {
-  topbar: (c, cfg) => `
-<nav style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:${cfg.navBg};border-bottom:${cfg.navBorder};backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;">
-  <a href="#top" style="font-family:${cfg.headingFont};font-weight:${cfg.headingWeight};font-size:1.25rem;letter-spacing:${cfg.letterSpacing};color:var(--text);">${c.brand_name || 'Brand'}</a>
-  <div class="clay-nav-links" style="display:flex;gap:2rem;align-items:center;">
-    ${(c.nav_links || ['Home','About','Services','Contact']).map(l => `<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.9rem;color:var(--muted);font-weight:500;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">${l}</a>`).join('')}
-  </div>
-  <a href="#contact" class="clay-btn" style="padding:0.6rem 1.3rem;font-size:0.88rem;">${c.cta_text || 'Get in touch'}</a>
-</nav>`,
+function renderNav(c, style) {
+  const links = c.nav_links || ['Home','About','Services','Contact'];
+  const brand = c.brand_name || 'Brand';
+  const linksHtml = links.map(l => `<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.9rem;">${l}</a>`).join('');
 
-  sidebar: (c, cfg) => `
-<div style="display:flex;min-height:100vh;">
-  <aside style="width:250px;background:var(--primary);color:var(--text-on-primary);padding:2.5rem 1.5rem;position:fixed;height:100vh;overflow-y:auto;">
-    <a href="#top" style="font-family:${cfg.headingFont};font-weight:${cfg.headingWeight};font-size:1.3rem;letter-spacing:${cfg.letterSpacing};display:block;margin-bottom:2.5rem;color:inherit;">${c.brand_name || 'Brand'}</a>
-    <nav style="display:flex;flex-direction:column;gap:0.25rem;">
-      ${(c.nav_links || ['Home','About','Services','Contact']).map(l => `<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.92rem;padding:0.6rem 0.85rem;border-radius:${cfg.radius};opacity:0.75;transition:${cfg.btnTransition};" onmouseover="this.style.opacity=1;this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.opacity=0.75;this.style.background='transparent'">${l}</a>`).join('')}
-    </nav>
-  </aside>
-  <main style="margin-left:250px;flex:1;">
-  <div id="top"></div>`,
+  switch (style) {
+    case 'brutalism':
+      return `<nav style="display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:var(--bg);border-bottom:4px solid var(--text);">
+        <a href="#top" style="font-family:'Archivo Black',sans-serif;font-size:1.4rem;text-transform:uppercase;letter-spacing:-0.02em;color:var(--text);">${brand}</a>
+        <div class="nav-links" style="display:flex;gap:0.5rem;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.8rem;font-weight:700;text-transform:uppercase;border:2px solid var(--text);padding:6px 12px;color:var(--text);">${l}</a>`).join('')}</div>
+        <a href="#contact" style="background:var(--text);color:var(--bg);padding:0.6rem 1.3rem;font-weight:700;text-transform:uppercase;font-size:0.85rem;">${c.cta_text||'Contact'}</a>
+      </nav>`;
 
-  minimal: (c, cfg) => `
-<nav style="display:flex;align-items:center;justify-content:space-between;padding:1.75rem 2rem;background:var(--bg);border-bottom:${cfg.navBorder};">
-  <a href="#top" style="font-family:${cfg.headingFont};font-weight:${cfg.headingWeight};font-size:1.15rem;letter-spacing:${cfg.letterSpacing};color:var(--text);">${c.brand_name || 'Brand'}</a>
-  <div class="clay-nav-links" style="display:flex;gap:2.5rem;align-items:center;">
-    ${(c.nav_links || ['About','Services','Contact']).map(l => `<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.88rem;color:var(--muted);font-weight:500;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">${l}</a>`).join('')}
-  </div>
-</nav>`,
-};
+    case 'sidebar':
+      return `<div style="display:flex;min-height:100vh;">
+        <aside style="width:250px;background:var(--primary);color:var(--on-primary);padding:2.5rem 1.5rem;position:fixed;height:100vh;overflow-y:auto;">
+          <a href="#top" style="font-family:${STYLE_FONTS[style].head};font-weight:${STYLE_FONTS[style].hw};font-size:1.3rem;display:block;margin-bottom:2.5rem;color:inherit;">${brand}</a>
+          <nav style="display:flex;flex-direction:column;gap:0.25rem;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.92rem;padding:0.6rem 0.85rem;opacity:0.75;">${l}</a>`).join('')}</nav>
+        </aside><main style="margin-left:250px;flex:1;"><div id="top"></div>`;
 
-const HERO = {
-  centered: (c, cfg) => `
-<section data-animate style="padding:${cfg.sectionPadding};text-align:center;max-width:800px;margin:0 auto;">
-  <h1 style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:1rem;">${c.headline || 'Welcome'}</h1>
-  <p style="font-size:1.18rem;color:var(--muted);max-width:560px;margin:0 auto 2rem;line-height:1.6;">${c.subheadline || ''}</p>
-  <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
-    <a href="#contact" class="clay-btn">${c.cta_text || 'Get started'}</a>
-    <a href="#about" class="clay-btn clay-btn-ghost">Learn more</a>
-  </div>
-</section>`,
+    case 'editorial':
+      return `<nav style="border-bottom:3px double var(--text);padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:flex-end;background:var(--bg);">
+        <div style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);">Est. ${new Date().getFullYear()}</div>
+        <a href="#top" style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;letter-spacing:-0.02em;color:var(--text);">${brand}</a>
+        <div class="nav-links" style="display:flex;gap:1.5rem;align-items:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);">${l}</a>`).join('')}</div>
+      </nav>`;
 
-  split: (c, cfg) => `
-<section data-animate class="clay-hero-split" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;padding:${cfg.sectionPadding};max-width:${cfg.maxWidth};margin:0 auto;align-items:center;">
-  <div>
-    <h1 style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:1rem;">${c.headline || 'Welcome'}</h1>
-    <p style="font-size:1.1rem;color:var(--muted);margin-bottom:1.75rem;line-height:1.6;">${c.subheadline || ''}</p>
-    <a href="#contact" class="clay-btn">${c.cta_text || 'Get started'}</a>
-  </div>
-  <div style="background:var(--secondary);border-radius:var(--radius);min-height:320px;display:flex;align-items:center;justify-content:center;color:var(--text-on-primary);font-size:0.9rem;opacity:0.85;${style === 'neumorphism' ? 'box-shadow:8px 8px 16px var(--shadow-dark),-8px -8px 16px var(--shadow-light);' : ''}">
-    <span style="opacity:0.6;"><i class="fa-regular fa-image" style="font-size:2rem;"></i><br><br>Image placeholder</span>
-  </div>
-</section>`,
+    case 'glassmorphism':
+      return `<div style="background:linear-gradient(135deg,${c._gradient1||'#667eea'},${c._gradient2||'#764ba2'});min-height:100vh;">
+        <nav style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.15);position:sticky;top:0;z-index:100;">
+          <a href="#top" style="font-family:'Poppins',sans-serif;font-weight:700;font-size:1.25rem;color:#fff;">${brand}</a>
+          <div class="nav-links" style="display:flex;gap:2rem;align-items:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.9rem;color:rgba(255,255,255,0.85);">${l}</a>`).join('')}</div>
+          <a href="#contact" style="background:rgba(255,255,255,0.2);color:#fff;padding:0.6rem 1.3rem;border-radius:12px;font-weight:600;font-size:0.88rem;border:1px solid rgba(255,255,255,0.25);">${c.cta_text||'Get in touch'}</a>
+        </nav>`;
 
-  bold: (c, cfg) => `
-<section data-animate style="background:var(--primary);color:var(--text-on-primary);padding:${cfg.sectionPadding};text-align:center;">
-  <h1 style="font-size:clamp(2.5rem,6vw,4.5rem);margin-bottom:1.5rem;">${c.headline || 'Welcome'}</h1>
-  <p style="font-size:1.2rem;opacity:0.8;max-width:580px;margin:0 auto 2.5rem;line-height:1.6;">${c.subheadline || ''}</p>
-  <a href="#contact" class="clay-btn" style="font-size:1.05rem;padding:1rem 2.2rem;">${c.cta_text || 'Get started'}</a>
-</section>`,
-};
+    case 'art-deco':
+      return `<nav style="background:var(--bg);border-bottom:2px solid var(--accent);padding:1.25rem 2rem;display:flex;justify-content:space-between;align-items:center;">
+        <a href="#top" style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.4rem;color:var(--accent);letter-spacing:0.05em;">${brand}</a>
+        <div class="nav-links" style="display:flex;gap:1.75rem;align-items:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.82rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text);">${l}</a>`).join('')}</div>
+        <a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.6rem 1.5rem;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">${c.cta_text||'Contact'}</a>
+      </nav>`;
 
-const FEATURES = {
-  '3-col': (c, cfg) => `
-<section id="services" data-animate style="padding:${cfg.sectionPadding};max-width:${cfg.maxWidth};margin:0 auto;">
-  <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);text-align:center;margin-bottom:0.5rem;">${c.title || 'What we offer'}</h2>
-  <p style="text-align:center;color:var(--muted);margin-bottom:3rem;font-size:1.05rem;">${c.subtitle || ''}</p>
-  <div class="clay-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
-    ${(c.cards || []).map((card, i) => `
-      <div class="clay-card${cfg === STYLE_CONFIG.neumorphism ? ' clay-neu' : ''}${cfg === STYLE_CONFIG.glassmorphism ? ' clay-glass' : ''}" data-animate style="animation-delay:${i * 0.1}s;">
-        <div style="width:48px;height:48px;background:var(--accent);color:var(--text-on-accent);border-radius:${cfg.radius};display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;font-size:1.25rem;"><i class="${card.icon || 'fa-solid fa-star'}"></i></div>
-        <h3 style="font-size:1.15rem;margin-bottom:0.5rem;">${card.title || ''}</h3>
-        <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;margin:0;">${card.description || ''}</p>
-      </div>
-    `).join('')}
-  </div>
-</section>`,
+    case 'playful':
+      return `<nav style="display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:var(--bg);border-bottom:3px solid var(--text);">
+        <a href="#top" style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.4rem;color:var(--text);">${brand} <span style="color:var(--accent);">.</span></a>
+        <div class="nav-links" style="display:flex;gap:1.5rem;align-items:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.95rem;font-weight:700;color:var(--text);">${l}</a>`).join('')}</div>
+        <a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.6rem 1.5rem;border-radius:20px;font-weight:800;font-size:0.9rem;box-shadow:0 4px 0 var(--text);">${c.cta_text||'Get started'}</a>
+      </nav>`;
 
-  '2-col': (c, cfg) => `
-<section id="services" data-animate style="padding:${cfg.sectionPadding};max-width:900px;margin:0 auto;">
-  <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);text-align:center;margin-bottom:3rem;">${c.title || 'What we offer'}</h2>
-  <div class="clay-grid-2" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;">
-    ${(c.cards || []).map((card, i) => `
-      <div class="clay-card${cfg === STYLE_CONFIG.neumorphism ? ' clay-neu' : ''}${cfg === STYLE_CONFIG.glassmorphism ? ' clay-glass' : ''}" data-animate style="animation-delay:${i * 0.1}s;display:flex;gap:1rem;align-items:flex-start;">
-        <div style="width:52px;height:52px;background:var(--accent);color:var(--text-on-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="${card.icon || 'fa-solid fa-star'}"></i></div>
-        <div>
-          <h3 style="font-size:1.1rem;margin-bottom:0.4rem;">${card.title || ''}</h3>
-          <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;margin:0;">${card.description || ''}</p>
+    case 'neumorphism':
+      const neuBg = p_neuBg || '#e0e5ec';
+      return `<nav style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:var(--bg);">
+        <a href="#top" style="font-family:'Poppins',sans-serif;font-weight:600;font-size:1.2rem;color:var(--text);">${brand}</a>
+        <div class="nav-links" style="display:flex;gap:0.5rem;align-items:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.88rem;padding:0.5rem 0.85rem;border-radius:10px;color:var(--muted);font-weight:500;">${l}</a>`).join('')}</div>
+        <a href="#contact" style="background:var(--bg);color:var(--accent);padding:0.6rem 1.3rem;border-radius:12px;font-weight:600;font-size:0.88rem;box-shadow:4px 4px 8px var(--shadow-dark),-4px -4px 8px var(--shadow-light);">Sign in</a>
+      </nav>`;
+
+    case 'swiss':
+      return `<nav style="display:grid;grid-template-columns:1fr 3fr 1fr;align-items:center;padding:1.25rem 2rem;background:var(--bg);border-bottom:2px solid var(--text);">
+        <a href="#top" style="font-weight:900;font-size:1.1rem;letter-spacing:-0.03em;color:var(--text);">${brand}<span style="color:var(--accent);">.</span></a>
+        <div class="nav-links" style="display:flex;gap:2rem;justify-content:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.85rem;font-weight:500;color:var(--muted);">${l}</a>`).join('')}</div>
+        <div style="text-align:right;font-size:0.75rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">EN / DE</div>
+      </nav>`;
+
+    case 'organic':
+      return `<nav style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:var(--bg);">
+        <a href="#top" style="font-family:'Lora',serif;font-weight:600;font-size:1.25rem;color:var(--text);">${brand}</a>
+        <div class="nav-links" style="display:flex;gap:2rem;align-items:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.9rem;color:var(--muted);">${l}</a>`).join('')}</div>
+        <a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.6rem 1.5rem;border-radius:24px;font-weight:600;font-size:0.88rem;">${c.cta_text||'Get in touch'}</a>
+      </nav>`;
+
+    default: // minimalism + corporate
+      return `<nav style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);">
+        <a href="#top" style="font-weight:${style==='corporate'?'800':'700'};font-size:1.2rem;letter-spacing:-0.03em;color:var(--text);">${brand}</a>
+        <div class="nav-links" style="display:flex;gap:2rem;align-items:center;">${links.map(l=>`<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.9rem;color:var(--muted);font-weight:500;">${l}</a>`).join('')}</div>
+        <a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.6rem 1.3rem;border-radius:${style==='corporate'?'8px':'6px'};font-weight:600;font-size:0.88rem;">${c.cta_text||'Get in touch'}</a>
+      </nav>`;
+  }
+}
+
+// ============================================================================
+// HERO — style-specific, each looks dramatically different
+// ============================================================================
+function renderHero(c, style) {
+  const headline = c.headline || 'Welcome';
+  const sub = c.subheadline || '';
+  const cta = c.cta_text || 'Get started';
+
+  switch (style) {
+    case 'brutalism':
+      return `<section style="padding:4rem 2rem;border-bottom:4px solid var(--text);">
+        <h1 class="anim-1" style="font-family:'Archivo Black',sans-serif;font-size:clamp(2.5rem,7vw,5rem);text-transform:uppercase;line-height:0.9;letter-spacing:-0.03em;margin-bottom:1.5rem;">${headline}</h1>
+        <p class="anim-2" style="font-size:1.1rem;max-width:600px;margin-bottom:2rem;line-height:1.4;">${sub}</p>
+        <a href="#contact" class="anim-3" style="display:inline-block;background:var(--text);color:var(--bg);padding:1rem 2rem;font-weight:700;text-transform:uppercase;border:3px solid var(--text);font-size:0.95rem;">${cta} →</a>
+      </section>
+      <div style="background:var(--text);color:var(--bg);padding:0.5rem 2rem;font-size:0.75rem;letter-spacing:0.3em;text-transform:uppercase;overflow:hidden;white-space:nowrap;">★ ${c.brand_name||'Brand'} ★ ${c.tagline||'Website'} ★ ${c.brand_name||'Brand'} ★ ${c.tagline||'Website'} ★ ${c.brand_name||'Brand'} ★ ${c.tagline||'Website'} ★</div>`;
+
+    case 'editorial':
+      return `<section style="padding:3rem 2rem;max-width:780px;margin:0 auto;">
+        <div class="anim-1" style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem;font-family:'Inter',sans-serif;">— Feature</div>
+        <h1 class="anim-2" style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4.5vw,3.2rem);font-weight:700;line-height:1.05;margin-bottom:1rem;">${headline}</h1>
+        <p class="anim-3" style="font-size:1.2rem;font-style:italic;color:var(--muted);max-width:560px;margin-bottom:2rem;">${sub}</p>
+        <div class="anim-4" style="font-size:0.75rem;color:var(--muted);border-left:2px solid var(--accent);padding-left:1rem;font-family:'Inter',sans-serif;">
+          <strong style="display:block;color:var(--text);font-size:0.85rem;margin-bottom:0.25rem;">${c.brand_name||'Brand'}</strong>
+          ${new Date().toLocaleDateString('en',{month:'long',day:'numeric',year:'numeric'})} · ${Math.floor(Math.random()*10)+3} min read
         </div>
+      </section>`;
+
+    case 'glassmorphism':
+      return `<section style="padding:5rem 2rem;text-align:center;">
+        <h1 class="anim-1" style="font-family:'Poppins',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:700;color:#fff;line-height:1.1;margin-bottom:1rem;text-shadow:0 2px 20px rgba(0,0,0,0.15);">${headline}</h1>
+        <p class="anim-2" style="font-size:1.15rem;color:rgba(255,255,255,0.85);max-width:520px;margin:0 auto 2rem;">${sub}</p>
+        <div class="anim-3" style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+          <a href="#contact" style="background:rgba(255,255,255,0.95);color:var(--text);padding:0.85rem 1.85rem;border-radius:12px;font-weight:600;font-size:0.95rem;">${cta}</a>
+          <a href="#about" style="background:rgba(255,255,255,0.15);color:#fff;padding:0.85rem 1.85rem;border-radius:12px;font-weight:600;font-size:0.95rem;border:1px solid rgba(255,255,255,0.25);">Learn more</a>
+        </div>
+      </section>`;
+
+    case 'art-deco':
+      return `<section style="padding:5rem 2rem;text-align:center;background:var(--bg);position:relative;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.5rem;">
+          <div style="width:60px;height:1px;background:var(--accent);"></div>
+          <i class="fa-solid fa-diamond" style="color:var(--accent);font-size:0.8rem;"></i>
+          <div style="width:60px;height:1px;background:var(--accent);"></div>
+        </div>
+        <h1 class="anim-1" style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4.5vw,3.5rem);font-weight:700;color:var(--text);margin-bottom:1rem;">${headline}</h1>
+        <p class="anim-2" style="font-size:1.15rem;color:var(--muted);max-width:500px;margin:0 auto 2rem;font-style:italic;">${sub}</p>
+        <a href="#contact" class="anim-3" style="display:inline-block;background:var(--accent);color:var(--on-accent);padding:0.85rem 2.5rem;font-size:0.85rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:600;border:2px solid var(--accent);">${cta}</a>
+      </section>`;
+
+    case 'playful':
+      return `<section style="padding:4rem 2rem;text-align:center;">
+        <h1 class="anim-1" style="font-family:'Nunito',sans-serif;font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;color:var(--text);margin-bottom:1rem;line-height:1.1;">${headline}</h1>
+        <p class="anim-2" style="font-size:1.2rem;color:var(--muted);max-width:500px;margin:0 auto 2rem;font-weight:600;">${sub}</p>
+        <a href="#contact" class="anim-3" style="display:inline-block;background:var(--accent);color:var(--on-accent);padding:1rem 2rem;border-radius:20px;font-weight:800;font-size:1.05rem;box-shadow:0 5px 0 var(--text);">${cta}</a>
+      </section>`;
+
+    case 'neumorphism':
+      return `<section style="padding:4rem 2rem;text-align:center;">
+        <div class="anim-1" style="width:80px;height:80px;background:var(--bg);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.5rem;box-shadow:8px 8px 16px var(--shadow-dark),-8px -8px 16px var(--shadow-light);">
+          <i class="fa-solid fa-circle-nodes" style="font-size:2rem;color:var(--accent);"></i>
+        </div>
+        <h1 class="anim-2" style="font-family:'Poppins',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;color:var(--text);margin-bottom:1rem;line-height:1.2;">${headline}</h1>
+        <p class="anim-3" style="font-size:1.1rem;color:var(--muted);max-width:480px;margin:0 auto 2rem;">${sub}</p>
+        <a href="#contact" class="anim-4" style="display:inline-block;background:var(--bg);color:var(--accent);padding:0.85rem 2rem;border-radius:14px;font-weight:600;font-size:0.95rem;box-shadow:6px 6px 12px var(--shadow-dark),-6px -6px 12px var(--shadow-light);">${cta}</a>
+      </section>`;
+
+    case 'swiss':
+      return `<section style="padding:4rem 2rem;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+        <div>
+          <div class="anim-1" style="font-size:0.72rem;font-weight:600;color:var(--accent);letter-spacing:0.15em;margin-bottom:0.75rem;">— 01</div>
+          <h1 class="anim-2" style="font-size:clamp(2rem,4.5vw,3.5rem);font-weight:900;line-height:0.95;letter-spacing:-0.04em;margin-bottom:1.5rem;">${headline}</h1>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:flex-end;">
+          <p class="anim-3" style="font-size:1.1rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5;">${sub}</p>
+          <a href="#contact" class="anim-4" style="display:inline-block;background:var(--text);color:var(--bg);padding:0.85rem 1.75rem;font-weight:600;font-size:0.9rem;align-self:flex-start;">${cta} →</a>
+        </div>
+      </section>`;
+
+    case 'organic':
+      return `<section style="padding:5rem 2rem;text-align:center;max-width:700px;margin:0 auto;">
+        <div class="anim-1" style="width:60px;height:60px;background:var(--accent);border-radius:50% 50% 50% 0;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+          <i class="fa-solid fa-leaf" style="color:var(--on-accent);font-size:1.5rem;"></i>
+        </div>
+        <h1 class="anim-2" style="font-family:'Lora',serif;font-size:clamp(2rem,4.5vw,3.2rem);font-weight:600;color:var(--text);margin-bottom:1rem;line-height:1.15;">${headline}</h1>
+        <p class="anim-3" style="font-size:1.15rem;color:var(--muted);max-width:480px;margin:0 auto 2rem;line-height:1.6;">${sub}</p>
+        <a href="#contact" class="anim-4" style="display:inline-block;background:var(--accent);color:var(--on-accent);padding:0.85rem 2rem;border-radius:24px;font-weight:600;font-size:0.95rem;">${cta}</a>
+      </section>`;
+
+    default: // minimalism + corporate
+      return `<section style="padding:5rem 2rem;text-align:center;max-width:800px;margin:0 auto;">
+        <h1 class="anim-1" style="font-size:clamp(2rem,5vw,3.5rem);font-weight:${style==='corporate'?'800':'800'};margin-bottom:1rem;line-height:1.1;">${headline}</h1>
+        <p class="anim-2" style="font-size:1.18rem;color:var(--muted);max-width:540px;margin:0 auto 2rem;line-height:1.6;">${sub}</p>
+        <div class="anim-3" style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+          <a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.85rem 1.75rem;border-radius:${style==='corporate'?'8px':'6px'};font-weight:600;font-size:0.95rem;">${cta}</a>
+          <a href="#about" style="background:transparent;color:var(--text);padding:0.85rem 1.75rem;border:2px solid var(--border);border-radius:${style==='corporate'?'8px':'6px'};font-weight:600;font-size:0.95rem;">Learn more</a>
+        </div>
+      </section>`;
+  }
+}
+
+// ============================================================================
+// FEATURES — style-specific card grids
+// ============================================================================
+function renderFeatures(c, style) {
+  const cards = c.cards || [];
+  const title = c.title || 'What we offer';
+  const subtitle = c.subtitle || '';
+
+  switch (style) {
+    case 'brutalism':
+      return `<section id="services" style="padding:4rem 2rem;border-bottom:4px solid var(--text);">
+        <h2 class="anim-1" style="font-family:'Archivo Black',sans-serif;font-size:clamp(1.8rem,4vw,3rem);text-transform:uppercase;margin-bottom:0.5rem;">${title}</h2>
+        <p class="anim-2" style="font-size:0.95rem;margin-bottom:2rem;">// ${subtitle}</p>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:4px solid var(--text);">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="padding:2rem;border-right:4px solid var(--text);border-bottom:4px solid var(--text);${i%3===2?'border-right:none;':''}">
+            <div style="font-family:'Archivo Black',sans-serif;font-size:2.5rem;line-height:1;margin-bottom:1rem;color:var(--accent);">0${i+1}</div>
+            <h3 style="font-size:1.1rem;text-transform:uppercase;margin-bottom:0.5rem;">${card.title||''}</h3>
+            <p style="font-size:0.88rem;line-height:1.5;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    case 'editorial':
+      return `<section id="services" style="padding:4rem 2rem;max-width:780px;margin:0 auto;border-top:1px solid var(--border);">
+        <h2 class="anim-1" style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:0.5rem;">${title}</h2>
+        <p class="anim-2" style="font-style:italic;color:var(--muted);margin-bottom:2rem;font-size:1.05rem;">${subtitle}</p>
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+          ${cards.map((card,i)=>`<div class="anim-${Math.min(i+1,5)}" style="display:flex;gap:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--accent);font-weight:900;line-height:1;min-width:40px;">${String(i+1).padStart(2,'0')}</div>
+            <div><h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.35rem;">${card.title||''}</h3>
+            <p style="font-size:0.95rem;color:var(--muted);line-height:1.6;">${card.description||''}</p></div>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    case 'glassmorphism':
+      return `<section id="services" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+        <h2 class="anim-1" style="font-family:'Poppins',sans-serif;font-size:2rem;color:#fff;text-align:center;margin-bottom:0.5rem;">${title}</h2>
+        <p class="anim-2" style="text-align:center;color:rgba(255,255,255,0.7);margin-bottom:2.5rem;">${subtitle}</p>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:1.75rem;color:#fff;">
+            <div style="width:44px;height:44px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:1.2rem;"><i class="${card.icon||'fa-solid fa-star'}"></i></div>
+            <h3 style="font-family:'Poppins',sans-serif;font-size:1.1rem;margin-bottom:0.4rem;">${card.title||''}</h3>
+            <p style="font-size:0.9rem;color:rgba(255,255,255,0.7);line-height:1.6;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    case 'art-deco':
+      return `<section id="services" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:3rem;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;">
+            <div style="width:40px;height:1px;background:var(--accent);"></div>
+            <i class="fa-solid fa-diamond" style="color:var(--accent);font-size:0.7rem;"></i>
+            <div style="width:40px;height:1px;background:var(--accent);"></div>
+          </div>
+          <h2 class="anim-1" style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);">${title}</h2>
+          <p class="anim-2" style="color:var(--muted);font-style:italic;margin-top:0.5rem;">${subtitle}</p>
+        </div>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="background:var(--bg);border:2px solid var(--accent);padding:2rem;position:relative;text-align:center;">
+            <div style="position:absolute;top:8px;left:8px;right:8px;bottom:8px;border:1px solid var(--accent);opacity:0.3;pointer-events:none;"></div>
+            <i class="${card.icon||'fa-solid fa-star'}" style="font-size:1.8rem;color:var(--accent);margin-bottom:1rem;"></i>
+            <h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:0.5rem;color:var(--text);">${card.title||''}</h3>
+            <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    case 'playful':
+      return `<section id="services" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+        <h2 class="anim-1" style="font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;text-align:center;margin-bottom:0.5rem;color:var(--text);">${title}</h2>
+        <p class="anim-2" style="text-align:center;color:var(--muted);margin-bottom:2.5rem;font-weight:600;font-size:1.05rem;">${subtitle}</p>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="background:var(--bg);border:3px solid var(--text);border-radius:20px;padding:1.75rem;box-shadow:0 4px 0 var(--text);">
+            <div style="width:50px;height:50px;background:var(--accent);color:var(--on-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;"><i class="${card.icon||'fa-solid fa-star'}"></i></div>
+            <h3 style="font-family:'Nunito',sans-serif;font-size:1.15rem;font-weight:800;margin-bottom:0.4rem;">${card.title||''}</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;font-weight:500;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    case 'neumorphism':
+      return `<section id="services" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+        <h2 class="anim-1" style="font-family:'Poppins',sans-serif;font-size:1.8rem;font-weight:600;text-align:center;margin-bottom:0.5rem;color:var(--text);">${title}</h2>
+        <p class="anim-2" style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">${subtitle}</p>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="background:var(--bg);border-radius:16px;padding:1.75rem;box-shadow:8px 8px 16px var(--shadow-dark),-8px -8px 16px var(--shadow-light);">
+            <div style="width:48px;height:48px;background:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);color:var(--accent);font-size:1.2rem;"><i class="${card.icon||'fa-solid fa-star'}"></i></div>
+            <h3 style="font-family:'Poppins',sans-serif;font-size:1.05rem;font-weight:600;margin-bottom:0.4rem;">${card.title||''}</h3>
+            <p style="font-size:0.9rem;color:var(--muted);line-height:1.6;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    case 'swiss':
+      return `<section id="services" style="padding:4rem 2rem;max-width:1200px;margin:0 auto;border-top:1px solid var(--text);">
+        <div style="display:grid;grid-template-columns:1fr 3fr;gap:2rem;margin-bottom:2rem;">
+          <div class="anim-1" style="font-size:0.72rem;font-weight:600;color:var(--accent);letter-spacing:0.15em;">— A</div>
+          <h2 class="anim-2" style="font-size:1.6rem;font-weight:900;">${title}</h2>
+        </div>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--text);">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="padding:1.5rem 1.5rem 1.5rem 0;border-right:1px solid var(--text);border-bottom:1px solid var(--text);${i%3===2?'border-right:none;':''}">
+            <div style="font-size:0.7rem;font-weight:600;color:var(--accent);letter-spacing:0.15em;margin-bottom:0.75rem;">— ${String.fromCharCode(66+i)}</div>
+            <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">${card.title||''}</h3>
+            <p style="font-size:0.88rem;color:var(--muted);line-height:1.5;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    case 'organic':
+      return `<section id="services" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+        <h2 class="anim-1" style="font-family:'Lora',serif;font-size:2rem;font-weight:600;text-align:center;margin-bottom:0.5rem;color:var(--text);">${title}</h2>
+        <p class="anim-2" style="text-align:center;color:var(--muted);margin-bottom:2.5rem;font-size:1.05rem;">${subtitle}</p>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:1.75rem;box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+            <div style="width:50px;height:50px;background:var(--accent);color:var(--on-accent);border-radius:50% 50% 50% 0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;"><i class="${card.icon||'fa-solid fa-leaf'}"></i></div>
+            <h3 style="font-family:'Lora',serif;font-size:1.1rem;font-weight:600;margin-bottom:0.4rem;">${card.title||''}</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+
+    default: // minimalism + corporate
+      return `<section id="services" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+        <h2 class="anim-1" style="font-size:2rem;text-align:center;margin-bottom:0.5rem;">${title}</h2>
+        <p class="anim-2" style="text-align:center;color:var(--muted);margin-bottom:2.5rem;font-size:1.05rem;">${subtitle}</p>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
+          ${cards.map((card,i)=>`<div class="anim-${(i%3)+1}" style="background:var(--bg);border:1px solid var(--border);border-radius:${style==='corporate'?'8px':'12px'};padding:1.75rem;${style==='corporate'?'box-shadow:0 1px 3px rgba(0,0,0,0.05);':''}transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='';this.style.boxShadow='${style==='corporate'?'0 1px 3px rgba(0,0,0,0.05)':'none'}';">
+            <div style="width:44px;height:44px;background:${style==='corporate'?'var(--accent)':withAlpha(accent,0.1)};color:${style==='corporate'?'var(--on-accent)':'var(--accent)'};border-radius:${style==='corporate'?'8px':'10px'};display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:1.2rem;"><i class="${card.icon||'fa-solid fa-star'}"></i></div>
+            <h3 style="font-size:1.1rem;margin-bottom:0.5rem;">${card.title||''}</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;">${card.description||''}</p>
+          </div>`).join('')}
+        </div>
+      </section>`;
+  }
+}
+
+// ============================================================================
+// ABOUT, TESTIMONIAL, CTA, CONTACT, FOOTER — style-aware
+// ============================================================================
+function renderAbout(c, style) {
+  const sf = STYLE_FONTS[style] || STYLE_FONTS.minimalism;
+  const dropCap = style === 'editorial' ? 'class="anim-1" style="font-family:\'Source Serif Pro\',serif;font-size:1.1rem;color:var(--muted);line-height:1.8;"' : 'class="anim-1" style="font-size:1.1rem;color:var(--muted);line-height:1.7;"';
+  const headingStyle = style === 'editorial' || style === 'art-deco' || style === 'organic'
+    ? `font-family:'${sf.head.replace(/'/g,'')}';font-weight:${sf.hw};` : `font-weight:${sf.hw};`;
+  return `<section id="about" style="padding:4rem 2rem;max-width:780px;margin:0 auto;">
+    <h2 class="anim-1" style="font-size:1.8rem;margin-bottom:1.25rem;${headingStyle}">${c.title||'About us'}</h2>
+    <p ${dropCap}>${c.body||''}</p>
+  </section>`;
+}
+
+function renderTestimonial(c, style) {
+  const sf = STYLE_FONTS[style] || STYLE_FONTS.minimalism;
+  return `<section class="anim-fade" style="padding:4rem 2rem;background:var(--secondary);color:var(--on-primary);text-align:center;">
+    <div style="max-width:680px;margin:0 auto;">
+      <div style="font-size:2.5rem;color:var(--accent);margin-bottom:1rem;opacity:0.6;"><i class="fa-solid fa-quote-left"></i></div>
+      <blockquote style="font-family:${sf.head};font-size:clamp(1.3rem,2.5vw,1.7rem);font-weight:${sf.hw};line-height:1.4;letter-spacing:${sf.ls};margin-bottom:1.5rem;">"${c.quote||''}"</blockquote>
+      <p style="font-size:0.85rem;opacity:0.7;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">${c.author||''}</p>
+    </div>
+  </section>`;
+}
+
+function renderCTA(c, style) {
+  return `<section class="anim-fade" style="padding:4rem 2rem;text-align:center;background:var(--primary);color:var(--on-primary);">
+    <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:0.75rem;">${c.headline||'Ready to start?'}</h2>
+    <p style="opacity:0.8;margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto;">${c.subtitle||''}</p>
+    <a href="#contact" style="display:inline-block;background:var(--accent);color:var(--on-accent);padding:0.9rem 2.2rem;border-radius:${style==='playful'?'20px':style==='brutalism'?'0':'8px'};font-weight:700;font-size:1rem;${style==='playful'?'box-shadow:0 4px 0 rgba(0,0,0,0.2);':''}">${c.button_text||'Get started'}</a>
+  </section>`;
+}
+
+function renderContact(c, style) {
+  const sf = STYLE_FONTS[style] || STYLE_FONTS.minimalism;
+  const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : style === 'organic' ? '24px' : '8px';
+  return `<section id="contact" class="anim-fade" style="padding:4rem 2rem;max-width:640px;margin:0 auto;">
+    <h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">${c.title||'Get in touch'}</h2>
+    <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">${c.subtitle||"We'd love to hear from you."}</p>
+    <form onsubmit="event.preventDefault();this.querySelector('.ff').style.display='none';this.querySelector('.fs').style.display='block';" style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="ff" style="display:flex;flex-direction:column;gap:1rem;">
+        <input type="text" placeholder="Your name" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${r};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${sf.body};">
+        <input type="email" placeholder="Your email" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${r};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${sf.body};">
+        <textarea placeholder="Your message" required rows="5" style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${r};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${sf.body};resize:vertical;"></textarea>
+        <button type="submit" style="background:var(--accent);color:var(--on-accent);padding:0.9rem;border:none;border-radius:${r};font-weight:700;font-size:0.95rem;cursor:pointer;font-family:${sf.body};">Send message</button>
       </div>
-    `).join('')}
-  </div>
-</section>`,
-};
+      <div class="fs" style="display:none;text-align:center;padding:2.5rem;background:var(--bg);border:1px solid var(--border);border-radius:${r};">
+        <i class="fa-solid fa-circle-check" style="font-size:2.5rem;color:#16A34A;margin-bottom:0.75rem;"></i>
+        <p style="font-weight:600;font-size:1.1rem;">Thank you! Your message has been sent.</p>
+      </div>
+    </form>
+    ${c.contact_details ? `<div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;font-size:0.9rem;color:var(--muted);">
+      ${c.contact_details.email?`<span><i class="fa-solid fa-envelope" style="color:var(--accent);margin-right:0.3rem;"></i>${c.contact_details.email}</span>`:''}
+      ${c.contact_details.phone?`<span><i class="fa-solid fa-phone" style="color:var(--accent);margin-right:0.3rem;"></i>${c.contact_details.phone}</span>`:''}
+      ${c.contact_details.address?`<span><i class="fa-solid fa-location-dot" style="color:var(--accent);margin-right:0.3rem;"></i>${c.contact_details.address}</span>`:''}
+    </div>`:''}
+  </section>`;
+}
 
-const ABOUT = {
-  standard: (c, cfg) => `
-<section id="about" data-animate style="padding:${cfg.sectionPadding};max-width:780px;margin:0 auto;">
-  <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:1.25rem;">${c.title || 'About us'}</h2>
-  <p class="clay-drop-cap" style="font-size:1.1rem;color:var(--muted);line-height:1.8;">${c.body || ''}</p>
-</section>`,
-};
+function renderFooter(c, style) {
+  const sf = STYLE_FONTS[style] || STYLE_FONTS.minimalism;
+  const links = c.nav_links || ['Home','About','Services','Contact'];
+  const socials = c.social_links || [];
+  const year = new Date().getFullYear();
 
-const TESTIMONIAL = {
-  single: (c, cfg) => `
-<section data-animate style="padding:${cfg.sectionPadding};background:var(--secondary);color:var(--text-on-primary);text-align:center;">
-  <div style="max-width:720px;margin:0 auto;">
-    <div style="font-size:3rem;color:var(--accent);margin-bottom:1rem;opacity:0.5;"><i class="fa-solid fa-quote-left"></i></div>
-    <blockquote style="font-family:${cfg.headingFont};font-size:clamp(1.3rem,2.5vw,1.8rem);font-weight:${cfg.headingWeight};line-height:1.4;letter-spacing:${cfg.letterSpacing};margin-bottom:1.5rem;">
-      "${c.quote || ''}"
-    </blockquote>
-    <p style="font-size:0.9rem;opacity:0.7;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">${c.author || ''}</p>
-  </div>
-</section>`,
-};
-
-const CTA = {
-  band: (c, cfg) => `
-<section data-animate style="padding:${cfg.sectionPadding};text-align:center;background:var(--primary);color:var(--text-on-primary);">
-  <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:0.75rem;">${c.headline || 'Ready to start?'}</h2>
-  <p style="opacity:0.8;margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto;font-size:1.05rem;">${c.subtitle || ''}</p>
-  <a href="#contact" class="clay-btn" style="font-size:1rem;padding:1rem 2.2rem;">${c.button_text || 'Get started'}</a>
-</section>`,
-};
-
-const CONTACT = {
-  standard: (c, cfg) => `
-<section id="contact" data-animate style="padding:${cfg.sectionPadding};max-width:640px;margin:0 auto;">
-  <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);text-align:center;margin-bottom:0.5rem;">${c.title || 'Get in touch'}</h2>
-  <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;font-size:1.05rem;">${c.subtitle || "We'd love to hear from you."}</p>
-  <form onsubmit="event.preventDefault();this.querySelector('.clay-form-fields').style.display='none';this.querySelector('.clay-form-success').style.display='block';" style="display:flex;flex-direction:column;gap:1rem;">
-    <div class="clay-form-fields" style="display:flex;flex-direction:column;gap:1rem;">
-      <input type="text" placeholder="Your name" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${cfg.radius};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${cfg.font};transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-      <input type="email" placeholder="Your email" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${cfg.radius};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${cfg.font};transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-      <textarea placeholder="Your message" required rows="5" style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${cfg.radius};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${cfg.font};resize:vertical;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-      <button type="submit" class="clay-btn" style="justify-content:center;padding:0.9rem;">Send message</button>
+  if (style === 'brutalism') {
+    return `<footer style="background:var(--text);color:var(--bg);padding:2rem;text-align:center;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;">© ${year} ${c.brand_name||'Brand'} // Built with Clay</footer>`;
+  }
+  if (style === 'minimalism' || style === 'swiss' || socials.length === 0) {
+    return `<footer style="padding:2.5rem;text-align:center;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;">© ${year} ${c.brand_name||'Brand'}. All rights reserved.</footer>`;
+  }
+  return `<footer style="background:var(--primary);color:var(--on-primary);padding:3.5rem 2rem;">
+    <div class="footer-grid" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:2.5rem;">
+      <div><h3 style="font-family:${sf.head};font-weight:${sf.hw};font-size:1.3rem;margin-bottom:0.6rem;">${c.brand_name||'Brand'}</h3><p style="opacity:0.7;font-size:0.9rem;line-height:1.6;max-width:300px;">${c.tagline||''}</p></div>
+      <div><h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Explore</h4>${links.map(l=>`<div style="margin-bottom:0.5rem;"><a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="opacity:0.75;font-size:0.88rem;">${l}</a></div>`).join('')}</div>
+      <div><h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Connect</h4>${socials.map(s=>`<div style="margin-bottom:0.5rem;"><a href="#" style="opacity:0.75;font-size:0.88rem;"><i class="fa-brands fa-${s}" style="margin-right:0.4rem;"></i>${s.charAt(0).toUpperCase()+s.slice(1)}</a></div>`).join('')}</div>
     </div>
-    <div class="clay-form-success" style="display:none;text-align:center;padding:2.5rem;background:var(--bg);border-radius:${cfg.radius};border:1px solid var(--border);">
-      <i class="fa-solid fa-circle-check" style="font-size:2.5rem;color:#16A34A;margin-bottom:0.75rem;"></i>
-      <p style="font-weight:600;font-size:1.1rem;margin:0;">Thank you! Your message has been sent.</p>
-    </div>
-  </form>
-  ${c.contact_details ? `<div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;font-size:0.9rem;color:var(--muted);">
-    ${c.contact_details.email ? `<span style="display:flex;align-items:center;gap:0.5rem;"><i class="fa-solid fa-envelope" style="color:var(--accent);"></i> ${c.contact_details.email}</span>` : ''}
-    ${c.contact_details.phone ? `<span style="display:flex;align-items:center;gap:0.5rem;"><i class="fa-solid fa-phone" style="color:var(--accent);"></i> ${c.contact_details.phone}</span>` : ''}
-    ${c.contact_details.address ? `<span style="display:flex;align-items:center;gap:0.5rem;"><i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> ${c.contact_details.address}</span>` : ''}
-  </div>` : ''}
-</section>`,
-};
-
-const FOOTER = {
-  minimal: (c, cfg) => `
-<footer style="padding:2.5rem 2rem;text-align:center;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;">
-  <p style="margin:0;">&copy; ${new Date().getFullYear()} ${c.brand_name || 'Brand'}. All rights reserved.</p>
-</footer>`,
-
-  rich: (c, cfg) => `
-<footer style="background:var(--primary);color:var(--text-on-primary);padding:3.5rem 2rem;">
-  <div style="max-width:${cfg.maxWidth};margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:2.5rem;">
-    <div>
-      <h3 style="font-family:${cfg.headingFont};font-weight:${cfg.headingWeight};font-size:1.3rem;margin-bottom:0.6rem;letter-spacing:${cfg.letterSpacing};">${c.brand_name || 'Brand'}</h3>
-      <p style="opacity:0.7;font-size:0.9rem;line-height:1.6;max-width:300px;">${c.tagline || ''}</p>
-    </div>
-    <div>
-      <h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Explore</h4>
-      ${(c.nav_links || ['Home','About','Services','Contact']).map(l => `<div style="margin-bottom:0.5rem;"><a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="opacity:0.75;font-size:0.88rem;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.75">${l}</a></div>`).join('')}
-    </div>
-    <div>
-      <h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Connect</h4>
-      ${(c.social_links || []).map(s => `<div style="margin-bottom:0.5rem;"><a href="#" style="opacity:0.75;font-size:0.88rem;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.75"><i class="fa-brands fa-${s}" style="margin-right:0.4rem;"></i>${s.charAt(0).toUpperCase()+s.slice(1)}</a></div>`).join('')}
-    </div>
-  </div>
-  <div style="max-width:${cfg.maxWidth};margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1);text-align:center;opacity:0.5;font-size:0.82rem;">
-    &copy; ${new Date().getFullYear()} ${c.brand_name || 'Brand'}. All rights reserved.
-  </div>
-</footer>
-<style>@media(max-width:768px){footer div[style*="grid-template-columns:2fr 1fr 1fr"]{grid-template-columns:1fr!important;gap:1.5rem;}}</style>`,
-};
+    <div style="max-width:1100px;margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1);text-align:center;opacity:0.5;font-size:0.82rem;">© ${year} ${c.brand_name||'Brand'}. All rights reserved.</div>
+  </footer>`;
+}
 
 // ============================================================================
 // RENDERER — assembles the full page
 // ============================================================================
 function renderSite(spec, palette, designStyle) {
-  const cfg = STYLE_CONFIG[designStyle] || STYLE_CONFIG.minimalism;
-  const css = generateCSS(palette, designStyle);
+  const sf = STYLE_FONTS[designStyle] || STYLE_FONTS.minimalism;
+  const css = baseCSS(palette, designStyle);
+
+  // For glassmorphism, add gradient background to content
+  const content = spec.content;
+  if (designStyle === 'glassmorphism') {
+    content._gradient1 = palette[1] || '#667eea';
+    content._gradient2 = palette[3] || '#764ba2';
+  }
+
+  // For neumorphism, set shadow vars
+  const neuShadows = designStyle === 'neumorphism'
+    ? `--shadow-dark:${luminance(palette[0])>0.5?'#D1D5DB':'#1F2937'};--shadow-light:${luminance(palette[0])>0.5?'#FFFFFF':'#374151'};`
+    : '';
 
   let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${spec.content.brand_name || 'Website'}${spec.content.tagline ? ' — ' + spec.content.tagline : ''}</title>
+<title>${content.brand_name||'Website'}${content.tagline?' — '+content.tagline:''}</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=${cfg.googleFonts}&display=swap" rel="stylesheet">
-<style>${css}</style>
+<link href="https://fonts.googleapis.com/css2?family=${sf.gf}&display=swap" rel="stylesheet">
+<style>${css}${neuShadows?`:root{${neuShadows}}`:''}</style>
 </head>
-<body>
-<div id="top"></div>`;
+<body${designStyle==='glassmorphism'?' style="background:transparent;"':''}><div id="top"></div>`;
 
   // Nav
-  const navVariant = spec.components.nav || 'topbar';
-  if (NAV[navVariant]) html += NAV[navVariant](spec.content, cfg);
-  const isSidebar = navVariant === 'sidebar';
+  html += renderNav(content, designStyle);
+  const isSidebar = (spec.components?.nav === 'sidebar');
+  const isGlass = designStyle === 'glassmorphism';
 
   // Hero
-  const heroVariant = spec.components.hero || 'centered';
-  if (HERO[heroVariant]) html += HERO[heroVariant](spec.content, cfg);
+  html += renderHero(content, designStyle);
 
   // Sections
   (spec.sections || []).forEach(section => {
-    const map = { features: FEATURES, about: ABOUT, testimonial: TESTIMONIAL, cta: CTA, contact: CONTACT };
-    const variants = map[section.type];
-    if (variants && variants[section.variant]) {
-      html += variants[section.variant](section.content || spec.content, cfg);
-    }
+    if (section.type === 'features') html += renderFeatures(section.content || content, designStyle);
+    else if (section.type === 'about') html += renderAbout(section.content || content, designStyle);
+    else if (section.type === 'testimonial') html += renderTestimonial(section.content || content, designStyle);
+    else if (section.type === 'cta') html += renderCTA(section.content || content, designStyle);
+    else if (section.type === 'contact') html += renderContact(section.content || content, designStyle);
   });
 
   // Footer
-  const footerVariant = spec.components.footer || 'minimal';
-  if (FOOTER[footerVariant]) html += FOOTER[footerVariant](spec.content, cfg);
+  html += renderFooter(content, designStyle);
 
+  // Close sidebar/glassmorphism wrappers
   if (isSidebar) html += `</main></div>`;
+  if (isGlass) html += `</div>`;
 
-  // Animation observer script
-  html += `
-<script>
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
-    if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth' }); }
-  });
-});
-// Show all animated elements — observer for scroll-triggered, plus immediate
-// show for anything already in viewport, plus a 1.5s safety timeout.
-var animatedEls = document.querySelectorAll('[data-animate]');
-var observer = new IntersectionObserver(function(entries) {
-  entries.forEach(function(e) {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
-animatedEls.forEach(function(el) { observer.observe(el); });
-// Safety: make everything visible after 1.5s no matter what
-setTimeout(function() {
-  document.querySelectorAll('[data-animate]:not(.visible)').forEach(function(el) {
-    el.classList.add('visible');
-  });
-}, 1500);
-</script>
-</body>
-</html>`;
+  // Smooth scroll script (minimal, reliable)
+  html += `<script>document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}}));</script>`;
+  html += `</body></html>`;
 
   return {
     'index.html': html,
-    'styles.css': '/* Generated by Clay component renderer. Styles are inline for portability. */\n',
-    'script.js': '// Generated by Clay component renderer. Scripts are inline for portability. //\n'
+    'styles.css': '/* Generated by Clay. Styles are inline for portability. */\n',
+    'script.js': '// Generated by Clay. Scripts are inline for portability.\n'
   };
 }
 
-window.CLAY_COMPONENTS = { renderSite, STYLE_CONFIG };
+window.CLAY_COMPONENTS = { renderSite, STYLE_FONTS };
