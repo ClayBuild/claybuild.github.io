@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ame's Bakery — Healthy Homemade Treats</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700|Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#FFFFFF;--primary:#000000;--secondary:#555555;--accent:#FF6B35;--text:#BF1D1D;
+--on-accent:#000;--on-primary:#FFF;--muted:#6B7280;--border:#E5E7EB;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Lora',serif;font-weight:600;letter-spacing:-0.015em;line-height:1.15;}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+
+/* Pure CSS load animations — no JS needed */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:translateX(0);}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+@keyframes bounceIn{0%{opacity:0;transform:scale(0.7) translateY(20px);}60%{opacity:1;transform:scale(1.03) translateY(-5px);}100%{transform:scale(1) translateY(0);}}
+
+.anim-1{animation:fadeUp 0.7s ease forwards;animation-delay:0.1s;opacity:0;}
+.anim-2{animation:fadeUp 0.7s ease forwards;animation-delay:0.25s;opacity:0;}
+.anim-3{animation:fadeUp 0.7s ease forwards;animation-delay:0.4s;opacity:0;}
+.anim-4{animation:fadeUp 0.7s ease forwards;animation-delay:0.55s;opacity:0;}
+.anim-5{animation:fadeUp 0.7s ease forwards;animation-delay:0.7s;opacity:0;}
+.anim-fade{animation:fadeIn 1s ease forwards;opacity:0;}
+
+@media(max-width:768px){
+  .nav-links{display:none!important;}
+  .grid-3{grid-template-columns:1fr!important;}
+  .grid-2{grid-template-columns:1fr!important;}
+  .hero-split{grid-template-columns:1fr!important;}
+  .footer-grid{grid-template-columns:1fr!important;}
+}
+</style>
+</head>
+<body><div id="top"></div><nav style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2rem;background:var(--bg);">
+        <a href="#top" style="font-family:'Lora',serif;font-weight:600;font-size:1.25rem;color:var(--text);">Ame's Bakery</a>
+        <div class="nav-links" style="display:flex;gap:2rem;align-items:center;"><a href="#home" style="font-size:0.9rem;color:var(--muted);">Home</a><a href="#menu" style="font-size:0.9rem;color:var(--muted);">Menu</a><a href="#about" style="font-size:0.9rem;color:var(--muted);">About</a><a href="#contact" style="font-size:0.9rem;color:var(--muted);">Contact</a></div>
+        <a href="#contact" style="background:var(--accent);color:var(--on-accent);padding:0.6rem 1.5rem;border-radius:24px;font-weight:600;font-size:0.88rem;">Shop Now</a>
+      </nav><section style="padding:5rem 2rem;text-align:center;max-width:700px;margin:0 auto;">
+        <div class="anim-1" style="width:60px;height:60px;background:var(--accent);border-radius:50% 50% 50% 0;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+          <i class="fa-solid fa-leaf" style="color:var(--on-accent);font-size:1.5rem;"></i>
+        </div>
+        <h1 class="anim-2" style="font-family:'Lora',serif;font-size:clamp(2rem,4.5vw,3.2rem);font-weight:600;color:var(--text);margin-bottom:1rem;line-height:1.15;">Delicious Homemade Snacks Delivered to Your Door</h1>
+        <p class="anim-3" style="font-size:1.15rem;color:var(--muted);max-width:480px;margin:0 auto 2rem;line-height:1.6;">Enjoy our range of wholesome cookies and protein bars, made with natural ingredients and love.</p>
+        <a href="#contact" class="anim-4" style="display:inline-block;background:var(--accent);color:var(--on-accent);padding:0.85rem 2rem;border-radius:24px;font-weight:600;font-size:0.95rem;">Shop Now</a>
+      </section><section id="services" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+        <h2 class="anim-1" style="font-family:'Lora',serif;font-size:2rem;font-weight:600;text-align:center;margin-bottom:0.5rem;color:var(--text);">Our Offerings</h2>
+        <p class="anim-2" style="text-align:center;color:var(--muted);margin-bottom:2.5rem;font-size:1.05rem;">What we bake with care</p>
+        <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
+          <div class="anim-1" style="background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:1.75rem;box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+            <div style="width:50px;height:50px;background:var(--accent);color:var(--on-accent);border-radius:50% 50% 50% 0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;"><i class="fa-solid fa-cookie"></i></div>
+            <h3 style="font-family:'Lora',serif;font-size:1.1rem;font-weight:600;margin-bottom:0.4rem;">Homemade Cookies</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;">Ragi, oats, chocolate and more – baked fresh and healthy.</p>
+          </div><div class="anim-2" style="background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:1.75rem;box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+            <div style="width:50px;height:50px;background:var(--accent);color:var(--on-accent);border-radius:50% 50% 50% 0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;"><i class="fa-solid fa-barcode"></i></div>
+            <h3 style="font-family:'Lora',serif;font-size:1.1rem;font-weight:600;margin-bottom:0.4rem;">Protein Bars</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;">Chocolate‑flavoured bars packed with protein for a tasty boost.</p>
+          </div><div class="anim-3" style="background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:1.75rem;box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+            <div style="width:50px;height:50px;background:var(--accent);color:var(--on-accent);border-radius:50% 50% 50% 0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;"><i class="fa-solid fa-lemon"></i></div>
+            <h3 style="font-family:'Lora',serif;font-size:1.1rem;font-weight:600;margin-bottom:0.4rem;">Aam Panna Syrup</h3>
+            <p style="font-size:0.92rem;color:var(--muted);line-height:1.6;">Refreshing mango‑tamarind syrup, perfect for drinks or desserts.</p>
+          </div>
+        </div>
+      </section><section id="about" style="padding:4rem 2rem;max-width:780px;margin:0 auto;">
+    <h2 class="anim-1" style="font-size:1.8rem;margin-bottom:1.25rem;font-family:'Lora,serif';font-weight:600;">About Ame's Bakery</h2>
+    <p class="anim-1" style="font-size:1.1rem;color:var(--muted);line-height:1.7;">Ame's Bakery is a small online bakery offering a playful selection of healthy, homemade snacks. From ragi and oat cookies to chocolate‑flavoured protein bars, every bite is crafted with care. We also feature refreshing aam panna syrup for a unique treat.</p>
+  </section><section class="anim-fade" style="padding:4rem 2rem;background:var(--secondary);color:var(--on-primary);text-align:center;">
+    <div style="max-width:680px;margin:0 auto;">
+      <div style="font-size:2.5rem;color:var(--accent);margin-bottom:1rem;opacity:0.6;"><i class="fa-solid fa-quote-left"></i></div>
+      <blockquote style="font-family:'Lora',serif;font-size:clamp(1.3rem,2.5vw,1.7rem);font-weight:600;line-height:1.4;letter-spacing:-0.015em;margin-bottom:1.5rem;">"I love the ragi cookies – they taste amazing and feel guilt‑free! The protein bars are my new go‑to snack."</blockquote>
+      <p style="font-size:0.85rem;opacity:0.7;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Priya Sharma</p>
+    </div>
+  </section><section class="anim-fade" style="padding:4rem 2rem;text-align:center;background:var(--primary);color:var(--on-primary);">
+    <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:0.75rem;">Taste the Health</h2>
+    <p style="opacity:0.8;margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto;">Order your favorite treats today!</p>
+    <a href="#contact" style="display:inline-block;background:var(--accent);color:var(--on-accent);padding:0.9rem 2.2rem;border-radius:8px;font-weight:700;font-size:1rem;">Shop Now</a>
+  </section><section id="contact" class="anim-fade" style="padding:4rem 2rem;max-width:640px;margin:0 auto;">
+    <h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">Get in Touch</h2>
+    <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">We'd love to hear from you.</p>
+    <form onsubmit="event.preventDefault();this.querySelector('.ff').style.display='none';this.querySelector('.fs').style.display='block';" style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="ff" style="display:flex;flex-direction:column;gap:1rem;">
+        <input type="text" placeholder="Your name" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:24px;font-size:0.95rem;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;">
+        <input type="email" placeholder="Your email" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:24px;font-size:0.95rem;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;">
+        <textarea placeholder="Your message" required rows="5" style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:24px;font-size:0.95rem;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;resize:vertical;"></textarea>
+        <button type="submit" style="background:var(--accent);color:var(--on-accent);padding:0.9rem;border:none;border-radius:24px;font-weight:700;font-size:0.95rem;cursor:pointer;font-family:'Inter',sans-serif;">Send message</button>
+      </div>
+      <div class="fs" style="display:none;text-align:center;padding:2.5rem;background:var(--bg);border:1px solid var(--border);border-radius:24px;">
+        <i class="fa-solid fa-circle-check" style="font-size:2.5rem;color:#16A34A;margin-bottom:0.75rem;"></i>
+        <p style="font-weight:600;font-size:1.1rem;">Thank you! Your message has been sent.</p>
+      </div>
+    </form>
+    <div style="margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;font-size:0.9rem;color:var(--muted);">
+      <span><i class="fa-solid fa-envelope" style="color:var(--accent);margin-right:0.3rem;"></i>placeholder@example.com</span>
+      
+      
+    </div>
+  </section><footer style="background:var(--primary);color:var(--on-primary);padding:3.5rem 2rem;">
+    <div class="footer-grid" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:2.5rem;">
+      <div><h3 style="font-family:'Lora',serif;font-weight:600;font-size:1.3rem;margin-bottom:0.6rem;">Ame's Bakery</h3><p style="opacity:0.7;font-size:0.9rem;line-height:1.6;max-width:300px;">Healthy Homemade Treats</p></div>
+      <div><h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Explore</h4><div style="margin-bottom:0.5rem;"><a href="#home" style="opacity:0.75;font-size:0.88rem;">Home</a></div><div style="margin-bottom:0.5rem;"><a href="#menu" style="opacity:0.75;font-size:0.88rem;">Menu</a></div><div style="margin-bottom:0.5rem;"><a href="#about" style="opacity:0.75;font-size:0.88rem;">About</a></div><div style="margin-bottom:0.5rem;"><a href="#contact" style="opacity:0.75;font-size:0.88rem;">Contact</a></div></div>
+      <div><h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Connect</h4><div style="margin-bottom:0.5rem;"><a href="#" style="opacity:0.75;font-size:0.88rem;"><i class="fa-brands fa-https://instagram.com/amesbakery" style="margin-right:0.4rem;"></i>Https://instagram.com/amesbakery</a></div></div>
+    </div>
+    <div style="max-width:1100px;margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.1);text-align:center;opacity:0.5;font-size:0.82rem;">© 2026 Ame's Bakery. All rights reserved.</div>
+  </footer><script>document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}}));</script></body></html>
