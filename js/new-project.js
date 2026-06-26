@@ -110,6 +110,19 @@ async function loadExistingProject(projectId, editMode) {
       STATE.logo = { info: q.logo_info, file: null, dataUrl: null, mime: null, ext: null };
     }
 
+    // If we have a saved palette but no palette list, seed the list with the
+    // saved palette plus some defaults so the user sees options when editing.
+    if ((!STATE.color_palettes || STATE.color_palettes.length === 0) && STATE.palette) {
+      STATE.color_palettes = [STATE.palette];
+      // Add a few generic defaults so there's something to choose from
+      STATE.color_palettes.push(
+        { name: 'Classic Mono', colors: ['#FFFFFF', '#000000', '#333333', '#666666', '#1A1A1A'] },
+        { name: 'Warm Light', colors: ['#FAF9F6', '#1C1917', '#44403C', '#D97757', '#1C1917'] },
+        { name: 'Cool Grey', colors: ['#F3F4F6', '#1F2937', '#4B5563', '#3B82F6', '#111827'] },
+        { name: 'Soft Earth', colors: ['#F5F1E8', '#3E2723', '#6D4C41', '#A0522D', '#2C1810'] }
+      );
+    }
+
     // Fallback: try to recover design_style from answers if not in questionnaire
     if (!STATE.design_style && STATE.answers) {
       Object.keys(STATE.answers).forEach(k => {

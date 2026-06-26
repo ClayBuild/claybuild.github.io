@@ -233,14 +233,13 @@ root.setProperty('--secondary', palette.secondary);
 root.setProperty('--accent', palette.accent);
 root.setProperty('--text', palette.text);
 
-// Display palette swatches at the bottom-left
+// Display palette swatches at the bottom-left (color squares only, no hex text)
 var display = document.getElementById('palette-display');
 var labels = ['bg','primary','secondary','accent','text'];
 var html = '';
 labels.forEach(function(k) {
   html += '<span class="swatch" style="background:' + palette[k] + '" title="' + k + ': ' + palette[k] + '"></span>';
 });
-html += '<span>' + palette.bg + ' · ' + palette.primary + ' · ' + palette.accent + '</span>';
 display.innerHTML = html;
 </script>
 </body>

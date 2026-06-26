@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Project — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=14">
+<link rel="stylesheet" href="./css/main.css?v=15">
 <style>
   .proj-header { padding: 1.5rem 0; }
   .proj-header .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
@@ -156,20 +156,24 @@
           </details>
         </div>
 
-        <div class="sidebar-card" id="qa-card" style="margin-bottom:1rem;">
-          <details>
-            <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
-              <span>Questionnaire</span>
-              <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
-            </summary>
-            <div id="qa-list" style="margin-top:0.5rem;"></div>
-          </details>
-        </div>
       </aside>
     </div>
 
-    <!-- FULL-WIDTH FILES SECTION (below the grid) -->
+    <!-- FULL-WIDTH QUESTIONNAIRE SECTION (below the grid, above files) -->
     <div style="margin-top:1.5rem;">
+      <div class="sidebar-card">
+        <details>
+          <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+            <span>Your answers</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
+          </summary>
+          <div id="qa-list" style="margin-top:0.75rem; display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:0.75rem;"></div>
+        </details>
+      </div>
+    </div>
+
+    <!-- FULL-WIDTH FILES SECTION (below questionnaire) -->
+    <div style="margin-top:1rem;">
       <div class="sidebar-card">
         <details>
           <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
@@ -251,8 +255,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=14"></script>
-<script src="./js/supabase.js?v=14"></script>
-<script src="./js/project.js?v=14"></script>
+<script src="./js/config.js?v=15"></script>
+<script src="./js/supabase.js?v=15"></script>
+<script src="./js/project.js?v=15"></script>
 </body>
 </html>

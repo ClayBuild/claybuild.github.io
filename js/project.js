@@ -58,9 +58,11 @@ function renderProject() {
   pill.textContent = status.toUpperCase();
   pill.className = `status-pill ${status}`;
 
-  // Hide the Publish button if already published
+  // For published sites, change the Publish button to "Republish"
   if (status === 'published' && PROJECT.published_url) {
-    document.getElementById('publish-btn').style.display = 'none';
+    const btn = document.getElementById('publish-btn');
+    btn.innerHTML = '<i class="fa-solid fa-rotate"></i> Republish';
+    btn.title = 'Push the current website files to GitHub again (updates the live site)';
   }
 
   // Wire ALL buttons first, before any rendering that might throw
@@ -201,17 +203,20 @@ function renderSidebar() {
     hexEl.innerHTML = '';
   }
 
-  // Questionnaire
+  // Questionnaire — full-width card grid
   const qaList = document.getElementById('qa-list');
   if (questions.length === 0) {
-    qaList.innerHTML = '<div style="font-size:0.85rem; color:var(--ink-3);">No questionnaire data.</div>';
+    qaList.innerHTML = '<div style="font-size:0.85rem; color:var(--grey-500);">No answers recorded.</div>';
   } else {
     qaList.innerHTML = questions.map(q => {
       const answer = answers[q.id];
       const display = Array.isArray(answer) ? answer.join(', ') : (answer || '—');
       return `
-      <div class="kv"><span class="k">${escapeHtml(q.question || q.id)}</span><span class="v">${escapeHtml(display)}</span></div>
-    `;
+        <div style="background:var(--grey-50); border:1px solid var(--border); border-radius:var(--radius); padding:0.85rem;">
+          <div style="font-size:0.78rem; color:var(--grey-500); margin-bottom:0.3rem; font-weight:500;">${escapeHtml(q.question || q.id)}</div>
+          <div style="font-size:0.92rem; color:var(--text); font-weight:500;">${escapeHtml(display)}</div>
+        </div>
+      `;
     }).join('');
   }
 }
