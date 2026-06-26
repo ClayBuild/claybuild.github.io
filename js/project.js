@@ -58,27 +58,41 @@ function renderProject() {
   pill.textContent = status.toUpperCase();
   pill.className = `status-pill ${status}`;
 
-  // Files
-  const files = PROJECT.website_files || {};
-  const fileNames = Object.keys(files);
-  document.getElementById('file-count').textContent = fileNames.length;
-
-  if (fileNames.length === 0) {
-    document.getElementById('preview-iframe').srcdoc = '<!DOCTYPE html><html><body style="font-family:sans-serif;padding:2rem;color:#666">No files yet. Generate your website to see a preview.</body></html>';
-  } else {
-    renderPreview(files);
-    renderFileBrowser(files);
+  // Hide the Publish button if already published
+  if (status === 'published' && PROJECT.published_url) {
+    document.getElementById('publish-btn').style.display = 'none';
   }
 
+  // Wire ALL buttons first, before any rendering that might throw
+  wireButtons();
+
+  // Files
+  try {
+    const files = PROJECT.website_files || {};
+    const fileNames = Object.keys(files);
+    document.getElementById('file-count').textContent = fileNames.length;
+
+    if (fileNames.length === 0) {
+      document.getElementById('preview-iframe').srcdoc = '<!DOCTYPE html><html><body style="font-family:sans-serif;padding:2rem;color:#666">No files yet. Generate your website to see a preview.</body></html>';
+    } else {
+      renderPreview(files);
+      renderFileBrowser(files);
+    }
+  } catch (e) { console.warn('File rendering error:', e); }
+
   // Sidebar
-  renderSidebar();
+  try {
+    renderSidebar();
+  } catch (e) { console.warn('Sidebar rendering error:', e); }
 
-  // Publish card state
-  updatePublishCard();
+  // Now update the publish card (may replace #publish-btn-2, so wire it inside updatePublishCard)
+  try {
+    updatePublishCard();
+  } catch (e) { console.warn('Publish card error:', e); }
+}
 
-  // Wire buttons
+function wireButtons() {
   document.getElementById('publish-btn').addEventListener('click', openPublishModal);
-  document.getElementById('publish-btn-2').addEventListener('click', openPublishModal);
   document.getElementById('publish-cancel').addEventListener('click', closePublishModal);
   document.getElementById('publish-confirm').addEventListener('click', confirmPublish);
   document.getElementById('refresh-preview').addEventListener('click', () => {
@@ -142,24 +156,12 @@ function renderFileBrowser(files) {
 }
 
 function renderSidebar() {
-  // Design card
   const q = PROJECT.questionnaire || {};
   const answers = q.answers || {};
   const questions = q.questions || [];
 
-  // Design style: check the enriched questionnaire field first, then fall back to answers
+  // Design style
   let style = q.design_style || '—';
-  let palette = '—', logo = '—';
-
-  // Palette: check the enriched questionnaire field
-  if (q.palette && q.palette.name) {
-    palette = q.palette.name;
-    if (q.palette.colors && q.palette.colors.length) {
-      palette += ' (' + q.palette.colors.join(', ') + ')';
-    }
-  }
-
-  // Fallback: look in answers for style
   if (style === '—') {
     Object.keys(answers).forEach(k => {
       const v = answers[k];
@@ -170,24 +172,34 @@ function renderSidebar() {
       }
     });
   }
-
-  // Fallback: try to extract style from design_doc
   if (style === '—' && PROJECT.design_doc) {
     const styleMatch = PROJECT.design_doc.match(/design style[:\s]+([a-z-]+)/i);
     if (styleMatch) style = styleMatch[1];
   }
+  if (style !== '—') style = style.charAt(0).toUpperCase() + style.slice(1);
 
+  // Logo
+  let logo = 'None uploaded';
   if (PROJECT.logo_path) {
-    logo = `<a href="#" id="view-logo"><i class="fa-regular fa-image"></i> View logo</a>`;
+    logo = '<a href="#" id="view-logo"><i class="fa-regular fa-image"></i> View logo</a>';
   } else if (q.logo_info) {
     logo = 'Uploaded (analyzed)';
-  } else {
-    logo = 'None uploaded';
   }
 
   document.getElementById('kv-style').textContent = style;
-  document.getElementById('kv-palette').textContent = palette;
   document.getElementById('kv-logo').innerHTML = logo;
+
+  // Palette: show as visual swatches instead of text
+  const swatchEl = document.getElementById('kv-palette-swatches');
+  const hexEl = document.getElementById('kv-palette-hex');
+  if (q.palette && q.palette.colors && q.palette.colors.length && swatchEl) {
+    const colors = q.palette.colors;
+    swatchEl.innerHTML = colors.map(c => `<div style="background:${escapeAttr(c)}; flex:1;" title="${escapeAttr(c)}"></div>`).join('');
+    hexEl.innerHTML = colors.map(c => `<span>${escapeHtml(c)}</span>`).join('');
+  } else if (swatchEl) {
+    swatchEl.innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:var(--grey-400); font-size:0.78rem;">No palette</div>';
+    hexEl.innerHTML = '';
+  }
 
   // Questionnaire
   const qaList = document.getElementById('qa-list');
@@ -213,10 +225,11 @@ function updatePublishCard() {
     card.innerHTML = `
       <h4>Your site is live</h4>
       <p>Open it, share it, or republish if you've made changes.</p>
-      <div style="display:flex; gap:0.5rem;">
+      <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
         <a class="btn" href="${escapeAttr(PROJECT.published_url)}" target="_blank" rel="noopener" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>
         <button class="btn btn-on-dark" id="copy-link-btn" style="flex:1;"><i class="fa-solid fa-link"></i> Copy link</button>
       </div>
+      <button class="btn btn-ghost" id="republish-btn" style="width:100%; background:rgba(255,255,255,0.1); color:#FFF; border-color:rgba(255,255,255,0.2);"><i class="fa-solid fa-rotate"></i> Republish</button>
     `;
     document.getElementById('copy-link-btn').addEventListener('click', () => {
       navigator.clipboard.writeText(PROJECT.published_url).then(() => {
@@ -225,6 +238,7 @@ function updatePublishCard() {
         toast('Could not copy link. Here it is: ' + PROJECT.published_url);
       });
     });
+    document.getElementById('republish-btn').addEventListener('click', openPublishModal);
   } else if (PROJECT.website_files && PROJECT.website_files['index.html']) {
     card.innerHTML = `
       <h4>Ready to publish?</h4>

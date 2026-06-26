@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Project — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=13">
+<link rel="stylesheet" href="./css/main.css?v=14">
 <style>
   .proj-header { padding: 1.5rem 0; }
   .proj-header .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
@@ -139,10 +139,21 @@
         </div>
 
         <div class="sidebar-card" id="design-card" style="margin-bottom:1rem;">
-          <h4>Design</h4>
-          <div class="kv"><span class="k">Style</span><span class="v" id="kv-style">—</span></div>
-          <div class="kv"><span class="k">Palette</span><span class="v" id="kv-palette">—</span></div>
-          <div class="kv"><span class="k">Logo</span><span class="v" id="kv-logo">—</span></div>
+          <details open>
+            <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+              <span>Design</span>
+              <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
+            </summary>
+            <div style="margin-top:0.75rem;">
+              <div class="kv"><span class="k">Style</span><span class="v" id="kv-style">—</span></div>
+              <div class="kv"><span class="k">Logo</span><span class="v" id="kv-logo">—</span></div>
+              <div style="margin-top:0.6rem;">
+                <div style="font-size:0.85rem; color:var(--grey-500); margin-bottom:0.35rem;">Palette</div>
+                <div id="kv-palette-swatches" style="display:flex; height:36px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border);"></div>
+                <div id="kv-palette-hex" style="display:flex; justify-content:space-between; margin-top:0.3rem; font-size:0.68rem; color:var(--grey-400);"></div>
+              </div>
+            </div>
+          </details>
         </div>
 
         <div class="sidebar-card" id="qa-card" style="margin-bottom:1rem;">
@@ -154,20 +165,23 @@
             <div id="qa-list" style="margin-top:0.5rem;"></div>
           </details>
         </div>
-
-        <div class="sidebar-card" style="margin-bottom:1rem;">
-          <details>
-            <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
-              <span>Files</span>
-              <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
-            </summary>
-            <div style="display:grid; grid-template-columns: 200px 1fr; gap:1rem; margin-top:0.75rem;">
-              <div class="file-browser" id="file-browser"></div>
-              <div class="code-viewer" id="code-viewer">Select a file</div>
-            </div>
-          </details>
-        </div>
       </aside>
+    </div>
+
+    <!-- FULL-WIDTH FILES SECTION (below the grid) -->
+    <div style="margin-top:1.5rem;">
+      <div class="sidebar-card">
+        <details>
+          <summary style="cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:0.02em; padding:0.5rem 0; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+            <span>Website files</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
+          </summary>
+          <div style="display:grid; grid-template-columns: 220px 1fr; gap:1rem; margin-top:0.75rem;">
+            <div class="file-browser" id="file-browser"></div>
+            <div class="code-viewer" id="code-viewer">Select a file</div>
+          </div>
+        </details>
+      </div>
     </div>
 
   </div>
@@ -237,8 +251,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=13"></script>
-<script src="./js/supabase.js?v=13"></script>
-<script src="./js/project.js?v=13"></script>
+<script src="./js/config.js?v=14"></script>
+<script src="./js/supabase.js?v=14"></script>
+<script src="./js/project.js?v=14"></script>
 </body>
 </html>

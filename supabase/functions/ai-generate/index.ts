@@ -9,10 +9,11 @@ const GENERATE_SYSTEM_PROMPT = `You are an expert front-end engineer. You genera
 
 The user will give you a detailed brief. You must respond with a SINGLE JSON object mapping file names to file contents.
 
-The JSON object MUST have AT LEAST these keys:
+The JSON object MUST have EXACTLY these three keys — all three are required, no more, no less:
   "index.html"
   "styles.css"
   "script.js"
+If you think no JavaScript is needed, still include "script.js" with a comment like "// No additional scripts needed". NEVER omit it — the HTML will reference ./script.js and the site will break if the file is missing.
 
 CRITICAL CONTENT RULES:
 1. ALL text content must accurately reflect the user's business as described in the brief. Read the business idea carefully and use it as the sole source of truth for what the business does.
