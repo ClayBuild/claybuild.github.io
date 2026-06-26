@@ -662,7 +662,8 @@ function renderReview() {
   if (STATE.logo) {
     const logoColors = STATE.logo.info?.colors || [];
     const swatches = logoColors.map(c => `<span style="display:inline-block; width:24px; height:24px; background:${escapeAttr(c)}; border-radius:4px; border:1px solid var(--grey-200); margin-right:4px;" title="${escapeAttr(c)}"></span>`).join('');
-    brandSection = `<dt>Logo</dt><dd>Uploaded ${escapeHtml(STATE.logo.file.name || '')}<br>${swatches}</dd>`;
+    const logoName = STATE.logo.file?.name || ('logo.' + (STATE.logo.ext || 'png'));
+    brandSection = `<dt>Logo</dt><dd>Uploaded ${escapeHtml(logoName)}<br>${swatches}</dd>`;
   } else if (STATE.palette && STATE.palette.name) {
     const swatches = (STATE.palette.colors || []).map(c => `<span style="display:inline-block; width:24px; height:24px; background:${escapeAttr(c)}; border-radius:4px; border:1px solid var(--grey-200); margin-right:4px;" title="${escapeAttr(c)}"></span>`).join('');
     brandSection = `<dt>Palette</dt><dd>${escapeHtml(STATE.palette.name)}<br>${swatches}</dd>`;

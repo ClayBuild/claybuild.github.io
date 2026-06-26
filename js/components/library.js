@@ -693,14 +693,17 @@ function renderPricing(c, style) {
 
 function renderStats(c, style) {
   const stats = c.stats || [];
-  return `<section class="anim-fade" style="padding:3rem 2rem;background:var(--primary);color:var(--on-primary);">
-    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(${Math.min(stats.length,4)},1fr);gap:2rem;text-align:center;">
-      ${stats.map((s,i)=>`<div class="anim-${(i%3)+1)}">
-        <div style="font-size:2.5rem;font-weight:800;color:var(--accent);margin-bottom:0.25rem;">${s.value||'0'}</div>
-        <div style="font-size:0.85rem;opacity:0.7;">${s.label||''}</div>
-      </div>`).join('')}
-    </div>
-  </section>`;
+  const statsHtml = stats.map(function(s, i) {
+    var animClass = 'anim-' + ((i % 3) + 1);
+    return '<div class="' + animClass + '">' +
+      '<div style="font-size:2.5rem;font-weight:800;color:var(--accent);margin-bottom:0.25rem;">' + (s.value || '0') + '</div>' +
+      '<div style="font-size:0.85rem;opacity:0.7;">' + (s.label || '') + '</div>' +
+      '</div>';
+  }).join('');
+  return '<section class="anim-fade" style="padding:3rem 2rem;background:var(--primary);color:var(--on-primary);">' +
+    '<div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(' + Math.min(stats.length, 4) + ',1fr);gap:2rem;text-align:center;">' +
+    statsHtml +
+    '</div></section>';
 }
 
 window.CLAY_COMPONENTS = { renderSite, STYLE_FONTS };
