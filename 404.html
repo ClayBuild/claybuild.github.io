@@ -5,21 +5,81 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>404 — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=19">
+<link rel="stylesheet" href="./css/main.css?v=20">
 <style>
-  body { display:flex; align-items:center; justify-content:center; min-height:100vh; }
-  .wrap { text-align:center; padding:3rem 1.5rem; max-width:520px; }
-  .big { font-size:5rem; font-weight:800; letter-spacing:-0.04em; line-height:1; color: var(--grey-300); }
-  h2 { margin-top:1rem; font-size: 1.5rem; }
-  .sub { margin:0.5rem 0 1.75rem; color: var(--text-3); }
+  body { display:flex; align-items:center; justify-content:center; min-height:100vh; overflow:hidden; position:relative; }
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(17,24,39,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17,24,39,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .blob {
+    position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.15;
+    pointer-events: none; z-index: 0; transition: transform 0.3s ease-out;
+  }
+  .blob-1 { width: 300px; height: 300px; background: #1F2937; top: 10%; left: 10%; }
+  .blob-2 { width: 250px; height: 250px; background: #6B7280; bottom: 10%; right: 15%; }
+  .wrap { position: relative; z-index: 1; text-align: center; padding: 3rem 2rem; max-width: 520px; }
+  .big {
+    font-size: clamp(6rem, 15vw, 10rem); font-weight: 800; letter-spacing: -0.05em;
+    line-height: 1; color: var(--grey-900);
+    transition: transform 0.1s ease-out, color 0.2s;
+    cursor: default;
+  }
+  .big span { display: inline-block; transition: transform 0.15s ease-out, color 0.2s; }
+  .big span:hover { color: var(--grey-500); transform: translateY(-10px); }
+  h2 { margin-top: 1rem; font-size: 1.5rem; }
+  .sub { margin: 0.5rem 0 1.75rem; color: var(--grey-500); }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--grey-800); color: #fff;
+    padding: 0.85rem 1.75rem; border-radius: 8px;
+    font-weight: 600; font-size: 0.95rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .home-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(17,24,39,0.15); }
+  .float-icon {
+    position: absolute; font-size: 1.5rem; color: var(--grey-300);
+    transition: transform 0.2s ease-out; pointer-events: none;
+  }
 </style>
 </head>
 <body>
+<div class="bg-grid"></div>
+<div class="blob blob-1" id="blob1"></div>
+<div class="blob blob-2" id="blob2"></div>
 <div class="wrap">
-  <div class="big">404</div>
-  <h2>Page not found.</h2>
+  <div class="big" id="big404"><span>4</span><span>0</span><span>4</span></div>
+  <h2>Page not found</h2>
   <p class="sub">The page you're looking for doesn't exist or was moved.</p>
-  <a href="./index.html" class="btn"><i class="fa-solid fa-house"></i> Back to Clay home</a>
+  <a href="./index.html" class="home-btn"><i class="fa-solid fa-house"></i> Back to Clay home</a>
 </div>
+
+<i class="fa-solid fa-circle-dot float-icon" style="top:15%;left:20%;" data-speed="0.5"></i>
+<i class="fa-solid fa-square float-icon" style="top:25%;right:15%;font-size:1rem;" data-speed="0.8"></i>
+<i class="fa-solid fa-triangle-exclamation float-icon" style="bottom:20%;left:25%;font-size:1.2rem;" data-speed="0.6"></i>
+<i class="fa-regular fa-circle float-icon" style="bottom:30%;right:20%;font-size:1.8rem;" data-speed="0.4"></i>
+
+<script>
+// Mouse-responsive blobs and floating icons
+document.addEventListener('mousemove', function(e) {
+  const x = (e.clientX / window.innerWidth - 0.5) * 2;
+  const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+  document.getElementById('blob1').style.transform = `translate(${x * 30}px, ${y * 30}px)`;
+  document.getElementById('blob2').style.transform = `translate(${x * -40}px, ${y * -40}px)`;
+
+  document.querySelectorAll('.float-icon').forEach(icon => {
+    const speed = parseFloat(icon.dataset.speed) || 0.5;
+    icon.style.transform = `translate(${x * 20 * speed}px, ${y * 20 * speed}px)`;
+  });
+
+  // Tilt the 404 text slightly
+  document.getElementById('big404').style.transform = `translate(${x * 10}px, ${y * 10}px) rotate(${x * 2}deg)`;
+});
+</script>
 </body>
 </html>

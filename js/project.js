@@ -191,13 +191,40 @@ function renderSidebar() {
   document.getElementById('kv-style').textContent = style;
   document.getElementById('kv-logo').innerHTML = logo;
 
+  // Wire up the View Logo button to open the logo in a new tab
+  const viewLogoBtn = document.getElementById('view-logo');
+  if (viewLogoBtn && PROJECT.logo_path) {
+    viewLogoBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const { data } = await supabase.storage.from('project-assets').createSignedUrl(PROJECT.logo_path, 3600);
+        if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+      } catch (err) { toast('Could not load logo.'); }
+    });
+  }
+
   // Palette: show as visual swatches instead of text
+  // If a logo was uploaded, derive palette from logo_info
   const swatchEl = document.getElementById('kv-palette-swatches');
   const hexEl = document.getElementById('kv-palette-hex');
-  if (q.palette && q.palette.colors && q.palette.colors.length && swatchEl) {
-    const colors = q.palette.colors;
-    swatchEl.innerHTML = colors.map(c => `<div style="background:${escapeAttr(c)}; flex:1;" title="${escapeAttr(c)}"></div>`).join('');
-    hexEl.innerHTML = colors.map(c => `<span>${escapeHtml(c)}</span>`).join('');
+
+  let paletteColors = null;
+  if (q.palette && q.palette.colors && q.palette.colors.length) {
+    paletteColors = q.palette.colors;
+  } else if (q.logo_info) {
+    // Derive palette from logo info
+    paletteColors = [
+      q.logo_info.recommended_background || '#FFFFFF',
+      (q.logo_info.colors || ['#000000'])[0] || '#000000',
+      (q.logo_info.colors || ['#555555'])[1] || '#555555',
+      q.logo_info.recommended_accent || '#3B82F6',
+      q.logo_info.recommended_text_color || '#1A1A1A',
+    ];
+  }
+
+  if (paletteColors && swatchEl) {
+    swatchEl.innerHTML = paletteColors.map(c => `<div style="background:${escapeAttr(c)}; flex:1;" title="${escapeAttr(c)}"></div>`).join('');
+    hexEl.innerHTML = ''; // No hex codes, just visual swatches
   } else if (swatchEl) {
     swatchEl.innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:var(--grey-400); font-size:0.78rem;">No palette</div>';
     hexEl.innerHTML = '';

@@ -326,45 +326,33 @@ p  { margin: 0 0 1rem; }
    AUTH PAGES
    ============================================================================ */
 .auth-wrap {
-  min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--grey-900); position: relative; overflow: hidden;
 }
-.auth-aside {
-  background: var(--grey-900);
-  color: #FFF;
-  padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between;
-  position: relative; overflow: hidden;
-}
-.auth-aside::before {
+.auth-wrap::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0);
-  background-size: 20px 20px;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+  background-size: 24px 24px;
 }
-.auth-aside > * { position: relative; z-index: 1; }
-.auth-aside .brand { color: #FFF; font-size: 1.25rem; }
-.auth-aside .brand .mark { background: rgba(255,255,255,0.15); color: #FFF; }
-.auth-aside .brand:hover { color: #FFF; text-decoration: none; }
-.auth-aside .quote { font-size: 1.35rem; font-weight: 500; line-height: 1.4; letter-spacing: -0.02em; max-width: 400px; }
-.auth-aside .quote em { font-style: normal; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 4px; }
-.auth-aside .attribution { font-size: 0.85rem; opacity: 0.7; margin-top: 1.25rem; }
-.auth-aside .meta { font-size: 0.8rem; opacity: 0.6; font-weight: 500; }
-.auth-aside .feature-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 2rem; }
-.auth-aside .feature-list .item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; opacity: 0.9; }
-.auth-aside .feature-list .item i { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
-.auth-main {
-  display: flex; align-items: center; justify-content: center;
-  padding: 2.5rem 1.5rem;
+.auth-wrap::after {
+  content: ''; position: absolute; width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.04), transparent 70%);
+  top: -100px; right: -100px; border-radius: 50%; pointer-events: none;
 }
-.auth-card { width: 100%; max-width: 380px; }
+.auth-card {
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 16px; padding: 2.5rem;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  position: relative; z-index: 1;
+}
 .auth-card .eyebrow { margin-bottom: 0.4rem; }
 .auth-card h1 { font-size: 1.6rem; margin-bottom: 0.3rem; }
 .auth-card .sub { color: var(--grey-500); margin-bottom: 1.5rem; font-size: 0.9rem; }
 .auth-card .alt { margin-top: 1.25rem; font-size: 0.875rem; color: var(--grey-500); text-align: center; }
 .auth-card .alt a { font-weight: 600; }
-
-@media (max-width: 860px) {
-  .auth-wrap { grid-template-columns: 1fr; }
-  .auth-aside { display: none; }
-}
+.auth-card .brand { margin-bottom: 1.5rem; display: inline-flex; }
 
 /* ============================================================================
    DASHBOARD

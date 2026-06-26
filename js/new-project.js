@@ -64,6 +64,26 @@ const STYLE_DESCRIPTIONS = {
   // Logo upload
   setupLogoUpload();
 
+  // Name choice radio buttons
+  const customRadio = document.getElementById('name-choice-custom');
+  const generateRadio = document.getElementById('name-choice-generate');
+  const nameInput = document.getElementById('proj-name');
+  const nameHint = document.getElementById('name-hint');
+  const customLabel = document.getElementById('name-choice-custom-label');
+  const generateLabel = document.getElementById('name-choice-generate-label');
+
+  function updateNameChoice() {
+    const isCustom = customRadio.checked;
+    nameInput.disabled = !isCustom;
+    nameInput.style.opacity = isCustom ? '1' : '0.4';
+    nameHint.textContent = isCustom ? 'Type your project name above.' : 'Clay will generate a creative name based on your idea.';
+    customLabel.style.borderColor = isCustom ? 'var(--grey-800)' : 'var(--grey-300)';
+    generateLabel.style.borderColor = !isCustom ? 'var(--grey-800)' : 'var(--grey-300)';
+  }
+  customRadio.addEventListener('change', updateNameChoice);
+  generateRadio.addEventListener('change', updateNameChoice);
+  updateNameChoice();
+
   // Custom palette
   setupCustomPalette();
 
@@ -108,6 +128,16 @@ async function loadExistingProject(projectId, editMode) {
     if (q.palette) STATE.palette = q.palette;
     if (q.logo_info) {
       STATE.logo = { info: q.logo_info, file: null, dataUrl: null, mime: null, ext: null };
+      // Try to fetch the actual logo image from storage for preview
+      if (proj.logo_path) {
+        try {
+          const { data } = await supabase.storage.from('project-assets').createSignedUrl(proj.logo_path, 3600);
+          if (data?.signedUrl) {
+            STATE.logo.dataUrl = data.signedUrl;
+            STATE.logo.ext = proj.logo_path.split('.').pop();
+          }
+        } catch (e) { console.warn('Logo fetch failed:', e); }
+      }
     }
 
     // Restore the full AI-recommended palette list if it was saved
@@ -194,8 +224,16 @@ function step1Next() {
 // STEP 2: NAME → call ai-init (only if questions don't already exist or idea changed)
 // ============================================================================
 async function step2Next() {
-  const name = document.getElementById('proj-name').value.trim();
-  STATE.project_name = name; // may be ""
+  const generateMode = document.getElementById('name-choice-generate').checked;
+  const name = generateMode ? '' : document.getElementById('proj-name').value.trim();
+
+  if (!generateMode && name.length < 2) {
+    toast('Please enter a project name, or select "Generate one for me".');
+    return;
+  }
+
+  STATE.project_name = name; // may be "" if generate mode
+  STATE._generateName = generateMode; // flag for generate() to know
 
   goToStep(3);
 
@@ -363,9 +401,37 @@ function step3Next() {
     return;
   }
   goToStep(4);
-  // If a palette was already selected (edit flow), re-select it to show
-  // the correct preview. Otherwise, default to the first palette.
-  if (STATE.palette) {
+
+  // If a logo was previously uploaded (edit flow), show its preview
+  if (STATE.logo && STATE.logo.info) {
+    const previewWrap = document.getElementById('logo-preview-wrap');
+    const previewImg = document.getElementById('logo-preview-img');
+    const fileName = document.getElementById('logo-file-name');
+    const colors = document.getElementById('logo-colors');
+    const desc = document.getElementById('logo-desc');
+    if (previewWrap && previewImg) {
+      if (STATE.logo.dataUrl) previewImg.src = STATE.logo.dataUrl;
+      if (fileName) fileName.textContent = 'logo.' + (STATE.logo.ext || 'png');
+      const logoColors = (STATE.logo.info.colors || []).slice(0, 5);
+      if (colors) colors.innerHTML = logoColors.map(c => `<span style="background:${escapeAttr(c)}" title="${escapeAttr(c)}"></span>`).join('');
+      if (desc) desc.textContent = STATE.logo.info.description || '';
+      previewWrap.classList.remove('hidden');
+    }
+    // Show logo colors in the palette preview
+    const logoPalette = {
+      name: 'Logo colors',
+      colors: [
+        STATE.logo.info.recommended_background || '#ffffff',
+        (STATE.logo.info.colors || ['#000000'])[0] || '#000000',
+        (STATE.logo.info.colors || ['#555555'])[1] || '#555555',
+        STATE.logo.info.recommended_accent || '#3B82F6',
+        STATE.logo.info.recommended_text_color || '#1A1A1A',
+      ],
+    };
+    const url = clayPalettePreviewUrl(logoPalette);
+    document.getElementById('palette-preview').src = url;
+    document.getElementById('palette-preview-url').textContent = 'Palette preview. Logo colors';
+  } else if (STATE.palette) {
     selectPalette(STATE.palette);
   } else if (STATE.color_palettes[0]) {
     selectPalette(STATE.color_palettes[0]);
@@ -594,11 +660,14 @@ function renderReview() {
 
   let brandSection;
   if (STATE.logo) {
-    brandSection = `<dt>Logo</dt><dd>Uploaded — ${escapeHtml(STATE.logo.file.name)}. Colors extracted: ${(STATE.logo.info?.colors || []).join(', ')}</dd>`;
+    const logoColors = STATE.logo.info?.colors || [];
+    const swatches = logoColors.map(c => `<span style="display:inline-block; width:24px; height:24px; background:${escapeAttr(c)}; border-radius:4px; border:1px solid var(--grey-200); margin-right:4px;" title="${escapeAttr(c)}"></span>`).join('');
+    brandSection = `<dt>Logo</dt><dd>Uploaded ${escapeHtml(STATE.logo.file.name || '')}<br>${swatches}</dd>`;
   } else if (STATE.palette && STATE.palette.name) {
-    brandSection = `<dt>Palette</dt><dd>${escapeHtml(STATE.palette.name)} — ${(STATE.palette.colors || []).join(', ')}</dd>`;
+    const swatches = (STATE.palette.colors || []).map(c => `<span style="display:inline-block; width:24px; height:24px; background:${escapeAttr(c)}; border-radius:4px; border:1px solid var(--grey-200); margin-right:4px;" title="${escapeAttr(c)}"></span>`).join('');
+    brandSection = `<dt>Palette</dt><dd>${escapeHtml(STATE.palette.name)}<br>${swatches}</dd>`;
   } else {
-    brandSection = `<dt>Brand</dt><dd><em style="color:var(--grey-500);">Not set — click Edit to choose a palette or upload a logo.</em></dd>`;
+    brandSection = `<dt>Brand</dt><dd><em style="color:var(--grey-500);">Not set. Click Edit to choose a palette or upload a logo.</em></dd>`;
   }
 
   container.innerHTML = `
@@ -729,6 +798,7 @@ async function generate() {
         specResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_GENERATE, {
           business_idea: STATE.business_idea,
           project_name: finalName,
+          generate_name: STATE._generateName || false,
           questionnaire: { answers: STATE.answers, questions: STATE.questions },
           design_style: STATE.design_style,
           palette: STATE.logo ? null : STATE.palette,
@@ -754,11 +824,6 @@ async function generate() {
     updateGenTitle('Creating your website…');
 
     const spec = specResult.spec;
-    // If a logo was uploaded, tell the renderer to use it
-    if (STATE.logo) {
-      spec.logo = true;
-      spec.logo_ext = STATE.logo.ext;
-    }
 
     const palette = STATE.logo?.info ? [
       STATE.logo.info.recommended_background || '#FFFFFF',
@@ -767,6 +832,24 @@ async function generate() {
       STATE.logo.info.recommended_accent || '#3B82F6',
       STATE.logo.info.recommended_text_color || '#1A1A1A',
     ] : (STATE.palette ? STATE.palette.colors : ['#FFFFFF', '#000000', '#555555', '#3B82F6', '#1A1A1A']);
+
+    // If the AI generated a name (generate_name mode), use it
+    if (STATE._generateName && spec.content.brand_name) {
+      STATE.ai_name = spec.content.brand_name;
+      // Update the project name in the DB
+      const finalNameFromAI = spec.content.brand_name;
+      STATE.slug = claySlugify(finalNameFromAI) || STATE.slug;
+      await supabase.from('projects').update({
+        name: finalNameFromAI,
+        slug: STATE.slug,
+      }).eq('id', projectId);
+    }
+
+    // If a logo was uploaded, tell the renderer to use it
+    if (STATE.logo) {
+      spec.logo = true;
+      spec.logo_ext = STATE.logo.ext;
+    }
 
     // Use the component library to render the final HTML
     STATE.website_files = window.CLAY_COMPONENTS.renderSite(spec, palette, STATE.design_style);

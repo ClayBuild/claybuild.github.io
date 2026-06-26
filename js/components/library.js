@@ -45,12 +45,22 @@ function baseCSS(p, style) {
   const bg = p[0], primary = p[1], secondary = p[2], accent = p[3], text = p[4];
   const onAccent = readableText(accent, '#FFF', '#000');
   const onPrimary = readableText(primary, '#FFF', '#000');
-  const muted = luminance(bg) > 0.5 ? '#6B7280' : '#9CA3AF';
-  const border = luminance(bg) > 0.5 ? '#E5E7EB' : '#374151';
+
+  // Glassmorphism has a colored gradient background, so ALL text must be light
+  let muted, border, textColor;
+  if (style === 'glassmorphism') {
+    muted = 'rgba(255,255,255,0.7)';
+    border = 'rgba(255,255,255,0.15)';
+    textColor = '#FFFFFF';
+  } else {
+    muted = luminance(bg) > 0.5 ? '#6B7280' : '#9CA3AF';
+    border = luminance(bg) > 0.5 ? '#E5E7EB' : '#374151';
+    textColor = text;
+  }
 
   return `
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-:root{--bg:${bg};--primary:${primary};--secondary:${secondary};--accent:${accent};--text:${text};
+:root{--bg:${bg};--primary:${primary};--secondary:${secondary};--accent:${accent};--text:${textColor};
 --on-accent:${onAccent};--on-primary:${onPrimary};--muted:${muted};--border:${border};}
 html{scroll-behavior:smooth;}
 body{font-family:${sf.body};background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
@@ -85,9 +95,9 @@ img{max-width:100%;display:block;}
 // ============================================================================
 // NAV — style-specific
 // ============================================================================
-function renderNav(c, style) {
+function renderNav(c, style, hasLogo, logoExt) {
   const links = c.nav_links || ['Home','About','Services','Contact'];
-  const brand = c.brand_name || 'Brand';
+  const brand = c._brandDisplay || c.brand_name || 'Brand';
   const linksHtml = links.map(l => `<a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="font-size:0.9rem;">${l}</a>`).join('');
 
   switch (style) {
@@ -440,17 +450,24 @@ function renderCTA(c, style) {
 function renderContact(c, style) {
   const sf = STYLE_FONTS[style] || STYLE_FONTS.minimalism;
   const r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : style === 'organic' ? '24px' : '8px';
+  // Glassmorphism: translucent inputs with white text on the gradient bg
+  const isGlass = style === 'glassmorphism';
+  const inputBg = isGlass ? 'rgba(255,255,255,0.1)' : 'var(--bg)';
+  const inputColor = isGlass ? '#FFFFFF' : 'var(--text)';
+  const inputBorder = isGlass ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--border)';
+  const inputPlaceholder = isGlass ? 'rgba(255,255,255,0.5)' : 'var(--muted)';
+  const successBg = isGlass ? 'rgba(255,255,255,0.1)' : 'var(--bg)';
   return `<section id="contact" class="anim-fade" style="padding:4rem 2rem;max-width:640px;margin:0 auto;">
     <h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">${c.title||'Get in touch'}</h2>
     <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">${c.subtitle||"We'd love to hear from you."}</p>
     <form onsubmit="event.preventDefault();this.querySelector('.ff').style.display='none';this.querySelector('.fs').style.display='block';" style="display:flex;flex-direction:column;gap:1rem;">
       <div class="ff" style="display:flex;flex-direction:column;gap:1rem;">
-        <input type="text" placeholder="Your name" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${r};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${sf.body};">
-        <input type="email" placeholder="Your email" required style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${r};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${sf.body};">
-        <textarea placeholder="Your message" required rows="5" style="padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:${r};font-size:0.95rem;background:var(--bg);color:var(--text);font-family:${sf.body};resize:vertical;"></textarea>
+        <input type="text" placeholder="Your name" required style="padding:0.9rem 1.1rem;border:${inputBorder};border-radius:${r};font-size:0.95rem;background:${inputBg};color:${inputColor};font-family:${sf.body};">
+        <input type="email" placeholder="Your email" required style="padding:0.9rem 1.1rem;border:${inputBorder};border-radius:${r};font-size:0.95rem;background:${inputBg};color:${inputColor};font-family:${sf.body};">
+        <textarea placeholder="Your message" required rows="5" style="padding:0.9rem 1.1rem;border:${inputBorder};border-radius:${r};font-size:0.95rem;background:${inputBg};color:${inputColor};font-family:${sf.body};resize:vertical;"></textarea>
         <button type="submit" style="background:var(--accent);color:var(--on-accent);padding:0.9rem;border:none;border-radius:${r};font-weight:700;font-size:0.95rem;cursor:pointer;font-family:${sf.body};">Send message</button>
       </div>
-      <div class="fs" style="display:none;text-align:center;padding:2.5rem;background:var(--bg);border:1px solid var(--border);border-radius:${r};">
+      <div class="fs" style="display:none;text-align:center;padding:2.5rem;background:${successBg};border:${inputBorder};border-radius:${r};">
         <i class="fa-solid fa-circle-check" style="font-size:2.5rem;color:#16A34A;margin-bottom:0.75rem;"></i>
         <p style="font-weight:600;font-size:1.1rem;">Thank you! Your message has been sent.</p>
       </div>
@@ -468,6 +485,7 @@ function renderFooter(c, style) {
   const links = c.nav_links || ['Home','About','Services','Contact'];
   const socials = c.social_links || [];
   const year = new Date().getFullYear();
+  const brandDisplay = c._brandDisplay || c.brand_name || 'Brand';
 
   if (style === 'brutalism') {
     return `<footer style="background:var(--text);color:var(--bg);padding:2rem;text-align:center;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;">© ${year} ${c.brand_name||'Brand'} // Built with Clay</footer>`;
@@ -477,7 +495,7 @@ function renderFooter(c, style) {
   }
   return `<footer style="background:var(--primary);color:var(--on-primary);padding:3.5rem 2rem;">
     <div class="footer-grid" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:2.5rem;">
-      <div><h3 style="font-family:${sf.head};font-weight:${sf.hw};font-size:1.3rem;margin-bottom:0.6rem;">${c.brand_name||'Brand'}</h3><p style="opacity:0.7;font-size:0.9rem;line-height:1.6;max-width:300px;">${c.tagline||''}</p></div>
+      <div><h3 style="font-family:${sf.head};font-weight:${sf.hw};font-size:1.3rem;margin-bottom:0.6rem;">${brandDisplay}</h3><p style="opacity:0.7;font-size:0.9rem;line-height:1.6;max-width:300px;">${c.tagline||''}</p></div>
       <div><h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Explore</h4>${links.map(l=>`<div style="margin-bottom:0.5rem;"><a href="#${l.toLowerCase().replace(/\s/g,'-')}" style="opacity:0.75;font-size:0.88rem;">${l}</a></div>`).join('')}</div>
       <div><h4 style="font-size:0.75rem;text-transform:uppercase;opacity:0.5;margin-bottom:0.85rem;letter-spacing:0.1em;font-weight:600;">Connect</h4>${socials.map(s=>`<div style="margin-bottom:0.5rem;"><a href="#" style="opacity:0.75;font-size:0.88rem;"><i class="fa-brands fa-${s}" style="margin-right:0.4rem;"></i>${s.charAt(0).toUpperCase()+s.slice(1)}</a></div>`).join('')}</div>
     </div>
@@ -486,71 +504,203 @@ function renderFooter(c, style) {
 }
 
 // ============================================================================
-// RENDERER — assembles the full page
+// RENDERER — assembles the full page, SPLIT into 3 real files
 // ============================================================================
 function renderSite(spec, palette, designStyle) {
   const sf = STYLE_FONTS[designStyle] || STYLE_FONTS.minimalism;
-  const css = baseCSS(palette, designStyle);
-
-  // For glassmorphism, add gradient background to content
   const content = spec.content;
+
+  // If a logo was uploaded, use it in the nav instead of the brand name text
+  const hasLogo = spec.logo === true;
+  const logoExt = spec.logo_ext || 'png';
+  const brandDisplay = hasLogo
+    ? `<img src="./logo.${logoExt}" alt="${content.brand_name||'Logo'}" style="height:36px;max-width:160px;object-fit:contain;">`
+    : content.brand_name || 'Brand';
+
+  // Replace brand_name in content with the logo-aware version for nav
+  content._brandDisplay = brandDisplay;
+
+  // Glassmorphism gradient
   if (designStyle === 'glassmorphism') {
     content._gradient1 = palette[1] || '#667eea';
     content._gradient2 = palette[3] || '#764ba2';
   }
 
-  // For neumorphism, set shadow vars
+  // Neumorphism shadow vars
   const neuShadows = designStyle === 'neumorphism'
     ? `--shadow-dark:${luminance(palette[0])>0.5?'#D1D5DB':'#1F2937'};--shadow-light:${luminance(palette[0])>0.5?'#FFFFFF':'#374151'};`
     : '';
 
+  // ---- Build CSS file ----
+  const cssContent = baseCSS(palette, designStyle) +
+    (neuShadows ? `:root{${neuShadows}}` : '') +
+    hoverCSS(designStyle);
+
+  // ---- Build JS file ----
+  const jsContent = `// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  });
+});
+// Contact form handler
+document.querySelectorAll('form').forEach(function(f){
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var ff=f.querySelector('.ff');var fs=f.querySelector('.fs');
+    if(ff&&fs){ff.style.display='none';fs.style.display='block';}
+  });
+});
+`;
+
+  // ---- Build HTML file ----
   let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${content.brand_name||'Website'}${content.tagline?' — '+content.tagline:''}</title>
+<title>${content.brand_name||'Website'}${content.tagline?' - '+content.tagline:''}</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=${sf.gf}&display=swap" rel="stylesheet">
-<style>${css}${neuShadows?`:root{${neuShadows}}`:''}</style>
+<link rel="stylesheet" href="./styles.css">
 </head>
 <body${designStyle==='glassmorphism'?' style="background:transparent;"':''}><div id="top"></div>`;
 
   // Nav
-  html += renderNav(content, designStyle);
+  html += renderNav(content, designStyle, hasLogo, logoExt);
   const isSidebar = (spec.components?.nav === 'sidebar');
   const isGlass = designStyle === 'glassmorphism';
 
   // Hero
   html += renderHero(content, designStyle);
 
-  // Sections
+  // Sections (shuffled for variety — see ai-generate)
   (spec.sections || []).forEach(section => {
     if (section.type === 'features') html += renderFeatures(section.content || content, designStyle);
     else if (section.type === 'about') html += renderAbout(section.content || content, designStyle);
     else if (section.type === 'testimonial') html += renderTestimonial(section.content || content, designStyle);
     else if (section.type === 'cta') html += renderCTA(section.content || content, designStyle);
     else if (section.type === 'contact') html += renderContact(section.content || content, designStyle);
+    else if (section.type === 'gallery') html += renderGallery(section.content || content, designStyle);
+    else if (section.type === 'pricing') html += renderPricing(section.content || content, designStyle);
+    else if (section.type === 'stats') html += renderStats(section.content || content, designStyle);
   });
 
   // Footer
   html += renderFooter(content, designStyle);
 
-  // Close sidebar/glassmorphism wrappers
+  // Close wrappers
   if (isSidebar) html += `</main></div>`;
   if (isGlass) html += `</div>`;
 
-  // Smooth scroll script (minimal, reliable)
-  html += `<script>document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}}));</script>`;
+  html += `<script src="./script.js" defer></script>`;
   html += `</body></html>`;
 
   return {
     'index.html': html,
-    'styles.css': '/* Generated by Clay. Styles are inline for portability. */\n',
-    'script.js': '// Generated by Clay. Scripts are inline for portability.\n'
+    'styles.css': cssContent,
+    'script.js': jsContent
   };
+}
+
+// ============================================================================
+// HOVER CSS — per-style interactive hover states
+// ============================================================================
+function hoverCSS(style) {
+  const hovers = {
+    playful: `
+.btn-3d{transition:transform 0.1s,box-shadow 0.1s;}
+.btn-3d:hover{transform:translateY(-1px);box-shadow:0 6px 0 var(--text);}
+.btn-3d:active{transform:translateY(3px);box-shadow:0 1px 0 var(--text);}
+.card-3d{transition:transform 0.2s,box-shadow 0.2s;}
+.card-3d:hover{transform:translateY(-4px) rotate(-1deg);box-shadow:0 8px 0 var(--accent);}
+.card-3d:active{transform:translateY(0) rotate(0);box-shadow:0 4px 0 var(--text);}`,
+    brutalism: `
+.btn-brutal{transition:transform 0.1s,box-shadow 0.1s;}
+.btn-brutal:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--accent);}
+.btn-brutal:active{transform:translate(0,0);box-shadow:0 0 0 var(--accent);}
+.card-brutal{transition:transform 0.1s,box-shadow 0.1s;}
+.card-brutal:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--accent);}`,
+    neumorphism: `
+.neu-card{transition:box-shadow 0.3s ease;}
+.neu-card:hover{box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);}
+.neu-btn{transition:box-shadow 0.3s ease;}
+.neu-btn:hover{box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light);}`,
+    glassmorphism: `
+.glass-card{transition:transform 0.3s,background 0.3s;}
+.glass-card:hover{transform:translateY(-4px);background:rgba(255,255,255,0.15);}
+.glass-btn{transition:transform 0.2s,background 0.2s;}
+.glass-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,0.25);}`,
+    'art-deco': `
+.deco-card{transition:transform 0.3s,box-shadow 0.3s;}
+.deco-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.2);}
+.deco-card:hover::before{opacity:0.6;}`,
+    editorial: `
+.edit-card{transition:transform 0.2s;}
+.edit-card:hover{transform:translateY(-2px);}`,
+    swiss: `
+.swiss-card{transition:border-color 0.2s,background 0.2s;}
+.swiss-card:hover{border-left-color:var(--text);background:var(--bg);}`,
+    organic: `
+.organic-card{transition:transform 0.3s,box-shadow 0.3s;}
+.organic-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.1);}`,
+    minimalism: `
+.min-card{transition:transform 0.2s,box-shadow 0.2s;}
+.min-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.06);}`,
+    corporate: `
+.corp-card{transition:transform 0.2s,box-shadow 0.2s;}
+.corp-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.1);}`,
+  };
+  return hovers[style] || hovers.minimalism;
+}
+
+// ============================================================================
+// NEW COMPONENTS — gallery, pricing, stats (for variety + business types)
+// ============================================================================
+function renderGallery(c, style) {
+  const items = c.items || [];
+  return `<section id="gallery" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+    <h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">${c.title||'Gallery'}</h2>
+    <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">${c.subtitle||''}</p>
+    <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+      ${items.map((item,i)=>`<div class="anim-${(i%3)+1}" style="aspect-ratio:1;background:var(--secondary);border-radius:${style==='organic'?'24px':style==='playful'?'20px':'8px'};display:flex;align-items:center;justify-content:center;color:var(--on-primary);font-size:0.85rem;opacity:0.85;overflow:hidden;position:relative;">
+        <span style="text-align:center;padding:1rem;"><i class="fa-regular fa-image" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>${item.caption||'Image'}</span>
+      </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function renderPricing(c, style) {
+  const plans = c.plans || [];
+  return `<section id="pricing" class="anim-fade" style="padding:4rem 2rem;max-width:1100px;margin:0 auto;">
+    <h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">${c.title||'Pricing'}</h2>
+    <p style="text-align:center;color:var(--muted);margin-bottom:2.5rem;">${c.subtitle||''}</p>
+    <div class="grid-${Math.min(plans.length,3)}" style="display:grid;grid-template-columns:repeat(${Math.min(plans.length,3)},1fr);gap:1.5rem;">
+      ${plans.map((plan,i)=>`<div class="anim-${(i%3)+1}" style="background:var(--bg);border:${i===1?'2px':'1px'} solid ${i===1?'var(--accent)':'var(--border)'};border-radius:${style==='organic'?'24px':style==='playful'?'20px':'12px'};padding:2rem;text-align:center;${i===1?'transform:scale(1.05);':''}">
+        <h3 style="font-size:1.1rem;margin-bottom:0.5rem;">${plan.name||'Plan'}</h3>
+        <div style="font-size:2.5rem;font-weight:800;margin-bottom:1rem;color:var(--accent);">${plan.price||'$0'}<span style="font-size:0.9rem;color:var(--muted);font-weight:400;">/${plan.period||'mo'}</span></div>
+        <ul style="list-style:none;text-align:left;margin-bottom:1.5rem;font-size:0.9rem;color:var(--muted);">
+          ${(plan.features||[]).map(f=>`<li style="padding:0.3rem 0;"><i class="fa-solid fa-check" style="color:var(--accent);margin-right:0.5rem;"></i>${f}</li>`).join('')}
+        </ul>
+        <a href="#contact" style="display:block;background:${i===1?'var(--accent)':'var(--bg)'};color:${i===1?'var(--on-accent)':'var(--text)'};padding:0.75rem;border-radius:${style==='playful'?'16px':'8px'};font-weight:600;border:${i===1?'none':'1px solid var(--border)'};text-align:center;">${plan.cta||'Choose'}</a>
+      </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function renderStats(c, style) {
+  const stats = c.stats || [];
+  return `<section class="anim-fade" style="padding:3rem 2rem;background:var(--primary);color:var(--on-primary);">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(${Math.min(stats.length,4)},1fr);gap:2rem;text-align:center;">
+      ${stats.map((s,i)=>`<div class="anim-${(i%3)+1)}">
+        <div style="font-size:2.5rem;font-weight:800;color:var(--accent);margin-bottom:0.25rem;">${s.value||'0'}</div>
+        <div style="font-size:0.85rem;opacity:0.7;">${s.label||''}</div>
+      </div>`).join('')}
+    </div>
+  </section>`;
 }
 
 window.CLAY_COMPONENTS = { renderSite, STYLE_FONTS };

@@ -6,7 +6,7 @@
 <title>Clay — Build a website by talking to AI</title>
 <meta name="description" content="Clay helps non-tech people build, host, and ship a real website by answering a few simple questions. No code. No templates. No friction.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=19">
+<link rel="stylesheet" href="./css/main.css?v=20">
 <style>
   /* ---- Hero ---- */
   .hero { padding: 4rem 0 5rem; position: relative; overflow: hidden; }
@@ -121,36 +121,28 @@
 <section class="hero">
   <div class="hero-inner">
     <div>
-      <span class="eyebrow">No code. No templates. No friction.</span>
+      <span class="eyebrow"><i class="fa-solid fa-bolt"></i> No code needed</span>
       <h1>Build a website by <span class="accent">answering a few questions.</span></h1>
-      <p class="lede">Clay turns your idea into a real, published website — HTML, hosting, and design all handled for you. The AI asks the questions; you just answer. It's that simple.</p>
+      <p class="lede">Describe your idea. Clay asks the right questions, designs the site, and publishes it for you.</p>
       <div class="cta">
         <a href="./signup.html" class="btn btn-lg">Start your project <i class="fa-solid fa-arrow-right"></i></a>
         <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
       </div>
       <div class="stats">
-        <div class="stat"><div class="n">3</div><div class="l">AI models working together</div></div>
-        <div class="stat"><div class="n">1</div><div class="l">Place to manage everything</div></div>
-        <div class="stat"><div class="n">~60s</div><div class="l">From idea to live URL</div></div>
+        <div class="stat"><div class="n"><i class="fa-solid fa-comments"></i></div><div class="l">Answer questions</div></div>
+        <div class="stat"><div class="n"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div class="l">AI builds it</div></div>
+        <div class="stat"><div class="n"><i class="fa-solid fa-rocket"></i></div><div class="l">Publish instantly</div></div>
       </div>
     </div>
     <div class="hero-visual">
-      <div class="hero-bubble b1">
-        <div class="label">AI asks</div>
-        "What type of navigation would you like?"
-      </div>
       <div class="hero-card">
         <div class="status-tag">Published</div>
-        <div class="card-eyebrow">Project Overview</div>
+        <div class="card-eyebrow">Your project</div>
         <h3>Clay Bakery</h3>
-        <div class="q-row"><span class="k">Business</span><span class="v"><i class="fa-solid fa-check check"></i> Bakery</span></div>
-        <div class="q-row"><span class="k">Navigation</span><span class="v"><i class="fa-solid fa-check check"></i> Top-bar</span></div>
-        <div class="q-row"><span class="k">Palette</span><span class="v"><i class="fa-solid fa-check check"></i> Warm earthy</span></div>
-        <div class="q-row"><span class="k">Style</span><span class="v"><i class="fa-solid fa-check check"></i> Editorial</span></div>
-      </div>
-      <div class="hero-bubble b2">
-        <div class="label">Clay responds</div>
-        Your site is live! 🎉
+        <div class="q-row"><span class="k"><i class="fa-solid fa-store"></i> Business</span><span class="v">Bakery</span></div>
+        <div class="q-row"><span class="k"><i class="fa-solid fa-palette"></i> Palette</span><span class="v">Warm earthy</span></div>
+        <div class="q-row"><span class="k"><i class="fa-solid fa-paintbrush"></i> Style</span><span class="v">Editorial</span></div>
+        <div class="q-row"><span class="k"><i class="fa-solid fa-link"></i> URL</span><span class="v">claybuild.github.io/bakery</span></div>
       </div>
     </div>
   </div>
@@ -226,19 +218,12 @@
     <div class="feature-split">
       <div>
         <h3>Design that matches your brand.</h3>
-        <p>Upload a logo and a vision model extracts your exact colors. Or pick from AI-curated palettes — previewed live on a sample site before you commit.</p>
+        <p>Upload a logo and a vision model extracts your exact colors. Or pick from AI-curated palettes, previewed live on a sample site before you commit.</p>
         <ul class="checks">
           <li><i class="fa-solid fa-check"></i> Logo upload with automatic color extraction</li>
-          <li><i class="fa-solid fa-check"></i> 5 distinct design styles to choose from</li>
+          <li><i class="fa-solid fa-check"></i> 10 distinct design styles to choose from</li>
           <li><i class="fa-solid fa-check"></i> Every choice previewed on a real sample site</li>
         </ul>
-        <div class="palette-strip">
-          <div style="background:#F4E1D2"></div>
-          <div style="background:#D4A373"></div>
-          <div style="background:#CCD5AE"></div>
-          <div style="background:#E9EDC9"></div>
-          <div style="background:#FEFAE0"></div>
-        </div>
       </div>
       <div class="visual">
         <div class="q-label">Palette Preview</div>
@@ -303,8 +288,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=19"></script>
-<script src="./js/supabase.js?v=19"></script>
+<script src="./js/config.js?v=20"></script>
+<script src="./js/supabase.js?v=20"></script>
 <script>
   (async () => {
     const { data } = await supabase.auth.getSession();

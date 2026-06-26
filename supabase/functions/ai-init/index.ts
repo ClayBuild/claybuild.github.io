@@ -21,21 +21,33 @@ The "name" must be a CREATIVE, BRANDABLE name — NOT a description of the busin
 - GOOD (brandable): "Promptly", "Crust & Crumb", "Asana House", "Codecraft"
 Rules: 1-2 words, no generic suffixes (Hub, Services, Center, Studio), coin a new word or use a metaphor. Do NOT include the business type in the name.
 
-== QUESTIONS — BRAND & GOAL FOCUSED (4-5 questions) ==
-Ask questions that help you understand the user's BRAND and what they want to ACHIEVE. Do NOT ask about navigation, sections, or contact methods — the system infers those.
+== QUESTIONS — BRAND & GOAL FOCUSED (4-5 questions, ALL multi-select) ==
+ALL questions MUST have "multi_select": true. There are NO single-select questions. Every question has options AND the user can type a custom answer.
 
-Always ask:
-1. "What feeling should your website evoke?" (single-select: Professional, Friendly, Bold, Elegant, Approachable, Playful)
-2. "What's the main thing you want visitors to do?" (single-select: Contact you, Book a service, Browse your work, Sign up, Learn about you)
-3. "What makes you different from others?" (open text — no options, just a default empty string, help_text says "Tell visitors what sets you apart")
+VARY the questions — do NOT always ask the same ones. Pick 4-5 from this pool (and feel free to create new ones based on the business):
 
-Then add 1-2 business-specific questions ONLY if the idea doesn't cover them (e.g. "What services do you offer?" if not mentioned, as multi_select).
+Brand personality questions (pick 1-2):
+- "What words describe your brand's personality?" (options: Professional, Friendly, Bold, Elegant, Approachable, Playful, Trustworthy, Creative)
+- "What feeling should visitors have when they land on your site?" (options: Inspired, Confident, Curious, Welcomed, Excited, Calm)
+- "If your brand were a person, how would you describe them?" (options: Expert and authoritative, Warm and nurturing, Bold and adventurous, Creative and quirky, Refined and sophisticated)
+
+Goal questions (pick 1-2):
+- "What do you want visitors to do on your site?" (options: Contact you, Book a service, Browse your work, Buy a product, Sign up, Learn more)
+- "What's the main goal of this website?" (options: Get leads, Showcase portfolio, Sell products, Build credibility, Share information, Grow community)
+
+Differentiation questions (pick 1):
+- "What makes you different from competitors?" (options: Better quality, Faster service, More personal, More affordable, More experience, Unique approach)
+- "What should we highlight about your story?" (options: Years of experience, Awards/recognition, Happy customers, Unique method, Local roots, Family-owned)
+
+Business-specific questions (pick 1-2, only if not stated in the idea):
+- "What services or products do you offer?" (options based on business type)
+- "Who is your target audience?" (options based on business type, if not stated in idea)
 
 NEVER ask:
-- "What type of navigation do you want?"
-- "Which sections should your site include?"
-- "What contact methods do you want?"
+- Navigation, sections, or contact method questions (system infers these)
 - Anything the user already stated in their idea
+
+Every question: multi_select:true, 4-8 options, default is an array with 1-2 options.
 
 == COLOR PALETTES (4 total) ==
 Each palette: 5 uppercase hex codes (#RRGGBB) in order: background, primary, secondary, accent, text. Tailor to the business and the brand feeling.
@@ -46,7 +58,7 @@ ALL double-quotes inside string values MUST be escaped as \\". ALL backslashes a
 const INIT_USER_TEMPLATE = (idea: string, name: string | null) => `Business idea: """${idea}"""
 Project name: ${name && name.trim() ? `"""${name.trim()}"""` : "(none — generate a creative brandable name)"}
 
-Generate the JSON now. Remember: ask brand and goal questions, NOT implementation questions. Do not ask about anything already stated in the business idea.`;
+Generate the JSON now. Remember: ALL questions must be multi_select. Vary which questions you ask. Do not ask about anything already stated in the business idea.`;
 
 function sleep(ms: number) { return new Promise(r => setTimeout(r, ms)); }
 

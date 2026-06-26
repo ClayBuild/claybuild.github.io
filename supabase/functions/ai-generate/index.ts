@@ -53,20 +53,35 @@ COMPONENT CHOICES:
 - hero: "centered" for most. "split" for sites with a visual element. "bold" for sites that want a strong first impression.
 - footer: "rich" if there are social links or multiple nav items. "minimal" for simple sites.
 
-SECTIONS:
-Include a sensible set based on the business:
-- Always include "features" (3-col or 2-col) showcasing what the business offers.
-- Always include "about" with the about_body.
-- Always include "contact" at the end.
-- Include "cta" before the contact section for most sites.
-- Include "testimonial" only if it feels appropriate (skip for very small/new businesses).
+SECTIONS — VARY THE STRUCTURE:
+Do NOT always use the same sections in the same order. Vary which sections you include and their order based on the business type. Available section types:
+- "features" (variants: "3-col", "2-col"): cards showcasing services/offerings
+- "about" (variant: "standard"): about the business
+- "testimonial" (variant: "single"): a customer quote
+- "cta" (variant: "band"): call-to-action band
+- "contact" (variant: "standard"): contact form
+- "gallery" (variant: "default"): image grid (for portfolios, bakeries, photographers, etc.)
+- "pricing" (variant: "default"): pricing tiers (for services, SaaS, tutoring, etc.)
+- "stats" (variant: "default"): key numbers (e.g. "500+ students", "10 years")
+
+BUSINESS-SPECIFIC SECTIONS:
+- Bakery/restaurant/food: include "gallery" (menu items), "pricing" (menu packages)
+- Photography/portfolio: include "gallery" prominently
+- Tutoring/education: include "pricing" (course tiers), "stats" (students taught)
+- SaaS/tech: include "pricing", "stats"
+- Law/finance: include "stats" (years experience), skip "gallery"
+- Retail/shop: include "gallery" (products), "pricing"
+
+VARIETY RULE: Even for the same business type, vary the section order and which sections you include. Don't always do features → about → testimonial → cta → contact. Mix it up. Sometimes start with stats, sometimes put about before features, sometimes skip testimonial, etc.
+
+Always include "contact" last (before footer).
 
 JSON ESCAPING: ALL double-quotes inside strings MUST be escaped as \\". Output ONLY the JSON object.`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const { generation_prompt, design_doc, slug, business_idea, project_name, questionnaire, design_style, palette, logo_info } = await req.json();
+    const { generation_prompt, design_doc, slug, business_idea, project_name, generate_name, questionnaire, design_style, palette, logo_info } = await req.json();
 
     const apiKey = Deno.env.get("OPENROUTER_API_KEY");
     if (!apiKey) return errorJson("OPENROUTER_API_KEY secret not set.", 500);
@@ -75,7 +90,9 @@ Deno.serve(async (req) => {
     // anymore since the AI is outputting a spec, not code.
     const userContent = `Business idea: """${business_idea || ''}"""
 
-Project name (USE THIS EXACT NAME as the brand_name in your spec — do not invent a different name): "${project_name || ''}"
+${generate_name
+  ? `Project name: (none provided — GENERATE a creative, brandable name based on the business idea and use it as brand_name)`
+  : `Project name (USE THIS EXACT NAME as the brand_name in your spec — do not invent a different name): "${project_name || ''}"`}
 
 Questionnaire answers:
 ${JSON.stringify(questionnaire?.answers || {}, null, 2)}
@@ -83,7 +100,7 @@ ${JSON.stringify(questionnaire?.answers || {}, null, 2)}
 Design style: "${design_style || 'minimalism'}"
 ${palette ? `Color palette: ${JSON.stringify(palette)}` : (logo_info ? `Logo colors: ${JSON.stringify(logo_info)}` : '')}
 
-Generate the structured spec JSON now. Use the project name above as brand_name. All content must accurately reflect the business idea above.`;
+Generate the structured spec JSON now. ${generate_name ? 'Generate a creative brand name and use it as brand_name. ' : ''}All content must accurately reflect the business idea above.`;
 
     const messages = [
       { role: "system", content: GENERATE_SYSTEM_PROMPT },

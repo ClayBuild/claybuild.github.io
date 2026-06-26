@@ -5,63 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign in — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=19">
+<link rel="stylesheet" href="./css/main.css?v=20">
 </head>
 <body>
 
 <div class="auth-wrap">
-  <aside class="auth-aside">
+  <div class="auth-card">
     <a href="./index.html" class="brand">
       <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
     </a>
-    <div>
-      <div class="quote">
-        Pick up exactly where you left off — your projects, your drafts, your <em>published URLs</em>.
+    <span class="eyebrow">Welcome back</span>
+    <h1>Sign in.</h1>
+    <p class="sub">Continue to your dashboard and projects.</p>
+
+    <div id="err" class="alert alert-error hidden" style="margin-bottom:1rem;"></div>
+
+    <form id="login-form" autocomplete="on">
+      <div class="field">
+        <label for="email">Email</label>
+        <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="you@studio.com" required>
       </div>
-      <div class="attribution">— Welcome back</div>
-    </div>
-    <div class="meta">© 2026 Clay · Build something today</div>
-  </aside>
-
-  <main class="auth-main">
-    <div class="auth-card">
-      <span class="eyebrow">Welcome back</span>
-      <h1>Sign in.</h1>
-      <p class="sub">Continue to your dashboard and projects.</p>
-
-      <div id="err" class="alert alert-error hidden" style="margin-bottom:1rem;"></div>
-
-      <form id="login-form" autocomplete="on">
-        <div class="field">
-          <label for="email">Email</label>
-          <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="you@studio.com" required>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw-wrap">
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+          <button type="button" class="pw-toggle" data-target="password" tabindex="-1" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
         </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <div class="pw-wrap">
-            <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
-            <button type="button" class="pw-toggle" data-target="password" tabindex="-1" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-block btn-lg" id="submit-btn">
-          <span class="btn-label">Sign in</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-      </form>
-
-      <div class="alt">
-        New to Clay? <a href="./signup.html">Create an account</a>
       </div>
+      <button type="submit" class="btn btn-block btn-lg" id="submit-btn">
+        <span class="btn-label">Sign in</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div class="alt">
+      New to Clay? <a href="./signup.html">Create an account</a>
     </div>
-  </main>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=19"></script>
-<script src="./js/supabase.js?v=19"></script>
+<script src="./js/config.js?v=20"></script>
+<script src="./js/supabase.js?v=20"></script>
 <script>
 (function () {
-  // Password toggles FIRST.
   document.querySelectorAll('.pw-toggle').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var target = document.getElementById(btn.dataset.target);
@@ -92,7 +79,7 @@
     var password = document.getElementById('password').value;
 
     btn.disabled = true;
-    btn.querySelector('.btn-label').textContent = 'Signing in…';
+    btn.querySelector('.btn-label').textContent = 'Signing in...';
     var spinner = document.createElement('span');
     spinner.className = 'spinner spinner-on-accent';
     btn.insertBefore(spinner, btn.firstChild);
