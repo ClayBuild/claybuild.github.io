@@ -724,6 +724,7 @@ async function generate() {
       try {
         specResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_GENERATE, {
           business_idea: STATE.business_idea,
+          project_name: finalName,
           questionnaire: { answers: STATE.answers, questions: STATE.questions },
           design_style: STATE.design_style,
           palette: STATE.logo ? null : STATE.palette,

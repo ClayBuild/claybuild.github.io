@@ -253,6 +253,10 @@ img { max-width:100%; display:block; }
 
 [data-animate] { opacity:0; }
 [data-animate].visible { animation: ${cfg.animation} 0.6s ease forwards; }
+/* Fallback: if JS doesn't run or observer fails, make content visible after 2s */
+@keyframes clayFallbackShow { to { opacity:1; } }
+[data-animate] { animation: clayFallbackShow 0.01s ease 2s forwards; }
+[data-animate].visible { animation: ${cfg.animation} 0.6s ease forwards, clayFallbackShow 0.01s ease 2s forwards; }
 
 /* ---- Cards ---- */
 .clay-card {
@@ -579,10 +583,24 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth' }); }
   });
 });
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-}, { threshold:0.1, rootMargin:'0px 0px -50px 0px' });
-document.querySelectorAll('[data-animate]').forEach(el => obs.observe(el));
+// Show all animated elements — observer for scroll-triggered, plus immediate
+// show for anything already in viewport, plus a 1.5s safety timeout.
+var animatedEls = document.querySelectorAll('[data-animate]');
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+animatedEls.forEach(function(el) { observer.observe(el); });
+// Safety: make everything visible after 1.5s no matter what
+setTimeout(function() {
+  document.querySelectorAll('[data-animate]:not(.visible)').forEach(function(el) {
+    el.classList.add('visible');
+  });
+}, 1500);
 </script>
 </body>
 </html>`;

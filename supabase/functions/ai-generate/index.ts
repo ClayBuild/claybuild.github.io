@@ -66,7 +66,7 @@ JSON ESCAPING: ALL double-quotes inside strings MUST be escaped as \\". Output O
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const { generation_prompt, design_doc, slug, business_idea, questionnaire, design_style, palette, logo_info } = await req.json();
+    const { generation_prompt, design_doc, slug, business_idea, project_name, questionnaire, design_style, palette, logo_info } = await req.json();
 
     const apiKey = Deno.env.get("OPENROUTER_API_KEY");
     if (!apiKey) return errorJson("OPENROUTER_API_KEY secret not set.", 500);
@@ -75,13 +75,15 @@ Deno.serve(async (req) => {
     // anymore since the AI is outputting a spec, not code.
     const userContent = `Business idea: """${business_idea || ''}"""
 
+Project name (USE THIS EXACT NAME as the brand_name in your spec — do not invent a different name): "${project_name || ''}"
+
 Questionnaire answers:
 ${JSON.stringify(questionnaire?.answers || {}, null, 2)}
 
 Design style: "${design_style || 'minimalism'}"
 ${palette ? `Color palette: ${JSON.stringify(palette)}` : (logo_info ? `Logo colors: ${JSON.stringify(logo_info)}` : '')}
 
-Generate the structured spec JSON now. All content must accurately reflect the business idea above.`;
+Generate the structured spec JSON now. Use the project name above as brand_name. All content must accurately reflect the business idea above.`;
 
     const messages = [
       { role: "system", content: GENERATE_SYSTEM_PROMPT },
