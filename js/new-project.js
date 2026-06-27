@@ -69,16 +69,12 @@ const STYLE_DESCRIPTIONS = {
   const generateRadio = document.getElementById('name-choice-generate');
   const nameInput = document.getElementById('proj-name');
   const nameHint = document.getElementById('name-hint');
-  const customLabel = document.getElementById('name-choice-custom-label');
-  const generateLabel = document.getElementById('name-choice-generate-label');
 
   function updateNameChoice() {
     const isCustom = customRadio.checked;
     nameInput.disabled = !isCustom;
     nameInput.style.opacity = isCustom ? '1' : '0.4';
     nameHint.textContent = isCustom ? 'Type your project name above.' : 'Clay will generate a creative name based on your idea.';
-    customLabel.style.borderColor = isCustom ? 'var(--grey-800)' : 'var(--grey-300)';
-    generateLabel.style.borderColor = !isCustom ? 'var(--grey-800)' : 'var(--grey-300)';
   }
   customRadio.addEventListener('change', updateNameChoice);
   generateRadio.addEventListener('change', updateNameChoice);
@@ -486,31 +482,47 @@ function selectPalette(p) {
 }
 
 function setupCustomPalette() {
-  const wrap = document.getElementById('custom-palette');
-  // Sync color picker <-> hex text
-  wrap.querySelectorAll('input[type=color]').forEach(c => {
-    c.addEventListener('input', () => {
-      wrap.querySelector(`input[data-slot-text="${c.dataset.slot}"]`).value = c.value.toUpperCase();
+  const trigger = document.getElementById('custom-palette-trigger');
+  const builder = document.getElementById('custom-palette-builder');
+  const cardsContainer = document.getElementById('custom-palette-cards');
+  const labels = ['Background', 'Primary', 'Secondary', 'Accent', 'Text'];
+  const defaults = ['#FFFFFF', '#000000', '#555555', '#2563EB', '#0F172A'];
+  let colors = [...defaults];
+
+  // Build color cards
+  function renderCards() {
+    cardsContainer.innerHTML = labels.map((label, i) => {
+      return '<div class="color-card" data-slot="' + i + '">' +
+        '<div class="swatch" style="background:' + colors[i] + '"></div>' +
+        '<div class="hex">' + colors[i] + '</div>' +
+        '<div class="lbl">' + label + '</div>' +
+        '<input type="color" value="' + colors[i] + '" data-slot="' + i + '">' +
+      '</div>';
+    }).join('');
+
+    // Wire up color pickers
+    cardsContainer.querySelectorAll('input[type=color]').forEach(input => {
+      input.addEventListener('input', function() {
+        const slot = parseInt(this.dataset.slot);
+        colors[slot] = this.value.toUpperCase();
+        const card = cardsContainer.querySelector('.color-card[data-slot="' + slot + '"]');
+        card.querySelector('.swatch').style.background = colors[slot];
+        card.querySelector('.hex').textContent = colors[slot];
+      });
     });
+  }
+
+  trigger.addEventListener('click', () => {
+    builder.classList.toggle('open');
+    if (builder.classList.contains('open')) renderCards();
   });
-  wrap.querySelectorAll('input[data-slot-text]').forEach(t => {
-    t.addEventListener('input', () => {
-      const v = t.value.trim();
-      if (/^#[0-9a-fA-F]{6}$/.test(v)) {
-        wrap.querySelector(`input[type=color][data-slot="${t.dataset.slotText}"]`).value = v;
-      }
-    });
-  });
+
   document.getElementById('custom-palette-apply').addEventListener('click', () => {
-    const slots = wrap.querySelectorAll('input[type=color]');
-    const colors = Array.from(slots).map(s => s.value.toUpperCase());
-    const custom = { name: 'Custom palette', colors };
+    const custom = { name: 'Custom palette', colors: [...colors] };
     STATE.color_palettes.push(custom);
     renderPalettes();
     selectPalette(custom);
-    // Scroll the new card into view
-    const cards = document.querySelectorAll('.palette-card');
-    cards[cards.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    builder.classList.remove('open');
     toast('Custom palette added.');
   });
 }

@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign up — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=27">
+<link rel="stylesheet" href="./css/main.css?v=28">
 </head>
 <body>
 
 <div class="auth-wrap">
   <div class="auth-card">
-    <a href="./index.html" class="brand">
+    <a href="./index.html" class="brand" style="justify-content:center;">
       <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
     </a>
-    <span class="eyebrow">Create your account</span>
-    <h1>Start building.</h1>
+    <div class="eyebrow" style="text-align:center;">Create your account</div>
+    <h1 style="text-align:center;">Start building.</h1>
     <p class="sub">No email verification. No credit card. Just answer a few questions and you're online.</p>
 
     <div id="err" class="alert alert-error hidden" style="margin-bottom:1rem;"></div>
@@ -35,7 +35,7 @@
           <input class="input" id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" required minlength="8">
           <button type="button" class="pw-toggle" data-target="password" tabindex="-1" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
         </div>
-        <div class="field-hint">Min 8 characters. Mix in a number for extra safety.</div>
+        <div class="field-hint">Min 8 characters.</div>
       </div>
       <div class="field">
         <label for="confirm">Confirm password</label>
@@ -50,88 +50,47 @@
       </button>
     </form>
 
-    <div class="alt">
-      Already have an account? <a href="./login.html">Sign in</a>
-    </div>
+    <div class="alt">Already have an account? <a href="./login.html">Sign in</a></div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=27"></script>
-<script src="./js/supabase.js?v=27"></script>
+<script src="./js/config.js?v=28"></script>
+<script src="./js/supabase.js?v=28"></script>
 <script>
 (function () {
   document.querySelectorAll('.pw-toggle').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var target = document.getElementById(btn.dataset.target);
       if (!target) return;
-      if (target.type === 'password') {
-        target.type = 'text';
-        btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
-        btn.setAttribute('aria-label', 'Hide password');
-      } else {
-        target.type = 'password';
-        btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
-        btn.setAttribute('aria-label', 'Show password');
-      }
+      if (target.type === 'password') { target.type = 'text'; btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>'; }
+      else { target.type = 'password'; btn.innerHTML = '<i class="fa-regular fa-eye"></i>'; }
     });
   });
-
   clayRedirectIfAuthed();
-
   var form = document.getElementById('signup-form');
   var err = document.getElementById('err');
   var btn = document.getElementById('submit-btn');
-
   form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    err.classList.add('hidden');
-
+    e.preventDefault(); err.classList.add('hidden');
     var name = document.getElementById('name').value.trim();
     var email = document.getElementById('email').value.trim();
     var password = document.getElementById('password').value;
     var confirm = document.getElementById('confirm').value;
-
     if (name.length < 2) return showError('Please enter your full name.');
     if (password.length < 8) return showError('Password must be at least 8 characters.');
     if (password !== confirm) return showError('Passwords do not match.');
-
-    btn.disabled = true;
-    btn.querySelector('.btn-label').textContent = 'Creating...';
-    var spinner = document.createElement('span');
-    spinner.className = 'spinner spinner-on-accent';
-    btn.insertBefore(spinner, btn.firstChild);
-
+    btn.disabled = true; btn.querySelector('.btn-label').textContent = 'Creating...';
+    var spinner = document.createElement('span'); spinner.className = 'spinner spinner-on-accent'; btn.insertBefore(spinner, btn.firstChild);
     try {
-      var { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: { data: { full_name: name } },
-      });
+      var { data, error } = await supabase.auth.signUp({ email: email, password: password, options: { data: { full_name: name } } });
       if (error) throw error;
-      toast('Account created. Welcome to Clay.');
-      // If user came from the home page with an idea, redirect to new-project with that idea
+      toast('Account created. Welcome to Clay!');
       var idea = new URLSearchParams(location.search).get('idea');
-      setTimeout(function () {
-        if (idea) {
-          window.location.href = './new-project.html?idea=' + encodeURIComponent(idea);
-        } else {
-          window.location.href = './dashboard.html';
-        }
-      }, 600);
-    } catch (e) {
-      showError(e.message || 'Sign-up failed. Please try again.');
-      btn.disabled = false;
-      btn.querySelector('.btn-label').textContent = 'Create account';
-      if (spinner.parentNode) spinner.remove();
-    }
+      setTimeout(function () { window.location.href = idea ? './new-project.html?idea=' + encodeURIComponent(idea) : './dashboard.html'; }, 600);
+    } catch (e) { showError(e.message || 'Sign-up failed.'); btn.disabled = false; btn.querySelector('.btn-label').textContent = 'Create account'; if (spinner.parentNode) spinner.remove(); }
   });
-
-  function showError(msg) {
-    err.textContent = msg;
-    err.classList.remove('hidden');
-    err.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+  function showError(msg) { err.textContent = msg; err.classList.remove('hidden'); }
 })();
 </script>
 </body>

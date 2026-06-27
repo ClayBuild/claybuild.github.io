@@ -5,71 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=27">
+<link rel="stylesheet" href="./css/main.css?v=28">
 <style>
-  .ambient-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-  .ambient-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.05; }
-  .ambient-blob.b1 { width: 400px; height: 400px; background: var(--accent); top: -100px; right: -100px; animation: drift 25s ease-in-out infinite; }
-  .ambient-blob.b2 { width: 350px; height: 350px; background: var(--cyan); bottom: -50px; left: -100px; animation: drift 30s ease-in-out infinite reverse; }
-  @keyframes drift { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,20px); } }
-  body > * { position: relative; z-index: 1; }
-
   .welcome-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .welcome-row h1 { font-size: 1.75rem; }
-
-  .idea-input-wrap {
-    position: relative; margin-bottom: 1.5rem;
-  }
-  .idea-input-wrap input {
-    width: 100%; padding: 1.1rem 4rem 1.1rem 1.4rem;
-    border: 2px solid var(--border-strong); border-radius: var(--radius-lg);
-    font-size: 1rem; outline: none; background: var(--surface);
-    transition: border-color .2s, box-shadow .2s;
-    font-family: inherit; box-shadow: var(--shadow-sm);
-  }
-  .idea-input-wrap input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px var(--accent-light), 0 8px 24px rgba(37,99,235,0.1);
-  }
-  .idea-input-wrap input::placeholder { color: var(--text-muted); }
-  .idea-input-wrap button {
-    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-    width: 44px; height: 44px; border-radius: var(--radius);
-    background: var(--accent); color: #FFF; border: none;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; cursor: pointer;
-    transition: background .15s, transform .15s;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.2);
-  }
-  .idea-input-wrap button:hover { background: var(--accent-hover); transform: translateY(-50%) scale(1.05); }
-
-  .dash-stats { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; }
-  .dash-stat-mini {
-    flex: 0 0 auto; padding: 0.85rem 1.25rem;
-    border-radius: var(--radius); color: #FFF;
-    display: flex; align-items: center; gap: 0.75rem;
-    transition: transform 0.15s; min-width: 140px;
-  }
-  .dash-stat-mini:hover { transform: translateY(-2px); }
-  .dash-stat-mini .icn { font-size: 1.3rem; opacity: 0.6; }
-  .dash-stat-mini .num { font-size: 1.6rem; font-weight: 900; line-height: 1; }
-  .dash-stat-mini .lbl { font-size: 0.72rem; opacity: 0.85; font-weight: 600; line-height: 1.2; }
-  .dash-stat-mini.blue { background: var(--accent); }
-  .dash-stat-mini.green { background: var(--success); }
-  .dash-stat-mini.orange { background: var(--orange); }
-
   .creations-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap; }
   .creations-header h2 { font-size: 1.3rem; margin: 0; }
-  .search-wrap { position: relative; }
-  .search-wrap input {
-    width: 240px; padding: 0.55rem 0.85rem 0.55rem 2.25rem;
-    border: 2px solid var(--border); border-radius: var(--radius);
-    font-size: 0.88rem; outline: none; background: var(--surface);
-    transition: border-color .15s;
-  }
-  .search-wrap input:focus { border-color: var(--accent); }
-  .search-wrap i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem; }
-  @media (max-width: 600px) { .search-wrap input { width: 100%; } }
+  .search-wrap { position: relative; min-width: 240px; }
 </style>
 </head>
 <body>
@@ -77,42 +19,30 @@
 <div class="ambient-bg">
   <div class="ambient-blob b1"></div>
   <div class="ambient-blob b2"></div>
+  <div class="ambient-blob b3"></div>
 </div>
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a href="./index.html" class="brand">
-      <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
-    </a>
-    <nav>
-      <a href="./dashboard.html" style="font-weight:700; color: var(--accent);">Dashboard</a>
-      <a href="#" id="sign-out"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out</a>
-    </nav>
+    <a href="./index.html" class="brand"><span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay</a>
+    <nav><a href="./dashboard.html" style="font-weight:700; color: var(--accent);">Dashboard</a><a href="#" id="sign-out"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out</a></nav>
   </div>
 </header>
 
 <div class="container">
-
   <section class="dash-header">
-    <div class="welcome-row">
-      <div>
-        <h1 id="welcome">Your projects</h1>
-        <p class="sub" id="welcome-sub">Describe your next idea above, or pick up an existing project below.</p>
-      </div>
-    </div>
-
-    <div class="idea-input-wrap">
-      <input type="text" id="dash-idea-input" placeholder="A coffee shop in Seattle with an online ordering system">
+    <div class="welcome-row"><div><h1 id="welcome">Your projects</h1><p class="sub" id="welcome-sub">Describe your next idea above, or pick up an existing project below.</p></div></div>
+    <div class="uiverse-input" style="margin-bottom:1.5rem;">
+      <input type="text" id="dash-idea-input" placeholder="A coffee shop in Bengaluru with an online ordering system">
       <button id="dash-idea-btn"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-
     <div class="dash-stats" id="dash-stats"></div>
   </section>
 
   <div id="creations-section">
     <div class="creations-header">
-      <h2 id="creations-title">Your Creations</h2>
-      <div class="search-wrap">
+      <h2>Your Creations</h2>
+      <div class="search-wrap uiverse-search">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="search-input" placeholder="Search by name...">
       </div>
@@ -124,139 +54,70 @@
       <div class="proj-card" style="opacity:0.5;"><div class="name">Loading...</div><div class="desc">Fetching your projects</div></div>
       <div class="proj-card" style="opacity:0.3;"><div class="name">Loading...</div><div class="desc">Fetching your projects</div></div>
     </div>
-
-    <div class="empty-state hidden" id="empty">
-      <div class="icon"><i class="fa-regular fa-folder-open"></i></div>
-      <h3>No projects yet</h3>
-      <p>Describe your idea in the box above and Clay will build your first website.</p>
-    </div>
-
+    <div class="empty-state hidden" id="empty"><div class="icon"><i class="fa-regular fa-folder-open"></i></div><h3>No projects yet</h3><p>Describe your idea in the box above and Clay will build your first website.</p></div>
     <div class="dash-grid hidden" id="grid"></div>
-    <div class="empty-state hidden" id="no-results" style="padding:2rem;">
-      <p style="margin:0; color:var(--text-3);">No projects match your search.</p>
-    </div>
+    <div class="empty-state hidden" id="no-results" style="padding:2rem;"><p style="margin:0; color:var(--text-3);">No projects match your search.</p></div>
   </div>
-
 </div>
 
-<footer class="footer">
-  <div class="container footer-inner">
-    <a href="./index.html" class="brand">
-      <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
-    </a>
-    <div style="font-size:0.82rem; color:var(--text-muted);">&copy; 2026 Clay</div>
-  </div>
-</footer>
+<footer class="footer"><div class="container footer-inner"><a href="./index.html" class="brand"><span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay</a><div style="font-size:0.82rem; color:var(--text-muted);">&copy; 2026 Clay</div></div></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=27"></script>
-<script src="./js/supabase.js?v=27"></script>
+<script src="./js/config.js?v=28"></script>
+<script src="./js/supabase.js?v=28"></script>
 <script>
 (async function () {
   var session = await clayRequireAuth();
   if (!session) return;
-
   var firstName = (session.user.user_metadata && session.user.user_metadata.full_name) || (session.user.email ? session.user.email.split('@')[0] : 'there');
   firstName = firstName.split(' ')[0];
   document.getElementById('welcome').textContent = 'Welcome back, ' + firstName + '!';
   document.getElementById('welcome-sub').textContent = 'Describe your next idea above, or pick up an existing project below.';
-
-  document.getElementById('sign-out').addEventListener('click', async function (e) {
-    e.preventDefault();
-    await claySignOut();
-  });
+  document.getElementById('sign-out').addEventListener('click', async function (e) { e.preventDefault(); await claySignOut(); });
 
   var ideaInput = document.getElementById('dash-idea-input');
   var ideaBtn = document.getElementById('dash-idea-btn');
   function handleIdea() {
     var idea = ideaInput.value.trim();
-    if (idea.length < 10) {
-      ideaInput.style.borderColor = 'var(--error)';
-      ideaInput.focus();
-      setTimeout(function() { ideaInput.style.borderColor = ''; }, 2000);
-      return;
-    }
+    if (idea.length < 10) { ideaInput.style.borderColor = 'var(--error)'; ideaInput.focus(); setTimeout(function() { ideaInput.style.borderColor = ''; }, 2000); return; }
     window.location.href = './new-project.html?idea=' + encodeURIComponent(idea);
   }
   ideaBtn.addEventListener('click', handleIdea);
   ideaInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleIdea(); });
 
   var allProjects = [];
-
   try {
-    var { data: projects, error } = await supabase
-      .from('projects')
-      .select('*')
-      .order('updated_at', { ascending: false });
-
+    var { data: projects, error } = await supabase.from('projects').select('*').order('updated_at', { ascending: false });
     document.getElementById('skeleton').classList.add('hidden');
     if (error) throw error;
-
     allProjects = projects || [];
-
     var total = allProjects.length;
     var published = allProjects.filter(function(p) { return p.status === 'published'; }).length;
     var inProgress = total - published;
-
     if (total > 0) {
       document.getElementById('dash-stats').innerHTML =
-        '<div class="dash-stat-mini blue"><div class="icn"><i class="fa-solid fa-globe"></i></div><div><div class="num">' + total + '</div><div class="lbl">' + firstName + '\'s websites</div></div></div>' +
-        '<div class="dash-stat-mini green"><div class="icn"><i class="fa-solid fa-check-circle"></i></div><div><div class="num">' + published + '</div><div class="lbl">Published</div></div></div>' +
-        '<div class="dash-stat-mini orange"><div class="icn"><i class="fa-solid fa-pen-ruler"></i></div><div><div class="num">' + inProgress + '</div><div class="lbl">In progress</div></div></div>';
+        '<div class="dash-stat-card blue"><div class="icn"><i class="fa-solid fa-globe"></i></div><div class="num">' + total + '</div><div class="lbl">' + firstName + '\'s websites</div></div>' +
+        '<div class="dash-stat-card green"><div class="icn"><i class="fa-solid fa-check-circle"></i></div><div class="num">' + published + '</div><div class="lbl">Published</div></div>' +
+        '<div class="dash-stat-card orange"><div class="icn"><i class="fa-solid fa-pen-ruler"></i></div><div class="num">' + inProgress + '</div><div class="lbl">In progress</div></div>';
     }
-
-    document.getElementById('creations-title').textContent = total > 0 ? firstName + '\'s Creations' : '';
-
-    if (total === 0) {
-      document.getElementById('empty').classList.remove('hidden');
-      document.getElementById('creations-section').style.display = 'none';
-      return;
-    }
-
+    if (total === 0) { document.getElementById('empty').classList.remove('hidden'); document.getElementById('creations-section').style.display = 'none'; return; }
     renderProjects(allProjects);
-  } catch (e) {
-    document.getElementById('skeleton').classList.add('hidden');
-    toast('Could not load projects: ' + (e.message || e), 5000);
-  }
+  } catch (e) { document.getElementById('skeleton').classList.add('hidden'); toast('Could not load projects: ' + (e.message || e), 5000); }
 
-  // Search filter
   document.getElementById('search-input').addEventListener('input', function() {
     var query = this.value.trim().toLowerCase();
-    var filtered = allProjects.filter(function(p) {
-      return (p.name || '').toLowerCase().includes(query);
-    });
+    var filtered = allProjects.filter(function(p) { return (p.name || '').toLowerCase().includes(query); });
     renderProjects(filtered);
     document.getElementById('no-results').classList.toggle('hidden', filtered.length > 0);
   });
 
   function renderProjects(projs) {
     var grid = document.getElementById('grid');
-    if (projs.length === 0) {
-      grid.classList.add('hidden');
-      return;
-    }
+    if (projs.length === 0) { grid.classList.add('hidden'); return; }
     grid.innerHTML = projs.map(renderCard).join('');
     grid.classList.remove('hidden');
-
-    grid.querySelectorAll('.proj-card').forEach(function (card) {
-      card.addEventListener('click', function () {
-        window.location.href = './project.html?id=' + card.dataset.id;
-      });
-    });
-
-    setTimeout(function() {
-      document.querySelectorAll('.copy-link-dash').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          var url = btn.dataset.url;
-          navigator.clipboard.writeText(url).then(function() {
-            toast('Link copied to clipboard!');
-          }).catch(function() {
-            toast('Could not copy. Here it is: ' + url);
-          });
-        });
-      });
-    }, 100);
+    grid.querySelectorAll('.proj-card').forEach(function (card) { card.addEventListener('click', function () { window.location.href = './project.html?id=' + card.dataset.id; }); });
+    setTimeout(function() { document.querySelectorAll('.copy-link-dash').forEach(function(btn) { btn.addEventListener('click', function(e) { e.stopPropagation(); var url = btn.dataset.url; navigator.clipboard.writeText(url).then(function() { toast('Link copied!'); }).catch(function() { toast('Could not copy: ' + url); }); }); }); }, 100);
   }
 
   function renderCard(p) {
@@ -265,33 +126,13 @@
     var status = p.status || 'draft';
     var statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
     var updatedAt = clayTimeAgo(p.updated_at || p.created_at);
-
     var url = '';
     if (p.published_url) {
-      url = '<div style="display:flex; gap:0.4rem; margin-top:0.5rem;">' +
-            '<a class="btn btn-sm" href="' + escapeAttr(p.published_url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</a>' +
-            '<button class="btn btn-ghost btn-sm copy-link-dash" data-url="' + escapeAttr(p.published_url) + '" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-link"></i> Copy</button>' +
-            '</div>';
+      url = '<div style="display:flex; gap:0.4rem; margin-top:0.5rem;"><a class="btn btn-sm" href="' + escapeAttr(p.published_url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</a><button class="btn btn-ghost btn-sm copy-link-dash" data-url="' + escapeAttr(p.published_url) + '" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-link"></i> Copy</button></div>';
     }
-
-    return '' +
-      '<div class="proj-card" data-id="' + p.id + '">' +
-        '<div class="top-row">' +
-          '<span class="status-pill ' + status + '">' + statusLabel + '</span>' +
-          '<span style="font-size:0.78rem;color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ' + updatedAt + '</span>' +
-        '</div>' +
-        '<div class="name">' + escapeHtml(p.name || 'Untitled') + '</div>' +
-        '<div class="desc">' + escapeHtml(ideaShort) + '</div>' +
-        url +
-        '<div class="footer-row">' +
-          '<span>Open project <i class="fa-solid fa-arrow-right" style="font-size:0.72rem;"></i></span>' +
-        '</div>' +
-      '</div>';
+    return '<div class="proj-card" data-id="' + p.id + '"><div class="top-row"><span class="status-pill ' + status + '">' + statusLabel + '</span><span style="font-size:0.78rem;color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ' + updatedAt + '</span></div><div class="name">' + escapeHtml(p.name || 'Untitled') + '</div><div class="desc">' + escapeHtml(ideaShort) + '</div>' + url + '<div class="footer-row"><span>Open project <i class="fa-solid fa-arrow-right" style="font-size:0.72rem;"></i></span></div></div>';
   }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; });
-  }
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
   function escapeAttr(s) { return escapeHtml(s); }
 })();
 </script>

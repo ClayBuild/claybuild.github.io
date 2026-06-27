@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign in — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=27">
+<link rel="stylesheet" href="./css/main.css?v=28">
 </head>
 <body>
 
 <div class="auth-wrap">
   <div class="auth-card">
-    <a href="./index.html" class="brand">
+    <a href="./index.html" class="brand" style="justify-content:center;">
       <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
     </a>
-    <span class="eyebrow">Welcome back</span>
-    <h1>Sign in.</h1>
+    <div class="eyebrow" style="text-align:center;">Welcome back</div>
+    <h1 style="text-align:center;">Sign in.</h1>
     <p class="sub">Continue to your dashboard and projects.</p>
 
     <div id="err" class="alert alert-error hidden" style="margin-bottom:1rem;"></div>
@@ -38,70 +38,42 @@
       </button>
     </form>
 
-    <div class="alt">
-      New to Clay? <a href="./signup.html">Create an account</a>
-    </div>
+    <div class="alt">New to Clay? <a href="./signup.html">Create an account</a></div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=27"></script>
-<script src="./js/supabase.js?v=27"></script>
+<script src="./js/config.js?v=28"></script>
+<script src="./js/supabase.js?v=28"></script>
 <script>
 (function () {
   document.querySelectorAll('.pw-toggle').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var target = document.getElementById(btn.dataset.target);
       if (!target) return;
-      if (target.type === 'password') {
-        target.type = 'text';
-        btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>';
-        btn.setAttribute('aria-label', 'Hide password');
-      } else {
-        target.type = 'password';
-        btn.innerHTML = '<i class="fa-regular fa-eye"></i>';
-        btn.setAttribute('aria-label', 'Show password');
-      }
+      if (target.type === 'password') { target.type = 'text'; btn.innerHTML = '<i class="fa-regular fa-eye-slash"></i>'; }
+      else { target.type = 'password'; btn.innerHTML = '<i class="fa-regular fa-eye"></i>'; }
     });
   });
-
   clayRedirectIfAuthed();
-
   var form = document.getElementById('login-form');
   var err = document.getElementById('err');
   var btn = document.getElementById('submit-btn');
-
   form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    err.classList.add('hidden');
-
+    e.preventDefault(); err.classList.add('hidden');
     var email = document.getElementById('email').value.trim();
     var password = document.getElementById('password').value;
-
-    btn.disabled = true;
-    btn.querySelector('.btn-label').textContent = 'Signing in...';
-    var spinner = document.createElement('span');
-    spinner.className = 'spinner spinner-on-accent';
-    btn.insertBefore(spinner, btn.firstChild);
-
+    btn.disabled = true; btn.querySelector('.btn-label').textContent = 'Signing in...';
+    var spinner = document.createElement('span'); spinner.className = 'spinner spinner-on-accent'; btn.insertBefore(spinner, btn.firstChild);
     try {
       var { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
       if (error) throw error;
-      toast('Welcome back.');
+      toast('Welcome back!');
       var next = new URLSearchParams(location.search).get('next') || './dashboard.html';
       setTimeout(function () { window.location.href = next; }, 400);
-    } catch (e) {
-      showError(e.message || 'Sign-in failed. Check your email and password.');
-      btn.disabled = false;
-      btn.querySelector('.btn-label').textContent = 'Sign in';
-      if (spinner.parentNode) spinner.remove();
-    }
+    } catch (e) { showError(e.message || 'Sign-in failed.'); btn.disabled = false; btn.querySelector('.btn-label').textContent = 'Sign in'; if (spinner.parentNode) spinner.remove(); }
   });
-
-  function showError(msg) {
-    err.textContent = msg;
-    err.classList.remove('hidden');
-  }
+  function showError(msg) { err.textContent = msg; err.classList.remove('hidden'); }
 })();
 </script>
 </body>

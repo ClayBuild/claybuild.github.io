@@ -91,7 +91,7 @@
 
     <div class="field">
       <label for="idea">Your business or project</label>
-      <textarea class="textarea" id="idea" placeholder="e.g. A small bakery in Brooklyn selling sourdough, pastries, and birthday cakes. We take custom orders and want a contact form."></textarea>
+      <textarea class="textarea" id="idea" placeholder="e.g. A small bakery in Mumbai selling sourdough, pastries, and birthday cakes. We take custom orders and want a contact form."></textarea>
       <div class="field-hint">Aim for 1–3 sentences. Mention your location, what you sell, and who it's for.</div>
     </div>
 
@@ -108,15 +108,15 @@
     <p class="lede">This will be the title of your project in the dashboard. You can type your own name, or let Clay generate one for you.</p>
 
     <div class="field">
-      <div style="display:flex; gap:1rem; margin-bottom:1rem;">
-        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; padding:0.85rem 1rem; border:1.5px solid var(--grey-300); border-radius:var(--radius); flex:1; transition:border-color 0.15s;" id="name-choice-custom-label">
-          <input type="radio" name="name-choice" value="custom" id="name-choice-custom" checked style="accent-color:var(--grey-800);">
-          <span style="font-weight:600; font-size:0.92rem;">I'll type my name</span>
-        </label>
-        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; padding:0.85rem 1rem; border:1.5px solid var(--grey-300); border-radius:var(--radius); flex:1; transition:border-color 0.15s;" id="name-choice-generate-label">
-          <input type="radio" name="name-choice" value="generate" id="name-choice-generate" style="accent-color:var(--grey-800);">
-          <span style="font-weight:600; font-size:0.92rem;">Generate one for me</span>
-        </label>
+      <div class="name-choice-row">
+        <div class="name-choice">
+          <input type="radio" name="name-choice" value="custom" id="name-choice-custom" checked>
+          <label for="name-choice-custom"><span class="radio-dot"></span> I'll type my name</label>
+        </div>
+        <div class="name-choice">
+          <input type="radio" name="name-choice" value="generate" id="name-choice-generate">
+          <label for="name-choice-generate"><span class="radio-dot"></span> Generate one for me</label>
+        </div>
       </div>
       <input class="input" id="proj-name" type="text" placeholder="e.g. Clay Bakery">
       <div class="field-hint" id="name-hint">Type your project name above.</div>
@@ -169,21 +169,17 @@
         <button class="btn btn-ghost btn-sm" id="logo-remove">Remove</button>
       </div>
 
-      <div style="text-align:center; margin: 1.5rem 0; color:var(--text-3); font-size:0.85rem; font-weight: 500;">— or pick a color palette —</div>
+      <div style="text-align:center; margin: 1.5rem 0; color:var(--text-3); font-size:0.85rem; font-weight: 500;">or pick a color palette</div>
 
       <div class="palette-grid" id="palette-grid"></div>
 
-      <details style="margin-top:1rem;">
-        <summary style="cursor:pointer; font-size:0.9rem; color:var(--text-2); padding:0.5rem 0; font-weight: 500;">Build a custom palette instead</summary>
-        <div class="custom-palette" id="custom-palette">
-          <div class="row"><label>Background</label><div class="color-pick"><input type="color" data-slot="0" value="#ffffff"><input type="text" data-slot-text="0" value="#FFFFFF"></div></div>
-          <div class="row"><label>Primary</label><div class="color-pick"><input type="color" data-slot="1" value="#000000"><input type="text" data-slot-text="1" value="#000000"></div></div>
-          <div class="row"><label>Secondary</label><div class="color-pick"><input type="color" data-slot="2" value="#555555"><input type="text" data-slot-text="2" value="#555555"></div></div>
-          <div class="row"><label>Accent</label><div class="color-pick"><input type="color" data-slot="3" value="#ff6b35"><input type="text" data-slot-text="3" value="#FF6B35"></div></div>
-          <div class="row"><label>Text</label><div class="color-pick"><input type="color" data-slot="4" value="#1a1a1a"><input type="text" data-slot-text="4" value="#1A1A1A"></div></div>
-          <button class="btn btn-sm" id="custom-palette-apply" style="margin-top:0.5rem;">Use this palette</button>
-        </div>
-      </details>
+      <div class="custom-palette-trigger" id="custom-palette-trigger">
+        <i class="fa-solid fa-palette"></i> Build a custom palette
+      </div>
+      <div class="custom-palette-builder" id="custom-palette-builder">
+        <div class="custom-palette-cards" id="custom-palette-cards"></div>
+        <button class="btn btn-sm" id="custom-palette-apply" style="margin-top:0.75rem;">Use this palette</button>
+      </div>
     </div>
 
     <!-- Live preview -->
