@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=25">
+<link rel="stylesheet" href="./css/main.css?v=26">
 <style>
-  .welcome-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+  .welcome-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .welcome-row h1 { font-size: 1.85rem; }
-  .welcome-row .sub { color: var(--text-3); margin-top: 0.3rem; }
+  .welcome-row .sub { color: var(--text-3); margin-top: 0.25rem; font-size: 0.9rem; }
 </style>
 </head>
 <body>
@@ -20,7 +20,7 @@
       <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
     </a>
     <nav>
-      <a href="./dashboard.html" style="font-weight:600; color: var(--text);">Dashboard</a>
+      <a href="./dashboard.html" style="font-weight:700; color: var(--accent);">Dashboard</a>
       <a href="#" id="sign-out"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign out</a>
     </nav>
   </div>
@@ -31,29 +31,35 @@
   <section class="dash-header">
     <div class="welcome-row">
       <div>
-        <span class="eyebrow">Dashboard</span>
         <h1 id="welcome">Your projects</h1>
         <p class="sub" id="welcome-sub">Pick up where you left off, or start something new.</p>
       </div>
-      <a href="./new-project.html" class="btn btn-lg">
-        <i class="fa-solid fa-plus"></i> New project
-      </a>
     </div>
+
+    <!-- Input bar (replaces New Project button) -->
+    <div class="dash-input-card">
+      <div class="field" style="flex:1;">
+        <label><i class="fa-solid fa-wand-magic-sparkles"></i> Describe your next website idea</label>
+        <input class="input" id="dash-idea-input" type="text" placeholder="A coffee shop in Seattle with an online ordering system">
+      </div>
+      <button class="btn btn-lg" id="dash-idea-btn"><i class="fa-solid fa-arrow-right"></i> Create</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="dash-stats" id="dash-stats"></div>
   </section>
 
   <div id="projects-area">
-    <!-- loading skeleton -->
     <div class="dash-grid" id="skeleton">
-      <div class="proj-card" style="opacity:0.5;"><div class="name">Loading…</div><div class="desc">Fetching your projects</div></div>
-      <div class="proj-card" style="opacity:0.3;"><div class="name">Loading…</div><div class="desc">Fetching your projects</div></div>
-      <div class="proj-card" style="opacity:0.2;"><div class="name">Loading…</div><div class="desc">Fetching your projects</div></div>
+      <div class="proj-card" style="opacity:0.5;"><div class="name">Loading...</div><div class="desc">Fetching your projects</div></div>
+      <div class="proj-card" style="opacity:0.3;"><div class="name">Loading...</div><div class="desc">Fetching your projects</div></div>
+      <div class="proj-card" style="opacity:0.2;"><div class="name">Loading...</div><div class="desc">Fetching your projects</div></div>
     </div>
 
     <div class="empty-state hidden" id="empty">
       <div class="icon"><i class="fa-regular fa-folder-open"></i></div>
       <h3>No projects yet</h3>
-      <p>When you build your first website with Clay, it'll show up here. It takes about 2 minutes from idea to URL.</p>
-      <a href="./new-project.html" class="btn"><i class="fa-solid fa-plus"></i> Start your first project</a>
+      <p>Describe your idea in the box above and Clay will build your first website.</p>
     </div>
 
     <div class="dash-grid hidden" id="grid"></div>
@@ -71,8 +77,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=25"></script>
-<script src="./js/supabase.js?v=25"></script>
+<script src="./js/config.js?v=26"></script>
+<script src="./js/supabase.js?v=26"></script>
 <script>
 (async function () {
   var session = await clayRequireAuth();
@@ -80,14 +86,30 @@
 
   // Personalize header
   var fullName = (session.user.user_metadata && session.user.user_metadata.full_name) || (session.user.email ? session.user.email.split('@')[0] : 'there');
-  document.getElementById('welcome').textContent = 'Welcome back, ' + fullName.split(' ')[0] + '.';
-  document.getElementById('welcome-sub').textContent = 'Pick up where you left off, or start something new.';
+  document.getElementById('welcome').textContent = 'Welcome back, ' + fullName.split(' ')[0] + '!';
+  document.getElementById('welcome-sub').textContent = 'Describe your next idea above, or pick up an existing project below.';
 
   // Sign out
   document.getElementById('sign-out').addEventListener('click', async function (e) {
     e.preventDefault();
     await claySignOut();
   });
+
+  // Input bar: go directly to new-project with idea pre-filled (skips to Name step)
+  var ideaInput = document.getElementById('dash-idea-input');
+  var ideaBtn = document.getElementById('dash-idea-btn');
+  function handleIdea() {
+    var idea = ideaInput.value.trim();
+    if (idea.length < 10) {
+      ideaInput.style.borderColor = 'var(--error)';
+      ideaInput.focus();
+      setTimeout(function() { ideaInput.style.borderColor = ''; }, 2000);
+      return;
+    }
+    window.location.href = './new-project.html?idea=' + encodeURIComponent(idea);
+  }
+  ideaBtn.addEventListener('click', handleIdea);
+  ideaInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleIdea(); });
 
   // Load projects
   try {
@@ -99,6 +121,19 @@
     document.getElementById('skeleton').classList.add('hidden');
 
     if (error) throw error;
+
+    // Render stats
+    var total = projects.length;
+    var published = projects.filter(function(p) { return p.status === 'published'; }).length;
+    var unpublished = total - published;
+    var statsHtml = '';
+    if (total > 0) {
+      statsHtml =
+        '<div class="dash-stat purple"><div class="icn"><i class="fa-solid fa-globe"></i></div><div class="num">' + total + '</div><div class="lbl">Total websites</div></div>' +
+        '<div class="dash-stat green"><div class="icn"><i class="fa-solid fa-check-circle"></i></div><div class="num">' + published + '</div><div class="lbl">Published</div></div>' +
+        '<div class="dash-stat warm"><div class="icn"><i class="fa-solid fa-pen-ruler"></i></div><div class="num">' + unpublished + '</div><div class="lbl">In progress</div></div>';
+    }
+    document.getElementById('dash-stats').innerHTML = statsHtml;
 
     if (!projects || projects.length === 0) {
       document.getElementById('empty').classList.remove('hidden');
@@ -114,6 +149,21 @@
         window.location.href = './project.html?id=' + card.dataset.id;
       });
     });
+
+    // Wire up copy-link buttons
+    setTimeout(function() {
+      document.querySelectorAll('.copy-link-dash').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var url = btn.dataset.url;
+          navigator.clipboard.writeText(url).then(function() {
+            toast('Link copied to clipboard!');
+          }).catch(function() {
+            toast('Could not copy. Here it is: ' + url);
+          });
+        });
+      });
+    }, 100);
   } catch (e) {
     document.getElementById('skeleton').classList.add('hidden');
     toast('Could not load projects: ' + (e.message || e), 5000);
@@ -121,7 +171,7 @@
 
   function renderCard(p) {
     var idea = p.business_idea || 'No description provided';
-    var ideaShort = idea.length > 90 ? idea.slice(0, 90) + '…' : idea;
+    var ideaShort = idea.length > 90 ? idea.slice(0, 90) + '...' : idea;
     var status = p.status || 'draft';
     var statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
     var updatedAt = clayTimeAgo(p.updated_at || p.created_at);
@@ -129,23 +179,22 @@
     var url = '';
     if (p.published_url) {
       url = '<div style="display:flex; gap:0.4rem; margin-top:0.5rem;">' +
-            '<a class="btn btn-sm" href="' + escapeAttr(p.published_url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>' +
-            '<button class="btn btn-ghost btn-sm copy-link-dash" data-url="' + escapeAttr(p.published_url) + '" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-link"></i> Copy link</button>' +
+            '<a class="btn btn-sm" href="' + escapeAttr(p.published_url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</a>' +
+            '<button class="btn btn-ghost btn-sm copy-link-dash" data-url="' + escapeAttr(p.published_url) + '" onclick="event.stopPropagation();" style="flex:1;"><i class="fa-solid fa-link"></i> Copy</button>' +
             '</div>';
     }
 
     return '' +
       '<div class="proj-card" data-id="' + p.id + '">' +
         '<div class="top-row">' +
-          '<span class="badge">' + escapeHtml(p.slug || 'no-slug') + '</span>' +
           '<span class="status-pill ' + status + '">' + statusLabel + '</span>' +
+          '<span style="font-size:0.78rem;color:var(--text-muted);"><i class="fa-regular fa-clock"></i> ' + updatedAt + '</span>' +
         '</div>' +
         '<div class="name">' + escapeHtml(p.name || 'Untitled') + '</div>' +
         '<div class="desc">' + escapeHtml(ideaShort) + '</div>' +
         url +
         '<div class="footer-row">' +
-          '<span><i class="fa-regular fa-clock"></i> ' + updatedAt + '</span>' +
-          '<span>Open <i class="fa-solid fa-arrow-right" style="font-size:0.72rem;"></i></span>' +
+          '<span>Open project <i class="fa-solid fa-arrow-right" style="font-size:0.72rem;"></i></span>' +
         '</div>' +
       '</div>';
   }
@@ -154,21 +203,6 @@
     return String(s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; });
   }
   function escapeAttr(s) { return escapeHtml(s); }
-
-  // Wire up copy-link buttons after rendering
-  setTimeout(function() {
-    document.querySelectorAll('.copy-link-dash').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        var url = btn.dataset.url;
-        navigator.clipboard.writeText(url).then(function() {
-          toast('Link copied to clipboard!');
-        }).catch(function() {
-          toast('Could not copy. Here it is: ' + url);
-        });
-      });
-    });
-  }, 100);
 })();
 </script>
 </body>

@@ -90,8 +90,16 @@ const STYLE_DESCRIPTIONS = {
   // Check if we're reusing an existing project (from project.html "Regenerate" or "Edit")
   const reuseId = new URLSearchParams(location.search).get('reuse');
   const editMode = new URLSearchParams(location.search).get('edit') === '1';
+  const ideaParam = new URLSearchParams(location.search).get('idea');
+
   if (reuseId) {
     await loadExistingProject(reuseId, editMode);
+  } else if (ideaParam) {
+    // User came from home page or dashboard with a pre-filled idea
+    document.getElementById('idea').value = ideaParam;
+    STATE.business_idea = ideaParam;
+    // Auto-advance to step 2 (name)
+    setTimeout(function() { goToStep(2); }, 200);
   } else {
     // Populate step 1 with placeholder focus
     setTimeout(() => document.getElementById('idea').focus(), 100);

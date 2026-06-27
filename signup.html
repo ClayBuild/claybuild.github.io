@@ -110,8 +110,14 @@
       });
       if (error) throw error;
       toast('Account created. Welcome to Clay.');
+      // If user came from the home page with an idea, redirect to new-project with that idea
+      var idea = new URLSearchParams(location.search).get('idea');
       setTimeout(function () {
-        window.location.href = './dashboard.html';
+        if (idea) {
+          window.location.href = './new-project.html?idea=' + encodeURIComponent(idea);
+        } else {
+          window.location.href = './dashboard.html';
+        }
       }, 600);
     } catch (e) {
       showError(e.message || 'Sign-up failed. Please try again.');

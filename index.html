@@ -4,99 +4,145 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clay — Build a website by talking to AI</title>
-<meta name="description" content="Clay helps non-tech people build, host, and ship a real website by answering a few simple questions. No code. No templates. No friction.">
+<meta name="description" content="Clay helps non-tech people build, host, and ship a real website by answering a few simple questions.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=25">
+<link rel="stylesheet" href="./css/main.css?v=26">
 <style>
   /* ---- Hero ---- */
-  .hero { padding: 4rem 0 5rem; position: relative; overflow: hidden; }
-  .hero-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 4rem; align-items: center; }
-  .hero h1 { font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.035em; margin-bottom: 1.25rem; }
-  .hero h1 .accent { color: var(--text-3); font-weight: 700; }
-  .hero .lede { font-size: 1.18rem; color: var(--text-2); max-width: 500px; margin-bottom: 2rem; line-height: 1.55; }
-  .hero .cta { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
-  .hero .stats { display: flex; gap: 2.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
-  .hero .stat .n { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); }
-  .hero .stat .l { font-size: 0.82rem; color: var(--text-3); margin-top: 0.15rem; }
+  .hero { padding: 3rem 0 4rem; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .hero-bg::before {
+    content: ''; position: absolute; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,58,237,0.08), transparent 70%);
+    top: -200px; left: -100px; border-radius: 50%;
+  }
+  .hero-bg::after {
+    content: ''; position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(236,72,153,0.08), transparent 70%);
+    top: -100px; right: -100px; border-radius: 50%;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; align-items: center; }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 1rem; }
+  .hero h1 .grad { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero .lede { font-size: 1.18rem; color: var(--text-2); max-width: 480px; margin-bottom: 1.5rem; line-height: 1.55; }
 
-  /* ---- Hero visual ---- */
+  /* ---- Hero input bar ---- */
+  .hero-input { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; max-width: 520px; }
+  .hero-input input {
+    flex: 1; padding: 1rem 1.25rem;
+    border: 2px solid var(--border-strong); border-radius: var(--radius);
+    font-size: 1rem; outline: none; background: var(--surface);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .hero-input input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
+  .hero-input input::placeholder { color: var(--text-muted); }
+
+  .hero-cta-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+  .hero-badges { display: flex; gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap; }
+  .hero-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-3); font-weight: 600; }
+  .hero-badge i { color: var(--accent); }
+
+  /* ---- Hero visual (dashboard preview placeholder) ---- */
   .hero-visual { position: relative; }
-  .hero-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: 1.5rem; box-shadow: var(--shadow-lg); position: relative;
-    transform: rotate(1deg); max-width: 400px; margin-left: auto;
+  .hero-preview-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.5rem;
+    box-shadow: var(--shadow-lg); position: relative;
+    transform: rotate(1deg); transition: transform 0.3s;
   }
-  .hero-card .card-eyebrow { font-size: 0.78rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
-  .hero-card h3 { font-size: 1.1rem; margin-bottom: 1rem; }
-  .hero-card .q-row { padding: 0.65rem 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
-  .hero-card .q-row:last-child { border-bottom: 0; }
-  .hero-card .q-row .k { color: var(--text-3); font-size: 0.82rem; }
-  .hero-card .q-row .v { font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 0.3rem; }
-  .hero-card .q-row .v .check { color: var(--success); font-size: 0.8rem; }
-  .hero-card .status-tag { position: absolute; top: -12px; right: 20px; background: var(--success); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: var(--radius-full); }
-  .hero-bubble {
-    position: absolute; background: var(--text); color: var(--bg); border-radius: var(--radius-md);
-    padding: 0.75rem 1rem; font-size: 0.85rem; box-shadow: var(--shadow-md); max-width: 220px;
+  .hero-preview-card:hover { transform: rotate(0deg); }
+  .hero-preview-card .ph-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+  .hero-preview-card .ph-header .brand-sm { font-weight: 900; font-size: 1rem; }
+  .hero-preview-card .ph-header .brand-sm .mark { display: inline-flex; width: 24px; height: 24px; background: var(--gradient-primary); border-radius: 6px; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; margin-right: 0.3rem; vertical-align: middle; }
+  .hero-preview-card .ph-stat-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .hero-preview-card .ph-stat { flex: 1; padding: 0.75rem; border-radius: var(--radius); color: #fff; text-align: center; }
+  .hero-preview-card .ph-stat .n { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+  .hero-preview-card .ph-stat .l { font-size: 0.7rem; opacity: 0.9; }
+  .hero-preview-card .ph-stat.p { background: var(--gradient-primary); }
+  .hero-preview-card .ph-stat.c { background: var(--gradient-cyan); }
+  .hero-preview-card .ph-stat.w { background: var(--gradient-warm); }
+  .hero-preview-card .ph-proj {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 0.85rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;
   }
-  .hero-bubble.b1 { top: -20px; left: -30px; transform: rotate(-3deg); }
-  .hero-bubble.b2 { bottom: -15px; left: 20px; transform: rotate(2deg); background: var(--accent); color: var(--accent-text); }
-  .hero-bubble .label { font-size: 0.7rem; opacity: 0.7; margin-bottom: 0.15rem; font-weight: 500; }
+  .hero-preview-card .ph-proj .name { font-weight: 700; font-size: 0.88rem; }
+  .hero-preview-card .ph-proj .pill { font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: var(--success-light); color: var(--success); font-weight: 700; }
+
+  /* Floating decorative elements */
+  .hero-float { position: absolute; z-index: 0; pointer-events: none; }
+  .hero-float.f1 { top: -15px; right: -20px; width: 60px; height: 60px; background: var(--gradient-warm); border-radius: 50%; opacity: 0.15; animation: float 4s ease-in-out infinite; }
+  .hero-float.f2 { bottom: -10px; left: -15px; width: 40px; height: 40px; background: var(--gradient-cyan); border-radius: 12px; opacity: 0.15; animation: float 5s ease-in-out infinite reverse; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
   @media (max-width: 900px) {
-    .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
-    .hero-card { margin: 0 auto; transform: rotate(0); }
-    .hero-bubble { display: none; }
+    .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .hero-visual { display: none; }
   }
 
-  /* ---- Section common ---- */
-  .section { padding: 5rem 0; }
-  .section-head { text-align: center; max-width: 640px; margin: 0 auto 3rem; }
-  .section-head .eyebrow { display: inline-block; margin-bottom: 0.6rem; }
-  .section-head h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); margin-bottom: 0.75rem; }
-  .section-head p { color: var(--text-3); font-size: 1.05rem; }
-
-  /* ---- Steps ---- */
+  /* ---- How it works: gradient cards ---- */
+  .section { padding: 4rem 0; }
+  .section-head { text-align: center; max-width: 600px; margin: 0 auto 3rem; }
+  .section-head h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 0.5rem; }
+  .section-head p { color: var(--text-3); font-size: 1.05rem; margin: 0; }
   .step-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-  .step-tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.75rem 1.5rem; position: relative; transition: transform .15s, box-shadow .15s; }
-  .step-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-  .step-tile .step-num { width: 36px; height: 36px; background: var(--accent-light); color: var(--accent); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; margin-bottom: 1rem; }
-  .step-tile .icon { font-size: 1.4rem; color: var(--accent); margin-bottom: 0.85rem; }
-  .step-tile h3 { font-size: 1.08rem; margin-bottom: 0.4rem; }
-  .step-tile p { font-size: 0.9rem; color: var(--text-3); line-height: 1.55; margin: 0; }
+  .step-tile {
+    border-radius: var(--radius-lg); padding: 1.75rem 1.5rem; color: #FFF;
+    position: relative; overflow: hidden; transition: transform 0.2s;
+  }
+  .step-tile:hover { transform: translateY(-4px); }
+  .step-tile.s1 { background: var(--gradient-primary); }
+  .step-tile.s2 { background: var(--gradient-cyan); }
+  .step-tile.s3 { background: var(--gradient-warm); }
+  .step-tile.s4 { background: var(--gradient-green); }
+  .step-tile .step-num { position: absolute; top: 0.75rem; right: 1rem; font-size: 3rem; font-weight: 900; opacity: 0.15; line-height: 1; }
+  .step-tile .icon { font-size: 1.75rem; margin-bottom: 0.85rem; opacity: 0.9; }
+  .step-tile h3 { font-size: 1.08rem; margin-bottom: 0.35rem; color: #FFF; }
+  .step-tile p { font-size: 0.88rem; line-height: 1.5; margin: 0; opacity: 0.9; }
   @media (max-width: 900px) { .step-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 540px) { .step-grid { grid-template-columns: 1fr; } }
 
-  /* ---- Feature split ---- */
-  .feature-split { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
-  .feature-split + .feature-split { margin-top: 4rem; }
-  .feature-split .visual {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: 2rem; min-height: 260px; display: flex; flex-direction: column; justify-content: center;
-    box-shadow: var(--shadow);
+  /* ---- Style carousel ---- */
+  .style-carousel-wrap { overflow: hidden; position: relative; padding: 0.5rem 0; }
+  .style-carousel { display: flex; gap: 1rem; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 1rem; scrollbar-width: none; }
+  .style-carousel::-webkit-scrollbar { display: none; }
+  .style-carousel-card {
+    flex-shrink: 0; width: 280px; border-radius: var(--radius-lg); overflow: hidden;
+    cursor: pointer; border: 2px solid var(--border); background: var(--surface);
+    transition: border-color .2s, transform .2s; position: relative;
   }
-  .feature-split .visual .q-label { font-size: 0.78rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
-  .feature-split .visual .q-text { font-size: 1.35rem; font-weight: 600; line-height: 1.3; margin-bottom: 1rem; color: var(--text); }
-  .feature-split .visual .opts { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .feature-split .visual .opts span { padding: 0.45rem 0.85rem; border-radius: var(--radius); font-size: 0.85rem; font-weight: 500; border: 1.5px solid var(--border-strong); color: var(--text-2); background: var(--surface); }
-  .feature-split .visual .opts span.sel { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
-  .feature-split h3 { font-size: 1.45rem; margin-bottom: 0.75rem; }
-  .feature-split p { color: var(--text-3); font-size: 1rem; margin-bottom: 1rem; line-height: 1.6; }
-  .feature-split ul.checks { padding: 0; }
-  .feature-split ul.checks li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.93rem; padding: 0.35rem 0; color: var(--text-2); }
-  .feature-split ul.checks li i { color: var(--accent); margin-top: 0.25rem; font-size: 0.85rem; }
-  @media (max-width: 900px) { .feature-split { grid-template-columns: 1fr; gap: 2rem; } .feature-split + .feature-split { margin-top: 2.5rem; } }
+  .style-carousel-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .style-carousel-card .thumb { height: 180px; overflow: hidden; background: var(--surface-2); }
+  .style-carousel-card .thumb iframe { width: 1200px; height: 800px; border: 0; transform: scale(0.23); transform-origin: top left; pointer-events: none; }
+  .style-carousel-card .info { padding: 1rem; }
+  .style-carousel-card .info .name { font-weight: 800; font-size: 1.05rem; text-transform: capitalize; color: var(--text); }
+  .style-carousel-card .info .desc { font-size: 0.82rem; color: var(--text-3); margin-top: 0.2rem; line-height: 1.4; }
 
-  .palette-strip { display: flex; height: 10px; border-radius: var(--radius-full); overflow: hidden; margin-top: 1rem; }
-  .palette-strip > div { flex: 1; }
+  .style-info-box {
+    display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.97);
+    padding: 1.5rem; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; border-radius: var(--radius-lg);
+  }
+  .style-carousel-card:hover .style-info-box { display: flex; }
+  .style-info-box .ib-name { font-weight: 900; font-size: 1.3rem; text-transform: capitalize; margin-bottom: 0.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .style-info-box .ib-desc { font-size: 0.88rem; color: var(--text-3); margin-bottom: 1rem; line-height: 1.5; }
+  .style-info-box .ib-btn { background: var(--gradient-primary); color: #FFF; padding: 0.5rem 1.2rem; border-radius: var(--radius); font-size: 0.85rem; font-weight: 700; }
 
   /* ---- CTA band ---- */
-  .cta-band { background: var(--grey-900); color: #FFF; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-lg); margin: 0 1.5rem; }
+  .cta-band { background: var(--gradient-primary); color: #FFF; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-lg); margin: 0 1.5rem; }
   .cta-band h2 { color: #FFF; font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 0.75rem; }
-  .cta-band p { color: var(--grey-400); font-size: 1.05rem; max-width: 480px; margin: 0 auto 1.75rem; }
-  .cta-band .btn { background: #FFF !important; color: var(--grey-900) !important; border-color: #FFF !important; }
-  .cta-band .btn:hover { background: var(--grey-100) !important; border-color: var(--grey-100) !important; color: var(--grey-900) !important; }
-  .cta-band .btn-ghost { background: transparent !important; color: #FFF !important; border-color: var(--grey-600) !important; }
-  .cta-band .btn-ghost:hover { background: #FFF !important; color: var(--grey-900) !important; border-color: #FFF !important; }
+  .cta-band p { color: rgba(255,255,255,0.85); font-size: 1.1rem; max-width: 480px; margin: 0 auto 1.75rem; }
+  .cta-band .btn { background: #FFF !important; color: var(--accent) !important; }
+  .cta-band .btn:hover { background: var(--surface-2) !important; }
+  .cta-band .btn-ghost { background: transparent !important; color: #FFF !important; border: 2px solid rgba(255,255,255,0.4) !important; }
+  .cta-band .btn-ghost:hover { background: rgba(255,255,255,0.1) !important; border-color: #FFF !important; }
+
+  /* ---- Preview modal ---- */
+  .preview-modal-host { position: fixed; inset: 0; background: rgba(26,26,46,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9997; padding: 1.5rem; }
+  .preview-modal-host.open { display: flex; }
+  .preview-modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 1100px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg); }
+  .preview-modal .head { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); }
+  .preview-modal .head .t { font-weight: 800; font-size: 1rem; text-transform: capitalize; }
+  .preview-modal iframe { width: 100%; flex: 1; border: 0; background: #fff; min-height: 60vh; }
 </style>
 </head>
 <body>
@@ -109,7 +155,7 @@
     </a>
     <nav>
       <a href="#how">How it works</a>
-      <a href="#features">Features</a>
+      <a href="#styles">Styles</a>
       <a href="./login.html" id="nav-login">Sign in</a>
       <a href="./signup.html" class="btn btn-sm" id="nav-signup">Get started</a>
       <a href="./dashboard.html" class="btn btn-sm hidden" id="nav-dashboard">Dashboard</a>
@@ -119,30 +165,40 @@
 
 <!-- HERO -->
 <section class="hero">
+  <div class="hero-bg"></div>
   <div class="hero-inner">
     <div>
-      <span class="eyebrow"><i class="fa-solid fa-bolt"></i> No code needed</span>
-      <h1>Build a website by <span class="accent">answering a few questions.</span></h1>
+      <h1>Build a website by <span class="grad">answering a few questions.</span></h1>
       <p class="lede">Describe your idea. Clay asks the right questions, designs the site, and publishes it for you.</p>
-      <div class="cta">
-        <a href="./signup.html" class="btn btn-lg">Start your project <i class="fa-solid fa-arrow-right"></i></a>
+      <div class="hero-input">
+        <input type="text" id="hero-idea-input" placeholder="A bakery in Brooklyn selling sourdough and pastries">
+        <button class="btn btn-lg" id="hero-idea-btn"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+      <div class="hero-cta-row">
         <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
       </div>
-      <div class="stats">
-        <div class="stat"><div class="n"><i class="fa-solid fa-comments"></i></div><div class="l">Answer questions</div></div>
-        <div class="stat"><div class="n"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div class="l">AI builds it</div></div>
-        <div class="stat"><div class="n"><i class="fa-solid fa-rocket"></i></div><div class="l">Publish instantly</div></div>
+      <div class="hero-badges">
+        <div class="hero-badge"><i class="fa-solid fa-bolt"></i> No code needed</div>
+        <div class="hero-badge"><i class="fa-solid fa-palette"></i> 10 design styles</div>
+        <div class="hero-badge"><i class="fa-solid fa-rocket"></i> Publish instantly</div>
       </div>
     </div>
     <div class="hero-visual">
-      <div class="hero-card">
-        <div class="status-tag">Published</div>
-        <div class="card-eyebrow">Your project</div>
-        <h3>Clay Bakery</h3>
-        <div class="q-row"><span class="k"><i class="fa-solid fa-store"></i> Business</span><span class="v">Bakery</span></div>
-        <div class="q-row"><span class="k"><i class="fa-solid fa-palette"></i> Palette</span><span class="v">Warm earthy</span></div>
-        <div class="q-row"><span class="k"><i class="fa-solid fa-paintbrush"></i> Style</span><span class="v">Editorial</span></div>
-        <div class="q-row"><span class="k"><i class="fa-solid fa-link"></i> URL</span><span class="v">claybuild.github.io/bakery</span></div>
+      <div class="hero-float f1"></div>
+      <div class="hero-float f2"></div>
+      <div class="hero-preview-card">
+        <div class="ph-header">
+          <div class="brand-sm"><span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay</div>
+          <span class="status-pill published">Published</span>
+        </div>
+        <div class="ph-stat-row">
+          <div class="ph-stat p"><div class="n">3</div><div class="l">Total</div></div>
+          <div class="ph-stat c"><div class="n">2</div><div class="l">Live</div></div>
+          <div class="ph-stat w"><div class="n">1</div><div class="l">Draft</div></div>
+        </div>
+        <div class="ph-proj"><div class="name">Clay Bakery</div><span class="pill">Live</span></div>
+        <div class="ph-proj"><div class="name">Codecraft Tutoring</div><span class="pill">Live</span></div>
+        <div class="ph-proj"><div class="name">Hotocise Portfolio</div><span class="pill" style="background:var(--surface-2);color:var(--text-3);">Draft</span></div>
       </div>
     </div>
   </div>
@@ -152,107 +208,48 @@
 <section class="section" id="how">
   <div class="container">
     <div class="section-head">
-      <span class="eyebrow">How it works</span>
-      <h2>From idea to URL in four steps.</h2>
-      <p>No setup. No templates to pick from. No code to copy-paste. Clay interviews you like a thoughtful designer would — then ships the site for you.</p>
+      <h2>From idea to live in 4 steps.</h2>
+      <p>No setup. No templates. No code. Just describe your idea and watch it come to life.</p>
     </div>
     <div class="step-grid">
-      <div class="step-tile">
+      <div class="step-tile s1">
         <div class="step-num">1</div>
         <div class="icon"><i class="fa-solid fa-feather-pointed"></i></div>
         <h3>Describe your idea</h3>
-        <p>Tell Clay what you're building in one sentence. "A bakery in Brooklyn." "A yoga studio." That's enough to start.</p>
+        <p>Tell Clay what you're building in one sentence. That's enough to start.</p>
       </div>
-      <div class="step-tile">
+      <div class="step-tile s2">
         <div class="step-num">2</div>
         <div class="icon"><i class="fa-solid fa-list-check"></i></div>
         <h3>Answer questions</h3>
-        <p>Clay asks a handful of simple design questions — navigation, sections, tone, colors. Pick from options or write your own.</p>
+        <p>Clay asks about your brand and goals. Pick from options or write your own.</p>
       </div>
-      <div class="step-tile">
+      <div class="step-tile s3">
         <div class="step-num">3</div>
         <div class="icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-        <h3>Generate the site</h3>
-        <p>Three AI models work together to build a complete website with a design system tuned to your brand.</p>
+        <h3>AI builds it</h3>
+        <p>Clay designs and codes your website with your colors, style, and content.</p>
       </div>
-      <div class="step-tile">
+      <div class="step-tile s4">
         <div class="step-num">4</div>
         <div class="icon"><i class="fa-solid fa-rocket"></i></div>
-        <h3>Publish in 60 seconds</h3>
-        <p>Hit publish. Clay pushes your site to GitHub Pages and hands you a live URL. You're online.</p>
+        <h3>Publish instantly</h3>
+        <p>Hit publish. Clay pushes your site live and hands you a URL.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
-<section class="section" id="features" style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+<!-- STYLE CAROUSEL -->
+<section class="section" id="styles" style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
   <div class="container">
     <div class="section-head">
-      <span class="eyebrow">Why Clay</span>
-      <h2>Everything in one place. Owned by you.</h2>
-      <p>Other AI builders bolt onto third-party backends. Clay keeps your database, hosting, and design under one roof — so there's nothing to wire up later.</p>
+      <h2>10 design styles. Pick your vibe.</h2>
+      <p>From minimal to brutalist to playful. Hover to learn more, click to preview.</p>
     </div>
-
-    <div class="feature-split">
-      <div class="visual">
-        <div class="q-label">Question 3 of 6</div>
-        <div class="q-text">What type of navigation would you like?</div>
-        <div class="opts">
-          <span class="sel">Top-bar</span>
-          <span>Sidebar</span>
-          <span>Mega-menu</span>
-        </div>
-      </div>
-      <div>
-        <h3>AI that asks, not just answers.</h3>
-        <p>Most AI tools wait for the perfect prompt. Clay knows what information a website actually needs — and asks you for it, one question at a time, in plain English.</p>
-        <ul class="checks">
-          <li><i class="fa-solid fa-check"></i> Multiple-choice with the option to write your own</li>
-          <li><i class="fa-solid fa-check"></i> Questions tailored to your specific business</li>
-          <li><i class="fa-solid fa-check"></i> Review and edit any answer before generating</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="feature-split">
-      <div>
-        <h3>Design that matches your brand.</h3>
-        <p>Upload a logo and a vision model extracts your exact colors. Or pick from AI-curated palettes, previewed live on a sample site before you commit.</p>
-        <ul class="checks">
-          <li><i class="fa-solid fa-check"></i> Logo upload with automatic color extraction</li>
-          <li><i class="fa-solid fa-check"></i> 10 distinct design styles to choose from</li>
-          <li><i class="fa-solid fa-check"></i> Every choice previewed on a real sample site</li>
-        </ul>
-      </div>
-      <div class="visual">
-        <div class="q-label">Palette Preview</div>
-        <div class="q-text">Warm Bakery</div>
-        <div class="palette-strip" style="margin-top:0">
-          <div style="background:#F4E1D2"></div>
-          <div style="background:#D4A373"></div>
-          <div style="background:#CCD5AE"></div>
-          <div style="background:#E9EDC9"></div>
-          <div style="background:#FEFAE0"></div>
-        </div>
-        <p style="margin-top:1rem; color:var(--text-3); font-size:0.85rem;">Previewed live before you commit</p>
-      </div>
-    </div>
-
-    <div class="feature-split">
-      <div class="visual">
-        <div class="q-label">Deployment</div>
-        <div class="q-text" style="font-family: monospace; font-size: 1rem; word-break: break-all;">claybuild.github.io/clay-bakery/</div>
-        <p style="color:var(--text-3); font-size:0.88rem; margin-top:0.5rem;">Live in 58 seconds. Automatic SSL. One click.</p>
-      </div>
-      <div>
-        <h3>Hosting included. No DevOps required.</h3>
-        <p>Every Clay project ships with a hosted URL, a built-in database for forms and signups, and a structure ready for growth. No servers to manage, no DNS to configure.</p>
-        <ul class="checks">
-          <li><i class="fa-solid fa-check"></i> One-click publish to a live URL</li>
-          <li><i class="fa-solid fa-check"></i> Contact forms write to your database</li>
-          <li><i class="fa-solid fa-check"></i> Full dashboard to manage everything</li>
-        </ul>
+    <div class="style-carousel-wrap">
+      <div class="style-carousel" id="style-carousel">
+        <!-- Cards inserted by JS -->
       </div>
     </div>
   </div>
@@ -265,7 +262,7 @@
       <h2>Your first website is one conversation away.</h2>
       <p>Free to start. No credit card. No setup wizard. Just answer the questions and watch your site appear.</p>
       <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
-        <a href="./signup.html" class="btn btn-lg">Get started — it's free</a>
+        <a href="./signup.html" class="btn btn-lg">Get started</a>
         <a href="./login.html" class="btn btn-ghost btn-lg">I have an account</a>
       </div>
     </div>
@@ -280,25 +277,124 @@
     </a>
     <div class="links">
       <a href="#how">How it works</a>
-      <a href="#features">Features</a>
+      <a href="#styles">Styles</a>
       <a href="https://github.com/ClayBuild/claybuild.github.io" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> GitHub</a>
     </div>
     <div style="font-size:0.82rem; color:var(--text-muted);">© 2026 Clay</div>
   </div>
 </footer>
 
+<!-- Style preview modal -->
+<div class="preview-modal-host" id="style-modal">
+  <div class="preview-modal">
+    <div class="head">
+      <div class="t" id="style-modal-title">Preview</div>
+      <button class="btn btn-ghost btn-sm" id="style-modal-close"><i class="fa-solid fa-xmark"></i> Close</button>
+    </div>
+    <iframe id="style-modal-iframe" src="about:blank"></iframe>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=25"></script>
-<script src="./js/supabase.js?v=25"></script>
+<script src="./js/config.js?v=26"></script>
+<script src="./js/supabase.js?v=26"></script>
 <script>
-  (async () => {
-    const { data } = await supabase.auth.getSession();
+(function() {
+  // Check auth and toggle nav
+  supabase.auth.getSession().then(function({ data }) {
     if (data.session) {
       document.getElementById('nav-login').classList.add('hidden');
       document.getElementById('nav-signup').classList.add('hidden');
       document.getElementById('nav-dashboard').classList.remove('hidden');
     }
-  })();
+  });
+
+  // Hero input: go to signup or new-project with the idea pre-filled
+  var ideaInput = document.getElementById('hero-idea-input');
+  var ideaBtn = document.getElementById('hero-idea-btn');
+
+  function handleIdea() {
+    var idea = ideaInput.value.trim();
+    if (idea.length < 10) {
+      ideaInput.style.borderColor = 'var(--error)';
+      ideaInput.focus();
+      setTimeout(function() { ideaInput.style.borderColor = ''; }, 2000);
+      return;
+    }
+    // Check if logged in
+    supabase.auth.getSession().then(function({ data }) {
+      if (data.session) {
+        window.location.href = './new-project.html?idea=' + encodeURIComponent(idea);
+      } else {
+        window.location.href = './signup.html?idea=' + encodeURIComponent(idea);
+      }
+    });
+  }
+
+  ideaBtn.addEventListener('click', handleIdea);
+  ideaInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleIdea(); });
+
+  // ---- Style carousel ----
+  var styles = [
+    { name: 'minimalism', desc: 'Essential only. Whitespace, light typography, quiet confidence.' },
+    { name: 'brutalism', desc: 'Loud, raw, exposed. Big type, hard borders, zero apology.' },
+    { name: 'swiss', desc: 'Mathematical. Grid-based, modular scale, asymmetric balance.' },
+    { name: 'neumorphism', desc: 'Soft, tactile, extruded shadows. Monochrome depth.' },
+    { name: 'editorial', desc: 'Newspaper-grade. Serif headlines, drop caps, ruled sections.' },
+    { name: 'glassmorphism', desc: 'Frosted glass panels over vibrant gradients. Modern, airy.' },
+    { name: 'art-deco', desc: '1920s glamour. Gold accents, geometric patterns, ornate.' },
+    { name: 'corporate', desc: 'Professional B2B. Clean, structured, trustworthy.' },
+    { name: 'playful', desc: 'Bright, rounded, bouncy. Bold colors, casual and fun.' },
+    { name: 'organic', desc: 'Natural and biophilic. Sage greens, organic shapes, calm.' },
+  ];
+
+  var carousel = document.getElementById('style-carousel');
+  carousel.innerHTML = styles.map(function(s) {
+    return '<div class="style-carousel-card" data-style="' + s.name + '">' +
+      '<div class="thumb"><iframe src="./samples/' + s.name + '.html" loading="lazy" sandbox="allow-same-origin allow-scripts"></iframe></div>' +
+      '<div class="info"><div class="name">' + s.name + '</div><div class="desc">' + s.desc + '</div></div>' +
+      '<div class="style-info-box">' +
+        '<div class="ib-name">' + s.name + '</div>' +
+        '<div class="ib-desc">' + s.desc + '</div>' +
+        '<div class="ib-btn">Click to preview <i class="fa-solid fa-arrow-right"></i></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Auto-scroll carousel
+  var scrollDir = 1;
+  var carouselInterval = setInterval(function() {
+    if (carousel.matches(':hover')) return; // pause on hover
+    var maxScroll = carousel.scrollWidth - carousel.clientWidth;
+    if (carousel.scrollLeft >= maxScroll - 5) scrollDir = -1;
+    if (carousel.scrollLeft <= 5) scrollDir = 1;
+    carousel.scrollBy({ left: 280 * scrollDir, behavior: 'smooth' });
+  }, 3000);
+
+  // Click to open preview modal
+  carousel.querySelectorAll('.style-carousel-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var style = card.dataset.style;
+      document.getElementById('style-modal-title').textContent = style;
+      document.getElementById('style-modal-iframe').src = './samples/' + style + '.html';
+      document.getElementById('style-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  document.getElementById('style-modal-close').addEventListener('click', function() {
+    document.getElementById('style-modal').classList.remove('open');
+    document.getElementById('style-modal-iframe').src = 'about:blank';
+    document.body.style.overflow = '';
+  });
+  document.getElementById('style-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('open');
+      document.getElementById('style-modal-iframe').src = 'about:blank';
+      document.body.style.overflow = '';
+    }
+  });
+})();
 </script>
 </body>
 </html>
