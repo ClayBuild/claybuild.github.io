@@ -6,7 +6,7 @@
 <title>Clay — Build a website by talking to AI</title>
 <meta name="description" content="Clay helps non-tech people build, host, and ship a real website by answering a few simple questions.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=28">
+<link rel="stylesheet" href="./css/main.css?v=29">
 <style>
   .hero { padding: 3.5rem 0 3rem; }
   .hero-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 3rem; align-items: center; }
@@ -18,23 +18,15 @@
   .hero-visual .ph span { font-size: 0.85rem; }
   @media (max-width: 900px) { .hero-inner { grid-template-columns: 1fr; gap: 2rem; } .hero-visual { display: none; } }
 
-  /* ---- Stats row (grand, interactive) ---- */
-  .stats-row { display: flex; justify-content: center; gap: 3.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
-  .stat-item { text-align: center; cursor: default; transition: transform 0.2s; }
-  .stat-item:hover { transform: translateY(-4px) scale(1.05); }
-  .stat-item .n { font-size: 3.5rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; transition: transform 0.15s; }
-  .stat-item:hover .n { transform: scale(1.1); }
-  .stat-item .l { font-size: 0.9rem; color: var(--text-3); margin-top: 0.35rem; font-weight: 700; }
-
+  .stats-row { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
   .section { padding: 4rem 0; }
   .section-head { text-align: center; max-width: 600px; margin: 0 auto 2.5rem; }
   .section-head h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem; }
   .section-head p { color: var(--text-3); font-size: 1rem; margin: 0; }
 
-  /* ---- Carousel (depth, not rotation) ---- */
   .carousel-stage { perspective: 1000px; width: 100%; max-width: 900px; margin: 0 auto; height: 360px; position: relative; overflow: visible; }
-  .carousel-track { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94); }
-  .carousel-card { position: absolute; width: 300px; height: 340px; top: 50%; left: 50%; margin-left: -150px; margin-top: -170px; border-radius: var(--radius-lg); overflow: hidden; background: var(--glass-bg); backdrop-filter: blur(16px); border: 2px solid var(--glass-border); cursor: pointer; transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.6s, border-color 0.2s; box-shadow: var(--shadow-md); }
+  .carousel-track { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .carousel-card { position: absolute; width: 300px; height: 340px; top: 50%; left: 50%; margin-left: -150px; margin-top: -170px; border-radius: var(--radius-lg); overflow: hidden; background: var(--glass-bg); backdrop-filter: blur(16px); border: 2px solid var(--glass-border); cursor: pointer; box-shadow: var(--shadow-md); }
   .carousel-card .thumb { height: 220px; overflow: hidden; background: var(--surface-2); }
   .carousel-card .thumb iframe { width: 1200px; height: 800px; border: 0; transform: scale(0.25); transform-origin: top left; pointer-events: none; }
   .carousel-card .info { padding: 0.85rem; text-align: center; }
@@ -45,7 +37,6 @@
   .carousel-nav button { width: 44px; height: 44px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(10px); border: 2px solid var(--border-strong); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; color: var(--text-2); }
   .carousel-nav button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 
-  /* ---- How it works (diversified gradients) ---- */
   .step-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
   .step-tile { border-radius: var(--radius-lg); padding: 1.75rem 1.5rem; color: #FFF; position: relative; overflow: hidden; transition: transform 0.2s; backdrop-filter: blur(8px); }
   .step-tile:hover { transform: translateY(-4px); }
@@ -77,6 +68,7 @@
   <div class="ambient-blob b3"></div>
   <div class="ambient-blob b4"></div>
 </div>
+<div id="particles-container"></div>
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -96,9 +88,13 @@
     <div>
       <h1>Build a website by <span class="grad">answering a few questions.</span></h1>
       <p class="lede">Describe your idea. Clay asks the right questions, designs the site, and publishes it for you.</p>
-      <div class="uiverse-input">
-        <input type="text" id="hero-idea-input" placeholder="A bakery in Mumbai selling sourdough and pastries">
-        <button id="hero-idea-btn"><i class="fa-solid fa-arrow-right"></i></button>
+      <div class="uiverse-bar" style="max-width:520px;">
+        <div class="uv-glow"></div>
+        <div class="uv-darkBorder"></div>
+        <div class="uv-border"></div>
+        <div class="uv-white"></div>
+        <input type="text" id="hero-idea-input" class="uv-input" placeholder="A bakery in Mumbai selling sourdough and pastries">
+        <button id="hero-idea-btn" class="uv-arrow"><i class="fa-solid fa-arrow-right"></i></button>
       </div>
     </div>
     <div class="hero-visual">
@@ -110,9 +106,9 @@
 <section class="section" id="styles">
   <div class="container">
     <div class="stats-row">
-      <div class="stat-item"><div class="n">10</div><div class="l">Templates</div></div>
-      <div class="stat-item"><div class="n" id="user-count">...</div><div class="l">Users</div></div>
-      <div class="stat-item"><div class="n">&infin;</div><div class="l">Possibilities</div></div>
+      <div class="stat-card-hp"><div class="n" data-target="10">0</div><div class="l">Templates</div></div>
+      <div class="stat-card-hp"><div class="n" id="user-count" data-target="0">0</div><div class="l">Users</div></div>
+      <div class="stat-card-hp"><div class="n">&infin;</div><div class="l">Possibilities</div></div>
     </div>
     <div class="section-head">
       <h2>Pick your style.</h2>
@@ -172,20 +168,44 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=28"></script>
-<script src="./js/supabase.js?v=28"></script>
+<script src="./js/config.js?v=29"></script>
+<script src="./js/supabase.js?v=29"></script>
 <script>
 (function() {
   supabase.auth.getSession().then(function({ data }) {
     if (data.session) { document.getElementById('nav-login').classList.add('hidden'); document.getElementById('nav-signup').classList.add('hidden'); document.getElementById('nav-dashboard').classList.remove('hidden'); }
   });
-  supabase.from('profiles').select('id', { count: 'exact', head: true }).then(function({ count }) { document.getElementById('user-count').textContent = count || '0'; }).catch(function() { document.getElementById('user-count').textContent = '?'; });
 
+  // Get user count and animate
+  supabase.from('profiles').select('id', { count: 'exact', head: true }).then(function({ count }) {
+    var el = document.getElementById('user-count');
+    el.dataset.target = count || 0;
+    animateCounter(el);
+  }).catch(function() { document.getElementById('user-count').textContent = '?'; });
+
+  // Animate all counters
+  function animateCounter(el) {
+    var target = parseInt(el.dataset.target || 0);
+    if (isNaN(target) || target === 0) { el.textContent = target; return; }
+    var current = 0; var duration = 1500; var start = performance.now();
+    function step(now) {
+      var progress = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+  // Animate the "10" counter
+  animateCounter(document.querySelector('.stat-card-hp .n[data-target="10"]'));
+
+  // Hero input
   var ideaInput = document.getElementById('hero-idea-input');
   var ideaBtn = document.getElementById('hero-idea-btn');
   function handleIdea() {
     var idea = ideaInput.value.trim();
-    if (idea.length < 10) { ideaInput.style.borderColor = 'var(--error)'; ideaInput.focus(); setTimeout(function() { ideaInput.style.borderColor = ''; }, 2000); return; }
+    if (idea.length < 10) { ideaInput.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.2)'; ideaInput.focus(); setTimeout(function() { ideaInput.style.boxShadow = ''; }, 2000); return; }
     supabase.auth.getSession().then(function({ data }) {
       if (data.session) { window.location.href = './new-project.html?idea=' + encodeURIComponent(idea); }
       else { window.location.href = './signup.html?idea=' + encodeURIComponent(idea); }
@@ -194,18 +214,18 @@
   ideaBtn.addEventListener('click', handleIdea);
   ideaInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleIdea(); });
 
-  // Mouse-interactive stats
-  document.querySelectorAll('.stat-item').forEach(function(item) {
+  // Mouse-interactive stat cards
+  document.querySelectorAll('.stat-card-hp').forEach(function(item) {
     item.addEventListener('mousemove', function(e) {
       var rect = item.getBoundingClientRect();
       var x = (e.clientX - rect.left) / rect.width - 0.5;
       var y = (e.clientY - rect.top) / rect.height - 0.5;
-      item.style.transform = 'translateY(-4px) perspective(400px) rotateY(' + (x * 10) + 'deg) rotateX(' + (-y * 10) + 'deg)';
+      item.style.transform = 'translateY(-4px) perspective(400px) rotateY(' + (x * 8) + 'deg) rotateX(' + (-y * 8) + 'deg)';
     });
     item.addEventListener('mouseleave', function() { item.style.transform = ''; });
   });
 
-  // ---- 3D Carousel (depth, not rotation) ----
+  // ---- 3D Carousel ----
   var styles = [
     { name: 'minimalism', desc: 'Clean, essential, confident.' },
     { name: 'brutalism', desc: 'Loud, raw, exposed.' },
@@ -247,7 +267,6 @@
       if (offset > n / 2) offset -= n;
       if (offset < -n / 2) offset += n;
       var absOffset = Math.abs(offset);
-      // Depth without rotation: translateX + translateZ + scale only
       var translateX = offset * 200;
       var translateZ = -absOffset * 100;
       var scale = absOffset === 0 ? 1 : 0.8 - absOffset * 0.03;
@@ -264,13 +283,12 @@
   document.getElementById('carousel-next').addEventListener('click', function() { next(); resetAutoRotate(); });
   document.getElementById('carousel-prev').addEventListener('click', function() { prev(); resetAutoRotate(); });
 
-  function startAutoRotate() { autoRotateInterval = setInterval(function() { if (!isPaused && !document.hidden) next(); }, 5000); }
+  function startAutoRotate() { autoRotateInterval = setInterval(function() { if (!isPaused && !document.hidden) next(); }, 3500); }
   function resetAutoRotate() { clearInterval(autoRotateInterval); startAutoRotate(); }
 
   var stage = document.getElementById('carousel-stage');
   stage.addEventListener('mouseenter', function() { isPaused = true; });
   stage.addEventListener('mouseleave', function() { isPaused = false; });
-  // Pause when tab not visible
   document.addEventListener('visibilitychange', function() { isPaused = document.hidden; });
 
   updateCarousel();
@@ -278,6 +296,24 @@
 
   document.getElementById('style-modal-close').addEventListener('click', function() { document.getElementById('style-modal').classList.remove('open'); document.getElementById('style-modal-iframe').src = 'about:blank'; document.body.style.overflow = ''; });
   document.getElementById('style-modal').addEventListener('click', function(e) { if (e.target === this) { this.classList.remove('open'); document.getElementById('style-modal-iframe').src = 'about:blank'; document.body.style.overflow = ''; } });
+
+  // ---- Ambient particles ----
+  var particlesContainer = document.getElementById('particles-container');
+  var colors = ['var(--accent)', 'var(--cyan)', 'var(--purple)', 'var(--green)', 'var(--pink)'];
+  var shapes = ['circle', 'square'];
+  for (var p = 0; p < 15; p++) {
+    var particle = document.createElement('div');
+    particle.className = 'particle ' + shapes[Math.floor(Math.random() * shapes.length)];
+    var size = Math.random() * 20 + 8;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animation = 'floatParticle ' + (Math.random() * 10 + 8) + 's ease-in-out infinite';
+    particle.style.animationDelay = Math.random() * 5 + 's';
+    particlesContainer.appendChild(particle);
+  }
 })();
 </script>
 </body>

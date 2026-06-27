@@ -233,15 +233,15 @@ function renderSidebar() {
   // Questionnaire — full-width card grid
   const qaList = document.getElementById('qa-list');
   if (questions.length === 0) {
-    qaList.innerHTML = '<div style="font-size:0.85rem; color:var(--grey-500);">No answers recorded.</div>';
+    qaList.innerHTML = '<div style="font-size:0.85rem; color:var(--text-3);">No answers recorded.</div>';
   } else {
     qaList.innerHTML = questions.map(q => {
       const answer = answers[q.id];
-      const display = Array.isArray(answer) ? answer.join(', ') : (answer || '—');
+      const display = Array.isArray(answer) ? answer.join(', ') : (answer || '\u2014');
       return `
-        <div style="background:var(--grey-50); border:1px solid var(--border); border-radius:var(--radius); padding:0.85rem;">
-          <div style="font-size:0.78rem; color:var(--grey-500); margin-bottom:0.3rem; font-weight:500;">${escapeHtml(q.question || q.id)}</div>
-          <div style="font-size:0.92rem; color:var(--text); font-weight:500;">${escapeHtml(display)}</div>
+        <div class="qa-card-item">
+          <div class="qa-q">${escapeHtml(q.question || q.id)}</div>
+          <div class="qa-a">${escapeHtml(display)}</div>
         </div>
       `;
     }).join('');

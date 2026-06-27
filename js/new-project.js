@@ -451,9 +451,6 @@ function renderPalettes() {
       <div class="palette-swatches">
         ${p.colors.map(c => `<div style="background:${escapeAttr(c)}"></div>`).join('')}
       </div>
-      <div class="palette-hex">
-        ${p.colors.map(c => `<span>${escapeHtml(c)}</span>`).join('')}
-      </div>
     </div>
   `).join('');
 

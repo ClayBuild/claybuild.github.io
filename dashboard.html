@@ -5,13 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Clay</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=28">
+<link rel="stylesheet" href="./css/main.css?v=29">
 <style>
   .welcome-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .welcome-row h1 { font-size: 1.75rem; }
-  .creations-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap; }
-  .creations-header h2 { font-size: 1.3rem; margin: 0; }
-  .search-wrap { position: relative; min-width: 240px; }
+  .creations-header h2 { font-size: 1.3rem; margin: 0 0 0.5rem 0; }
 </style>
 </head>
 <body>
@@ -21,6 +19,7 @@
   <div class="ambient-blob b2"></div>
   <div class="ambient-blob b3"></div>
 </div>
+<div id="particles-container"></div>
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -32,20 +31,28 @@
 <div class="container">
   <section class="dash-header">
     <div class="welcome-row"><div><h1 id="welcome">Your projects</h1><p class="sub" id="welcome-sub">Describe your next idea above, or pick up an existing project below.</p></div></div>
-    <div class="uiverse-input" style="margin-bottom:1.5rem;">
-      <input type="text" id="dash-idea-input" placeholder="A coffee shop in Bengaluru with an online ordering system">
-      <button id="dash-idea-btn"><i class="fa-solid fa-arrow-right"></i></button>
+    <div class="uiverse-bar" style="margin-bottom:2rem;">
+      <div class="uv-glow"></div>
+      <div class="uv-darkBorder"></div>
+      <div class="uv-border"></div>
+      <div class="uv-white"></div>
+      <input type="text" id="dash-idea-input" class="uv-input" placeholder="A coffee shop in Bengaluru with an online ordering system">
+      <button id="dash-idea-btn" class="uv-arrow"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
-    <div class="dash-stats" id="dash-stats"></div>
+
+    <div id="dash-stats-wrap" style="display:none;margin-bottom:2rem;">
+      <h3 style="font-size:0.85rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;">You Have</h3>
+      <div class="dash-stats" id="dash-stats"></div>
+    </div>
   </section>
 
   <div id="creations-section">
     <div class="creations-header">
       <h2>Your Creations</h2>
-      <div class="search-wrap uiverse-search">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="search-input" placeholder="Search by name...">
-      </div>
+    </div>
+    <div class="uiverse-search" style="margin-bottom:1.5rem;">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="search-input" placeholder="Search by name...">
     </div>
   </div>
 
@@ -63,8 +70,8 @@
 <footer class="footer"><div class="container footer-inner"><a href="./index.html" class="brand"><span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay</a><div style="font-size:0.82rem; color:var(--text-muted);">&copy; 2026 Clay</div></div></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=28"></script>
-<script src="./js/supabase.js?v=28"></script>
+<script src="./js/config.js?v=29"></script>
+<script src="./js/supabase.js?v=29"></script>
 <script>
 (async function () {
   var session = await clayRequireAuth();
@@ -79,7 +86,7 @@
   var ideaBtn = document.getElementById('dash-idea-btn');
   function handleIdea() {
     var idea = ideaInput.value.trim();
-    if (idea.length < 10) { ideaInput.style.borderColor = 'var(--error)'; ideaInput.focus(); setTimeout(function() { ideaInput.style.borderColor = ''; }, 2000); return; }
+    if (idea.length < 10) { ideaInput.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.2)'; ideaInput.focus(); setTimeout(function() { ideaInput.style.boxShadow = ''; }, 2000); return; }
     window.location.href = './new-project.html?idea=' + encodeURIComponent(idea);
   }
   ideaBtn.addEventListener('click', handleIdea);
@@ -95,9 +102,10 @@
     var published = allProjects.filter(function(p) { return p.status === 'published'; }).length;
     var inProgress = total - published;
     if (total > 0) {
+      document.getElementById('dash-stats-wrap').style.display = 'block';
       document.getElementById('dash-stats').innerHTML =
-        '<div class="dash-stat-card blue"><div class="icn"><i class="fa-solid fa-globe"></i></div><div class="num">' + total + '</div><div class="lbl">' + firstName + '\'s websites</div></div>' +
-        '<div class="dash-stat-card green"><div class="icn"><i class="fa-solid fa-check-circle"></i></div><div class="num">' + published + '</div><div class="lbl">Published</div></div>' +
+        '<div class="dash-stat-card blue"><div class="icn"><i class="fa-solid fa-globe"></i></div><div class="num">' + total + '</div><div class="lbl">Total websites</div></div>' +
+        '<div class="dash-stat-card green"><div class="icn"><i class="fa-solid fa-check-circle"></i></div><div class="num">' + published + '</div><div class="lbl">Published websites</div></div>' +
         '<div class="dash-stat-card orange"><div class="icn"><i class="fa-solid fa-pen-ruler"></i></div><div class="num">' + inProgress + '</div><div class="lbl">In progress</div></div>';
     }
     if (total === 0) { document.getElementById('empty').classList.remove('hidden'); document.getElementById('creations-section').style.display = 'none'; return; }
@@ -134,6 +142,22 @@
   }
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
   function escapeAttr(s) { return escapeHtml(s); }
+
+  // Ambient particles
+  var particlesContainer = document.getElementById('particles-container');
+  var colors = ['var(--accent)', 'var(--cyan)', 'var(--purple)', 'var(--green)'];
+  var shapes = ['circle', 'square'];
+  for (var p = 0; p < 10; p++) {
+    var particle = document.createElement('div');
+    particle.className = 'particle ' + shapes[Math.floor(Math.random() * shapes.length)];
+    var size = Math.random() * 15 + 8;
+    particle.style.width = size + 'px'; particle.style.height = size + 'px';
+    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.left = Math.random() * 100 + '%'; particle.style.top = Math.random() * 100 + '%';
+    particle.style.animation = 'floatParticle ' + (Math.random() * 10 + 8) + 's ease-in-out infinite';
+    particle.style.animationDelay = Math.random() * 5 + 's';
+    particlesContainer.appendChild(particle);
+  }
 })();
 </script>
 </body>
