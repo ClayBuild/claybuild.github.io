@@ -1,0 +1,40 @@
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#F5F0EB;--primary:#A0522D;--secondary:#D2B48C;--accent:#8B4513;--text:#3E2723;
+--on-accent:#FFF;--on-primary:#FFF;--muted:#6B7280;--border:#E5E7EB;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Lora',serif;font-weight:600;letter-spacing:-0.015em;line-height:1.15;}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+
+/* Pure CSS load animations — no JS needed */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:translateX(0);}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+@keyframes bounceIn{0%{opacity:0;transform:scale(0.7) translateY(20px);}60%{opacity:1;transform:scale(1.03) translateY(-5px);}100%{transform:scale(1) translateY(0);}}
+
+.anim-1{animation:fadeUp 0.7s ease both;animation-delay:0.1s;}
+.anim-2{animation:fadeUp 0.7s ease both;animation-delay:0.25s;}
+.anim-3{animation:fadeUp 0.7s ease both;animation-delay:0.4s;}
+.anim-4{animation:fadeUp 0.7s ease both;animation-delay:0.55s;}
+.anim-5{animation:fadeUp 0.7s ease both;animation-delay:0.7s;}
+.anim-fade{animation:fadeIn 1s ease both;}
+
+@media(max-width:768px){
+  .nav-links{display:none!important;}
+  .grid-3{grid-template-columns:1fr!important;}
+  .grid-2{grid-template-columns:1fr!important;}
+  .grid-4{grid-template-columns:1fr!important;}
+  .hero-split{grid-template-columns:1fr!important;}
+  .footer-grid{grid-template-columns:1fr!important;}
+}
+@media(max-width:1024px){
+  .grid-4{grid-template-columns:repeat(2,1fr)!important;}
+}
+
+a[href],button[type],.clay-btn{transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;}
+a[href]:hover,button[type]:hover,.clay-btn:hover{transform:translateY(-2px);}
+section .grid-3 > div,section .grid-2 > div,section .grid-4 > div{transition:transform 0.3s,box-shadow 0.3s;cursor:pointer;}
+section .grid-3 > div:hover,section .grid-2 > div:hover,section .grid-4 > div:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.1);}
