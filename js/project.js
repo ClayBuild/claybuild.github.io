@@ -118,6 +118,32 @@ function wireButtons() {
   document.getElementById('data-btn').addEventListener('click', () => {
     location.href = `./data.html?id=${PROJECT.id}`;
   });
+
+  // File download buttons
+  function downloadFile(filename, content, mime) {
+    var blob = new Blob([content], { type: mime || 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+  document.getElementById('download-html')?.addEventListener('click', function() {
+    if (PROJECT.website_files && PROJECT.website_files['index.html']) downloadFile('index.html', PROJECT.website_files['index.html'], 'text/html');
+  });
+  document.getElementById('download-css')?.addEventListener('click', function() {
+    if (PROJECT.website_files && PROJECT.website_files['styles.css']) downloadFile('styles.css', PROJECT.website_files['styles.css'], 'text/css');
+  });
+  document.getElementById('download-js')?.addEventListener('click', function() {
+    if (PROJECT.website_files && PROJECT.website_files['script.js']) downloadFile('script.js', PROJECT.website_files['script.js'], 'text/javascript');
+  });
+  document.getElementById('download-all')?.addEventListener('click', function() {
+    if (!PROJECT.website_files) return;
+    Object.keys(PROJECT.website_files).forEach(function(name) {
+      var mime = name.endsWith('.html') ? 'text/html' : name.endsWith('.css') ? 'text/css' : name.endsWith('.js') ? 'text/javascript' : 'text/plain';
+      downloadFile(name, PROJECT.website_files[name], mime);
+    });
+    toast('All files downloaded.');
+  });
   document.getElementById('delete-btn').addEventListener('click', deleteProject);
 
   // Deploy modal buttons

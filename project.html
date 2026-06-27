@@ -188,6 +188,12 @@
             <span>Website files</span>
             <i class="fa-solid fa-chevron-down" style="font-size:0.75rem;"></i>
           </summary>
+          <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap;">
+            <button class="export-btn" id="download-html" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:0.5rem 0.85rem;font-size:0.8rem;font-weight:600;color:var(--text-2);cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fa-solid fa-file-code"></i> HTML</button>
+            <button class="export-btn" id="download-css" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:0.5rem 0.85rem;font-size:0.8rem;font-weight:600;color:var(--text-2);cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fa-brands fa-css3-alt"></i> CSS</button>
+            <button class="export-btn" id="download-js" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:0.5rem 0.85rem;font-size:0.8rem;font-weight:600;color:var(--text-2);cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fa-brands fa-js"></i> JS</button>
+            <button class="export-btn" id="download-all" style="background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:0.5rem 0.85rem;font-size:0.8rem;font-weight:600;color:var(--text-2);cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fa-solid fa-download"></i> All files</button>
+          </div>
           <div style="display:grid; grid-template-columns: 220px 1fr; gap:1rem; margin-top:0.75rem;">
             <div class="file-browser" id="file-browser"></div>
             <div class="code-viewer" id="code-viewer">Select a file</div>

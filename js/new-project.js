@@ -278,9 +278,14 @@ async function runAiInit() {
     STATE.color_palettes = result.color_palettes || [];
     STATE.design_styles = result.design_styles || [];
 
-    // Default answers to the AI's suggested defaults
+    // Do NOT pre-select defaults — questions start unselected for new projects.
+    // (When editing, answers are already loaded from the saved project.)
     STATE.questions.forEach(q => {
-      if (q.default && !STATE.answers[q.id]) STATE.answers[q.id] = q.default;
+      if (!STATE.answers[q.id]) {
+        // For multi-select, default to empty array (not the AI's default)
+        if (q.multi_select === true) STATE.answers[q.id] = [];
+        else STATE.answers[q.id] = '';
+      }
     });
 
     renderQuestions();

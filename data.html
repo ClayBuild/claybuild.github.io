@@ -6,7 +6,7 @@
 <title>Data — Clay</title>
 <link rel="icon" type="image/png" href="./assets/favicon.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=36">
+<link rel="stylesheet" href="./css/main.css?v=37">
 <style>
   .data-header { padding: 1.5rem 0 1rem; }
   .data-header .row1 { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -14,7 +14,7 @@
   .data-header .back-link { color: var(--text-3); font-size: 0.85rem; font-weight: 600; }
   .data-header .back-link:hover { color: var(--accent); }
 
-  .data-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0; overflow-x: auto; }
+  .data-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0; overflow-x: auto; overflow-y: hidden; }
   .data-tab {
     padding: 0.75rem 1.25rem; cursor: pointer; font-weight: 700; font-size: 0.9rem;
     color: var(--text-3); border: none; background: transparent; border-radius: var(--radius) var(--radius) 0 0;
@@ -22,7 +22,7 @@
   }
   .data-tab:hover { color: var(--text); }
   .data-tab.active { color: var(--accent); }
-  .data-tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background: var(--accent); border-radius: 3px 3px 0 0; }
+  .data-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
   .data-tab .count { background: var(--accent-light); color: var(--accent); font-size: 0.72rem; padding: 0.1rem 0.45rem; border-radius: 9999px; font-weight: 700; }
   .data-tab.active .count { background: var(--accent); color: #FFF; }
 
@@ -108,8 +108,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=36"></script>
-<script src="./js/supabase.js?v=36"></script>
+<script src="./js/config.js?v=37"></script>
+<script src="./js/supabase.js?v=37"></script>
 <script>
 (async function () {
   var session = await clayRequireAuth();
