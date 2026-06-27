@@ -38,6 +38,16 @@
   .publish-card .published-url { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius); padding: 0.75rem; font-size: 0.8rem; word-break: break-all; margin-top: 0.6rem; }
   .publish-card .published-url a { color: #FFFFFF; text-decoration: underline; text-underline-offset: 2px; }
   .publish-card .published-url a:hover { color: rgba(255,255,255,0.8); }
+  /* Hover effects for publish-card buttons */
+  .publish-card button:hover, .publish-card a:hover {
+    filter: brightness(1.1) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    transition: all 0.15s ease;
+  }
+  .publish-card button:active, .publish-card a:active {
+    transform: translateY(0);
+  }
 
   .deploy-progress { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem; }
   .deploy-progress .line { padding: 0.25rem 0; display: flex; align-items: center; gap: 0.5rem; }
