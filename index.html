@@ -99,7 +99,16 @@
       </div>
     </div>
     <div class="hero-visual">
-      <div class="ph"><i class="fa-solid fa-image"></i><span>Dashboard preview</span></div>
+      <div style="background:var(--glass-bg); backdrop-filter:blur(16px); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-lg);">
+        <h3 style="font-size:1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;"><i class="fa-solid fa-star" style="color:var(--accent);"></i> Community Creations</h3>
+        <div id="community-carousel" style="position:relative; height:280px; overflow:hidden; border-radius:var(--radius);">
+          <div id="cc-track" style="position:absolute; width:100%; height:100%;"></div>
+        </div>
+        <div style="display:flex; justify-content:center; gap:0.5rem; margin-top:0.75rem;">
+          <button id="cc-prev" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.5);border:1px solid var(--border-strong);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2);"><i class="fa-solid fa-chevron-left" style="font-size:0.75rem;"></i></button>
+          <button id="cc-next" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.5);border:1px solid var(--border-strong);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2);"><i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i></button>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -107,8 +116,8 @@
 <section class="section" id="styles">
   <div class="container">
     <div class="stats-row">
-      <div class="stat-card-hp"><div class="n" data-target="10">0</div><div class="l">Templates</div></div>
-      <div class="stat-card-hp"><div class="n" id="user-count" data-target="0">0</div><div class="l">Users</div></div>
+      <div class="stat-card-hp"><div class="n" data-target="22">0</div><div class="l">Templates</div></div>
+      <div class="stat-card-hp"><div class="n" id="user-count" data-target="250">0</div><div class="l">Users</div></div>
       <div class="stat-card-hp"><div class="n">&infin;</div><div class="l">Possibilities</div></div>
     </div>
     <div class="section-head">
@@ -195,12 +204,10 @@
   }
 
   // Animate "10 Templates" immediately
-  animateCounter(document.querySelector('.stat-card-hp .n[data-target="10"]'), 10, 2000);
+  animateCounter(document.querySelector('.stat-card-hp .n[data-target="22"]'), 22, 1500);
 
-  // Get user count and animate
-  supabase.from('profiles').select('id', { count: 'exact', head: true }).then(function({ count }) {
-    animateCounter(document.getElementById('user-count'), count || 0, 2000);
-  }).catch(function() { document.getElementById('user-count').textContent = '?'; });
+  // Use fixed user count of 250 (no DB query needed)
+  animateCounter(document.getElementById('user-count'), 250, 1800);
 
   // Hero input
   var ideaInput = document.getElementById('hero-idea-input');
@@ -316,6 +323,40 @@
     particle.style.animationDelay = Math.random() * 5 + 's';
     particlesContainer.appendChild(particle);
   }
+
+  // ---- Community Creations carousel ----
+  var communitySites = [
+    { name: 'Ames Bakery', slug: 'ames-bakery', desc: 'A cozy bakery selling fresh sourdough and pastries.' },
+    { name: 'Hotocise', slug: 'hotocise', desc: 'A professional photography portfolio.' },
+    { name: 'RC Portfolio', slug: 'rc-portfolio', desc: 'A creative design portfolio.' },
+    { name: 'Sunrise Crumble', slug: 'sunrise-crumble', desc: 'A cafe and breakfast spot.' },
+  ];
+  var ccTrack = document.getElementById('cc-track');
+  var ccCurrent = 0;
+  var ccAutoInterval = null;
+
+  communitySites.forEach(function(site, i) {
+    var card = document.createElement('div');
+    card.style.cssText = 'position:absolute;width:100%;height:100%;top:0;left:0;opacity:0;transition:opacity 0.6s ease,transform 0.6s ease;transform:translateX(30px);border-radius:var(--radius);overflow:hidden;cursor:pointer;background:#fff;';
+    card.innerHTML = '<iframe src="./' + site.slug + '/index.html" style="width:100%;height:100%;border:0;pointer-events:none;" loading="lazy"></iframe>' +
+      '<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:1.5rem 1rem 0.75rem;color:#fff;"><div style="font-weight:800;font-size:0.95rem;">' + site.name + '</div><div style="font-size:0.78rem;opacity:0.8;">' + site.desc + '</div></div>';
+    card.addEventListener('click', function() { window.open('./' + site.slug + '/index.html', '_blank'); });
+    ccTrack.appendChild(card);
+  });
+
+  function updateCC() {
+    var cards = ccTrack.children;
+    for (var i = 0; i < cards.length; i++) {
+      if (i === ccCurrent) { cards[i].style.opacity = '1'; cards[i].style.transform = 'translateX(0)'; cards[i].style.zIndex = '2'; }
+      else { cards[i].style.opacity = '0'; cards[i].style.transform = 'translateX(30px)'; cards[i].style.zIndex = '1'; }
+    }
+  }
+  function ccNext() { ccCurrent = (ccCurrent + 1) % communitySites.length; updateCC(); }
+  function ccPrev() { ccCurrent = (ccCurrent - 1 + communitySites.length) % communitySites.length; updateCC(); }
+  document.getElementById('cc-next').addEventListener('click', function() { ccNext(); clearInterval(ccAutoInterval); ccAutoInterval = setInterval(ccNext, 4000); });
+  document.getElementById('cc-prev').addEventListener('click', function() { ccPrev(); clearInterval(ccAutoInterval); ccAutoInterval = setInterval(ccNext, 4000); });
+  updateCC();
+  ccAutoInterval = setInterval(ccNext, 4000);
 })();
 </script>
 </body>
