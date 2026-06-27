@@ -6,91 +6,127 @@
 <title>Clay — Build a website by talking to AI</title>
 <meta name="description" content="Clay helps non-tech people build, host, and ship a real website by answering a few simple questions.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=26">
+<link rel="stylesheet" href="./css/main.css?v=27">
 <style>
+  /* ---- Ambient background ---- */
+  .ambient-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .ambient-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.07; }
+  .ambient-blob.b1 { width: 500px; height: 500px; background: var(--accent); top: -100px; left: -100px; animation: drift 20s ease-in-out infinite; }
+  .ambient-blob.b2 { width: 400px; height: 400px; background: var(--cyan); top: 30%; right: -100px; animation: drift 25s ease-in-out infinite reverse; }
+  .ambient-blob.b3 { width: 350px; height: 350px; background: var(--green); bottom: -50px; left: 30%; animation: drift 30s ease-in-out infinite; }
+  @keyframes drift { 0%,100% { transform: translate(0,0); } 33% { transform: translate(30px,-20px); } 66% { transform: translate(-20px,30px); } }
+
+  body > * { position: relative; z-index: 1; }
+
   /* ---- Hero ---- */
-  .hero { padding: 3rem 0 4rem; position: relative; overflow: hidden; }
-  .hero-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-  .hero-bg::before {
-    content: ''; position: absolute; width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(124,58,237,0.08), transparent 70%);
-    top: -200px; left: -100px; border-radius: 50%;
-  }
-  .hero-bg::after {
-    content: ''; position: absolute; width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(236,72,153,0.08), transparent 70%);
-    top: -100px; right: -100px; border-radius: 50%;
-  }
-  .hero-inner { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; align-items: center; }
-  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 1rem; }
-  .hero h1 .grad { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .hero .lede { font-size: 1.18rem; color: var(--text-2); max-width: 480px; margin-bottom: 1.5rem; line-height: 1.55; }
+  .hero { padding: 3rem 0 3rem; position: relative; }
+  .hero-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 3rem; align-items: center; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 1rem; }
+  .hero h1 .grad { color: var(--accent); }
+  .hero .lede { font-size: 1.15rem; color: var(--text-2); max-width: 480px; margin-bottom: 1.5rem; line-height: 1.55; }
 
-  /* ---- Hero input bar ---- */
-  .hero-input { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; max-width: 520px; }
-  .hero-input input {
-    flex: 1; padding: 1rem 1.25rem;
-    border: 2px solid var(--border-strong); border-radius: var(--radius);
+  /* ---- Aesthetic input bar (uiverse-style) ---- */
+  .idea-input-wrap {
+    position: relative; max-width: 520px; margin-bottom: 1.5rem;
+  }
+  .idea-input-wrap input {
+    width: 100%; padding: 1.1rem 4rem 1.1rem 1.4rem;
+    border: 2px solid var(--border-strong); border-radius: var(--radius-lg);
     font-size: 1rem; outline: none; background: var(--surface);
-    transition: border-color .15s, box-shadow .15s;
+    transition: border-color .2s, box-shadow .2s;
+    font-family: inherit;
   }
-  .hero-input input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-light); }
-  .hero-input input::placeholder { color: var(--text-muted); }
+  .idea-input-wrap input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-light), 0 8px 24px rgba(37,99,235,0.1);
+  }
+  .idea-input-wrap input::placeholder { color: var(--text-muted); }
+  .idea-input-wrap button {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: var(--radius);
+    background: var(--accent); color: #FFF; border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; cursor: pointer;
+    transition: background .15s, transform .15s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+  }
+  .idea-input-wrap button:hover { background: var(--accent-hover); transform: translateY(-50%) scale(1.05); }
 
-  .hero-cta-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
-  .hero-badges { display: flex; gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap; }
-  .hero-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-3); font-weight: 600; }
-  .hero-badge i { color: var(--accent); }
-
-  /* ---- Hero visual (dashboard preview placeholder) ---- */
+  /* ---- Hero visual (placeholder image) ---- */
   .hero-visual { position: relative; }
-  .hero-preview-card {
+  .hero-visual img {
+    width: 100%; border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+  }
+  .hero-visual .ph {
+    width: 100%; aspect-ratio: 4/3;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 1.5rem;
-    box-shadow: var(--shadow-lg); position: relative;
-    transform: rotate(1deg); transition: transform 0.3s;
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: var(--text-3); gap: 0.5rem;
   }
-  .hero-preview-card:hover { transform: rotate(0deg); }
-  .hero-preview-card .ph-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .hero-preview-card .ph-header .brand-sm { font-weight: 900; font-size: 1rem; }
-  .hero-preview-card .ph-header .brand-sm .mark { display: inline-flex; width: 24px; height: 24px; background: var(--gradient-primary); border-radius: 6px; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; margin-right: 0.3rem; vertical-align: middle; }
-  .hero-preview-card .ph-stat-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-  .hero-preview-card .ph-stat { flex: 1; padding: 0.75rem; border-radius: var(--radius); color: #fff; text-align: center; }
-  .hero-preview-card .ph-stat .n { font-size: 1.3rem; font-weight: 900; line-height: 1; }
-  .hero-preview-card .ph-stat .l { font-size: 0.7rem; opacity: 0.9; }
-  .hero-preview-card .ph-stat.p { background: var(--gradient-primary); }
-  .hero-preview-card .ph-stat.c { background: var(--gradient-cyan); }
-  .hero-preview-card .ph-stat.w { background: var(--gradient-warm); }
-  .hero-preview-card .ph-proj {
-    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 0.85rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;
-  }
-  .hero-preview-card .ph-proj .name { font-weight: 700; font-size: 0.88rem; }
-  .hero-preview-card .ph-proj .pill { font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: var(--success-light); color: var(--success); font-weight: 700; }
-
-  /* Floating decorative elements */
-  .hero-float { position: absolute; z-index: 0; pointer-events: none; }
-  .hero-float.f1 { top: -15px; right: -20px; width: 60px; height: 60px; background: var(--gradient-warm); border-radius: 50%; opacity: 0.15; animation: float 4s ease-in-out infinite; }
-  .hero-float.f2 { bottom: -10px; left: -15px; width: 40px; height: 40px; background: var(--gradient-cyan); border-radius: 12px; opacity: 0.15; animation: float 5s ease-in-out infinite reverse; }
-  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+  .hero-visual .ph i { font-size: 3rem; color: var(--accent); opacity: 0.3; }
+  .hero-visual .ph span { font-size: 0.85rem; }
 
   @media (max-width: 900px) {
     .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
     .hero-visual { display: none; }
   }
 
-  /* ---- How it works: gradient cards ---- */
+  /* ---- Stats row (above carousel) ---- */
+  .stats-row { display: flex; justify-content: center; gap: 3rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+  .stat-item { text-align: center; }
+  .stat-item .n { font-size: 2.5rem; font-weight: 900; color: var(--accent); line-height: 1; }
+  .stat-item .l { font-size: 0.88rem; color: var(--text-3); margin-top: 0.25rem; font-weight: 600; }
+
+  /* ---- Section ---- */
   .section { padding: 4rem 0; }
-  .section-head { text-align: center; max-width: 600px; margin: 0 auto 3rem; }
-  .section-head h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 0.5rem; }
-  .section-head p { color: var(--text-3); font-size: 1.05rem; margin: 0; }
+  .section-head { text-align: center; max-width: 600px; margin: 0 auto 2.5rem; }
+  .section-head h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem; }
+  .section-head p { color: var(--text-3); font-size: 1rem; margin: 0; }
+
+  /* ---- Style carousel (3D coverflow) ---- */
+  .carousel-stage {
+    perspective: 1200px; width: 100%; max-width: 900px; margin: 0 auto;
+    height: 320px; position: relative; overflow: hidden;
+  }
+  .carousel-track {
+    position: absolute; width: 100%; height: 100%;
+    transform-style: preserve-3d; transition: transform 0.5s ease;
+  }
+  .carousel-card {
+    position: absolute; width: 240px; height: 300px;
+    top: 50%; left: 50%; margin-left: -120px; margin-top: -150px;
+    border-radius: var(--radius-lg); overflow: hidden;
+    background: var(--surface); border: 2px solid var(--border);
+    cursor: pointer; transition: transform 0.5s ease, opacity 0.5s ease, border-color 0.2s;
+    box-shadow: var(--shadow-md);
+  }
+  .carousel-card .thumb { height: 200px; overflow: hidden; background: var(--surface-2); }
+  .carousel-card .thumb iframe { width: 1200px; height: 800px; border: 0; transform: scale(0.2); transform-origin: top left; pointer-events: none; }
+  .carousel-card .info { padding: 0.75rem; text-align: center; }
+  .carousel-card .info .name { font-weight: 800; font-size: 0.95rem; text-transform: capitalize; color: var(--text); }
+  .carousel-card .info .desc { font-size: 0.75rem; color: var(--text-3); margin-top: 0.15rem; line-height: 1.3; }
+  .carousel-card.center { border-color: var(--accent); box-shadow: 0 12px 40px rgba(37,99,235,0.2); z-index: 10; }
+  .carousel-nav {
+    display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;
+  }
+  .carousel-nav button {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s; color: var(--text-2);
+  }
+  .carousel-nav button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  /* ---- How it works: gradient cards ---- */
   .step-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
   .step-tile {
     border-radius: var(--radius-lg); padding: 1.75rem 1.5rem; color: #FFF;
     position: relative; overflow: hidden; transition: transform 0.2s;
   }
   .step-tile:hover { transform: translateY(-4px); }
-  .step-tile.s1 { background: var(--gradient-primary); }
+  .step-tile.s1 { background: var(--accent); }
   .step-tile.s2 { background: var(--gradient-cyan); }
   .step-tile.s3 { background: var(--gradient-warm); }
   .step-tile.s4 { background: var(--gradient-green); }
@@ -101,51 +137,24 @@
   @media (max-width: 900px) { .step-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 540px) { .step-grid { grid-template-columns: 1fr; } }
 
-  /* ---- Style carousel ---- */
-  .style-carousel-wrap { overflow: hidden; position: relative; padding: 0.5rem 0; }
-  .style-carousel { display: flex; gap: 1rem; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 1rem; scrollbar-width: none; }
-  .style-carousel::-webkit-scrollbar { display: none; }
-  .style-carousel-card {
-    flex-shrink: 0; width: 280px; border-radius: var(--radius-lg); overflow: hidden;
-    cursor: pointer; border: 2px solid var(--border); background: var(--surface);
-    transition: border-color .2s, transform .2s; position: relative;
-  }
-  .style-carousel-card:hover { border-color: var(--accent); transform: translateY(-4px); }
-  .style-carousel-card .thumb { height: 180px; overflow: hidden; background: var(--surface-2); }
-  .style-carousel-card .thumb iframe { width: 1200px; height: 800px; border: 0; transform: scale(0.23); transform-origin: top left; pointer-events: none; }
-  .style-carousel-card .info { padding: 1rem; }
-  .style-carousel-card .info .name { font-weight: 800; font-size: 1.05rem; text-transform: capitalize; color: var(--text); }
-  .style-carousel-card .info .desc { font-size: 0.82rem; color: var(--text-3); margin-top: 0.2rem; line-height: 1.4; }
-
-  .style-info-box {
-    display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.97);
-    padding: 1.5rem; flex-direction: column; justify-content: center; align-items: center;
-    text-align: center; border-radius: var(--radius-lg);
-  }
-  .style-carousel-card:hover .style-info-box { display: flex; }
-  .style-info-box .ib-name { font-weight: 900; font-size: 1.3rem; text-transform: capitalize; margin-bottom: 0.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .style-info-box .ib-desc { font-size: 0.88rem; color: var(--text-3); margin-bottom: 1rem; line-height: 1.5; }
-  .style-info-box .ib-btn { background: var(--gradient-primary); color: #FFF; padding: 0.5rem 1.2rem; border-radius: var(--radius); font-size: 0.85rem; font-weight: 700; }
-
   /* ---- CTA band ---- */
-  .cta-band { background: var(--gradient-primary); color: #FFF; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-lg); margin: 0 1.5rem; }
-  .cta-band h2 { color: #FFF; font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 0.75rem; }
-  .cta-band p { color: rgba(255,255,255,0.85); font-size: 1.1rem; max-width: 480px; margin: 0 auto 1.75rem; }
-  .cta-band .btn { background: #FFF !important; color: var(--accent) !important; }
-  .cta-band .btn:hover { background: var(--surface-2) !important; }
-  .cta-band .btn-ghost { background: transparent !important; color: #FFF !important; border: 2px solid rgba(255,255,255,0.4) !important; }
-  .cta-band .btn-ghost:hover { background: rgba(255,255,255,0.1) !important; border-color: #FFF !important; }
-
-  /* ---- Preview modal ---- */
-  .preview-modal-host { position: fixed; inset: 0; background: rgba(26,26,46,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9997; padding: 1.5rem; }
-  .preview-modal-host.open { display: flex; }
-  .preview-modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 1100px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg); }
-  .preview-modal .head { padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); }
-  .preview-modal .head .t { font-weight: 800; font-size: 1rem; text-transform: capitalize; }
-  .preview-modal iframe { width: 100%; flex: 1; border: 0; background: #fff; min-height: 60vh; }
+  .cta-band { background: var(--accent); color: #FFF; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-lg); margin: 0 1.5rem; }
+  .cta-band h2 { color: #FFF; font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.75rem; }
+  .cta-band p { color: rgba(255,255,255,0.85); font-size: 1.05rem; max-width: 460px; margin: 0 auto 1.75rem; }
+  .cta-band .btn { background: #FFFFFF !important; color: var(--accent) !important; }
+  .cta-band .btn:hover { background: #F0F4FF !important; color: var(--accent-hover) !important; }
+  .cta-band .btn-ghost { background: transparent !important; color: #FFFFFF !important; border: 2px solid rgba(255,255,255,0.5) !important; box-shadow: none !important; }
+  .cta-band .btn-ghost:hover { background: rgba(255,255,255,0.15) !important; border-color: #FFF !important; color: #FFF !important; }
 </style>
 </head>
 <body>
+
+<!-- Ambient background -->
+<div class="ambient-bg">
+  <div class="ambient-blob b1"></div>
+  <div class="ambient-blob b2"></div>
+  <div class="ambient-blob b3"></div>
+</div>
 
 <!-- TOPBAR -->
 <header class="topbar">
@@ -154,8 +163,8 @@
       <span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay
     </a>
     <nav>
-      <a href="#how">How it works</a>
       <a href="#styles">Styles</a>
+      <a href="#how">How it works</a>
       <a href="./login.html" id="nav-login">Sign in</a>
       <a href="./signup.html" class="btn btn-sm" id="nav-signup">Get started</a>
       <a href="./dashboard.html" class="btn btn-sm hidden" id="nav-dashboard">Dashboard</a>
@@ -165,47 +174,48 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
   <div class="hero-inner">
     <div>
       <h1>Build a website by <span class="grad">answering a few questions.</span></h1>
       <p class="lede">Describe your idea. Clay asks the right questions, designs the site, and publishes it for you.</p>
-      <div class="hero-input">
+      <div class="idea-input-wrap">
         <input type="text" id="hero-idea-input" placeholder="A bakery in Brooklyn selling sourdough and pastries">
-        <button class="btn btn-lg" id="hero-idea-btn"><i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-      <div class="hero-cta-row">
-        <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
-      </div>
-      <div class="hero-badges">
-        <div class="hero-badge"><i class="fa-solid fa-bolt"></i> No code needed</div>
-        <div class="hero-badge"><i class="fa-solid fa-palette"></i> 10 design styles</div>
-        <div class="hero-badge"><i class="fa-solid fa-rocket"></i> Publish instantly</div>
+        <button id="hero-idea-btn"><i class="fa-solid fa-arrow-right"></i></button>
       </div>
     </div>
     <div class="hero-visual">
-      <div class="hero-float f1"></div>
-      <div class="hero-float f2"></div>
-      <div class="hero-preview-card">
-        <div class="ph-header">
-          <div class="brand-sm"><span class="mark"><i class="fa-solid fa-circle-nodes"></i></span> Clay</div>
-          <span class="status-pill published">Published</span>
-        </div>
-        <div class="ph-stat-row">
-          <div class="ph-stat p"><div class="n">3</div><div class="l">Total</div></div>
-          <div class="ph-stat c"><div class="n">2</div><div class="l">Live</div></div>
-          <div class="ph-stat w"><div class="n">1</div><div class="l">Draft</div></div>
-        </div>
-        <div class="ph-proj"><div class="name">Clay Bakery</div><span class="pill">Live</span></div>
-        <div class="ph-proj"><div class="name">Codecraft Tutoring</div><span class="pill">Live</span></div>
-        <div class="ph-proj"><div class="name">Hotocise Portfolio</div><span class="pill" style="background:var(--surface-2);color:var(--text-3);">Draft</span></div>
+      <div class="ph">
+        <i class="fa-solid fa-image"></i>
+        <span>Dashboard preview</span>
       </div>
     </div>
   </div>
 </section>
 
+<!-- STYLE CAROUSEL -->
+<section class="section" id="styles">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item"><div class="n">10</div><div class="l">Templates</div></div>
+      <div class="stat-item"><div class="n" id="user-count">...</div><div class="l">Users</div></div>
+      <div class="stat-item"><div class="n">&infin;</div><div class="l">Possibilities</div></div>
+    </div>
+    <div class="section-head">
+      <h2>Pick your style.</h2>
+      <p>Hover to pause. Click to preview fullscreen.</p>
+    </div>
+    <div class="carousel-stage" id="carousel-stage">
+      <div class="carousel-track" id="carousel-track"></div>
+    </div>
+    <div class="carousel-nav">
+      <button id="carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
+      <button id="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+  </div>
+</section>
+
 <!-- HOW IT WORKS -->
-<section class="section" id="how">
+<section class="section" id="how" style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
   <div class="container">
     <div class="section-head">
       <h2>From idea to live in 4 steps.</h2>
@@ -216,7 +226,7 @@
         <div class="step-num">1</div>
         <div class="icon"><i class="fa-solid fa-feather-pointed"></i></div>
         <h3>Describe your idea</h3>
-        <p>Tell Clay what you're building in one sentence. That's enough to start.</p>
+        <p>Tell Clay what you're building in one sentence.</p>
       </div>
       <div class="step-tile s2">
         <div class="step-num">2</div>
@@ -235,21 +245,6 @@
         <div class="icon"><i class="fa-solid fa-rocket"></i></div>
         <h3>Publish instantly</h3>
         <p>Hit publish. Clay pushes your site live and hands you a URL.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- STYLE CAROUSEL -->
-<section class="section" id="styles" style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-  <div class="container">
-    <div class="section-head">
-      <h2>10 design styles. Pick your vibe.</h2>
-      <p>From minimal to brutalist to playful. Hover to learn more, click to preview.</p>
-    </div>
-    <div class="style-carousel-wrap">
-      <div class="style-carousel" id="style-carousel">
-        <!-- Cards inserted by JS -->
       </div>
     </div>
   </div>
@@ -280,7 +275,7 @@
       <a href="#styles">Styles</a>
       <a href="https://github.com/ClayBuild/claybuild.github.io" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> GitHub</a>
     </div>
-    <div style="font-size:0.82rem; color:var(--text-muted);">© 2026 Clay</div>
+    <div style="font-size:0.82rem; color:var(--text-muted);">&copy; 2026 Clay</div>
   </div>
 </footer>
 
@@ -296,8 +291,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js?v=26"></script>
-<script src="./js/supabase.js?v=26"></script>
+<script src="./js/config.js?v=27"></script>
+<script src="./js/supabase.js?v=27"></script>
 <script>
 (function() {
   // Check auth and toggle nav
@@ -309,10 +304,16 @@
     }
   });
 
-  // Hero input: go to signup or new-project with the idea pre-filled
+  // Get user count from profiles table
+  supabase.from('profiles').select('id', { count: 'exact', head: true }).then(function({ count }) {
+    document.getElementById('user-count').textContent = count || '0';
+  }).catch(function() {
+    document.getElementById('user-count').textContent = '?';
+  });
+
+  // Hero input
   var ideaInput = document.getElementById('hero-idea-input');
   var ideaBtn = document.getElementById('hero-idea-btn');
-
   function handleIdea() {
     var idea = ideaInput.value.trim();
     if (idea.length < 10) {
@@ -321,7 +322,6 @@
       setTimeout(function() { ideaInput.style.borderColor = ''; }, 2000);
       return;
     }
-    // Check if logged in
     supabase.auth.getSession().then(function({ data }) {
       if (data.session) {
         window.location.href = './new-project.html?idea=' + encodeURIComponent(idea);
@@ -330,58 +330,104 @@
       }
     });
   }
-
   ideaBtn.addEventListener('click', handleIdea);
   ideaInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleIdea(); });
 
-  // ---- Style carousel ----
+  // ---- 3D Carousel ----
   var styles = [
-    { name: 'minimalism', desc: 'Essential only. Whitespace, light typography, quiet confidence.' },
-    { name: 'brutalism', desc: 'Loud, raw, exposed. Big type, hard borders, zero apology.' },
-    { name: 'swiss', desc: 'Mathematical. Grid-based, modular scale, asymmetric balance.' },
-    { name: 'neumorphism', desc: 'Soft, tactile, extruded shadows. Monochrome depth.' },
-    { name: 'editorial', desc: 'Newspaper-grade. Serif headlines, drop caps, ruled sections.' },
-    { name: 'glassmorphism', desc: 'Frosted glass panels over vibrant gradients. Modern, airy.' },
-    { name: 'art-deco', desc: '1920s glamour. Gold accents, geometric patterns, ornate.' },
-    { name: 'corporate', desc: 'Professional B2B. Clean, structured, trustworthy.' },
-    { name: 'playful', desc: 'Bright, rounded, bouncy. Bold colors, casual and fun.' },
-    { name: 'organic', desc: 'Natural and biophilic. Sage greens, organic shapes, calm.' },
+    { name: 'minimalism', desc: 'Clean, essential, confident.' },
+    { name: 'brutalism', desc: 'Loud, raw, exposed.' },
+    { name: 'swiss', desc: 'Mathematical, grid-based.' },
+    { name: 'neumorphism', desc: 'Soft, tactile depth.' },
+    { name: 'editorial', desc: 'Newspaper-grade serifs.' },
+    { name: 'glassmorphism', desc: 'Frosted glass, modern.' },
+    { name: 'art-deco', desc: '1920s glamour, gold.' },
+    { name: 'corporate', desc: 'Professional, structured.' },
+    { name: 'playful', desc: 'Bright, rounded, bouncy.' },
+    { name: 'organic', desc: 'Natural, calm, biophilic.' },
   ];
 
-  var carousel = document.getElementById('style-carousel');
-  carousel.innerHTML = styles.map(function(s) {
-    return '<div class="style-carousel-card" data-style="' + s.name + '">' +
+  var track = document.getElementById('carousel-track');
+  var currentCenter = 0;
+  var autoRotateInterval = null;
+
+  // Create cards
+  styles.forEach(function(s, i) {
+    var card = document.createElement('div');
+    card.className = 'carousel-card';
+    card.dataset.index = i;
+    card.innerHTML =
       '<div class="thumb"><iframe src="./samples/' + s.name + '.html" loading="lazy" sandbox="allow-same-origin allow-scripts"></iframe></div>' +
-      '<div class="info"><div class="name">' + s.name + '</div><div class="desc">' + s.desc + '</div></div>' +
-      '<div class="style-info-box">' +
-        '<div class="ib-name">' + s.name + '</div>' +
-        '<div class="ib-desc">' + s.desc + '</div>' +
-        '<div class="ib-btn">Click to preview <i class="fa-solid fa-arrow-right"></i></div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-
-  // Auto-scroll carousel
-  var scrollDir = 1;
-  var carouselInterval = setInterval(function() {
-    if (carousel.matches(':hover')) return; // pause on hover
-    var maxScroll = carousel.scrollWidth - carousel.clientWidth;
-    if (carousel.scrollLeft >= maxScroll - 5) scrollDir = -1;
-    if (carousel.scrollLeft <= 5) scrollDir = 1;
-    carousel.scrollBy({ left: 280 * scrollDir, behavior: 'smooth' });
-  }, 3000);
-
-  // Click to open preview modal
-  carousel.querySelectorAll('.style-carousel-card').forEach(function(card) {
+      '<div class="info"><div class="name">' + s.name + '</div><div class="desc">' + s.desc + '</div></div>';
     card.addEventListener('click', function() {
-      var style = card.dataset.style;
-      document.getElementById('style-modal-title').textContent = style;
-      document.getElementById('style-modal-iframe').src = './samples/' + style + '.html';
-      document.getElementById('style-modal').classList.add('open');
-      document.body.style.overflow = 'hidden';
+      // If it's the center card, open preview
+      if (parseInt(card.dataset.index) === currentCenter) {
+        document.getElementById('style-modal-title').textContent = s.name;
+        document.getElementById('style-modal-iframe').src = './samples/' + s.name + '.html';
+        document.getElementById('style-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      } else {
+        // Rotate to this card
+        currentCenter = parseInt(card.dataset.index);
+        updateCarousel();
+      }
     });
+    track.appendChild(card);
   });
 
+  function updateCarousel() {
+    var cards = track.querySelectorAll('.carousel-card');
+    var n = styles.length;
+    cards.forEach(function(card, i) {
+      var offset = i - currentCenter;
+      // Normalize offset to shortest path (for infinite feel)
+      if (offset > n / 2) offset -= n;
+      if (offset < -n / 2) offset += n;
+
+      var absOffset = Math.abs(offset);
+      var translateX = offset * 180;
+      var translateZ = -absOffset * 120;
+      var rotateY = offset * -25;
+      var opacity = absOffset > 3 ? 0 : 1 - absOffset * 0.15;
+      var scale = absOffset === 0 ? 1 : 0.85 - absOffset * 0.05;
+
+      card.style.transform = 'translateX(' + translateX + 'px) translateZ(' + translateZ + 'px) rotateY(' + rotateY + 'deg) scale(' + scale + ')';
+      card.style.opacity = opacity;
+      card.style.zIndex = 20 - absOffset;
+      card.classList.toggle('center', absOffset === 0);
+    });
+  }
+
+  function next() {
+    currentCenter = (currentCenter + 1) % styles.length;
+    updateCarousel();
+  }
+  function prev() {
+    currentCenter = (currentCenter - 1 + styles.length) % styles.length;
+    updateCarousel();
+  }
+
+  document.getElementById('carousel-next').addEventListener('click', function() { next(); resetAutoRotate(); });
+  document.getElementById('carousel-prev').addEventListener('click', function() { prev(); resetAutoRotate(); });
+
+  // Auto-rotate
+  function startAutoRotate() {
+    autoRotateInterval = setInterval(next, 3500);
+  }
+  function resetAutoRotate() {
+    clearInterval(autoRotateInterval);
+    startAutoRotate();
+  }
+
+  // Pause on hover
+  var stage = document.getElementById('carousel-stage');
+  stage.addEventListener('mouseenter', function() { clearInterval(autoRotateInterval); });
+  stage.addEventListener('mouseleave', function() { startAutoRotate(); });
+
+  updateCarousel();
+  startAutoRotate();
+
+  // Modal close
   document.getElementById('style-modal-close').addEventListener('click', function() {
     document.getElementById('style-modal').classList.remove('open');
     document.getElementById('style-modal-iframe').src = 'about:blank';
