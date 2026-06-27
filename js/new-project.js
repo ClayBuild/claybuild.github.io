@@ -923,26 +923,49 @@ async function generate() {
       }
     }
 
-    // ---- 4b. Create a default "contacts" collection for form submissions ----
+    // ---- 4b. Create collections for each form type in the spec ----
     try {
-      // Check if collection already exists
-      const { data: existingColl } = await supabase
-        .from('project_collections')
-        .select('id')
-        .eq('project_id', projectId)
-        .eq('name', 'contacts')
-        .maybeSingle();
+      // Always create 'contacts' collection (default contact form)
+      var collectionsToCreate = [
+        { name: 'contacts', schema: { your_name: 'Name', your_email: 'Email', your_message: 'Message' } }
+      ];
 
-      if (!existingColl) {
-        await supabase.from('project_collections').insert({
-          project_id: projectId,
-          name: 'contacts',
-          schema: {
-            your_name: 'Name',
-            your_email: 'Email',
-            your_message: 'Message'
-          }
-        });
+      // Check spec for additional form sections
+      (spec.sections || []).forEach(function(section) {
+        if (section.type === 'newsletter') {
+          collectionsToCreate.push({ name: 'newsletter', schema: { your_email_com: 'Email' } });
+        }
+        if (section.type === 'booking') {
+          collectionsToCreate.push({ name: 'bookings', schema: {
+            your_name: 'Name', your_email: 'Email', phone_number: 'Phone',
+            _date_: 'Date', _select_a_service_: 'Service', _notes_optional_: 'Notes'
+          } });
+        }
+        if (section.type === 'order') {
+          collectionsToCreate.push({ name: 'orders', schema: {
+            your_name: 'Name', your_email: 'Email', phone_number: 'Phone',
+            delivery_address: 'Address', _select_a_product_: 'Product',
+            _quantity: 'Quantity', _special_instructions_optional_: 'Instructions'
+          } });
+        }
+      });
+
+      for (var ci = 0; ci < collectionsToCreate.length; ci++) {
+        var coll = collectionsToCreate[ci];
+        var { data: existingColl } = await supabase
+          .from('project_collections')
+          .select('id')
+          .eq('project_id', projectId)
+          .eq('name', coll.name)
+          .maybeSingle();
+
+        if (!existingColl) {
+          await supabase.from('project_collections').insert({
+            project_id: projectId,
+            name: coll.name,
+            schema: coll.schema
+          });
+        }
       }
     } catch (e) {
       console.warn('Collection creation failed:', e);

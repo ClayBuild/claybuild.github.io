@@ -590,6 +590,7 @@ function renderSite(spec, palette, designStyle) {
     '  f.addEventListener("submit",function(e){\n' +
     '    e.preventDefault();\n' +
     '    var ff=f.querySelector(".ff");var fs=f.querySelector(".fs");\n' +
+    '    var collectionName = f.getAttribute("data-collection") || "contacts";\n' +
     '    // Collect form data\n' +
     '    var inputs = f.querySelectorAll("input, textarea, select");\n' +
     '    var record = {};\n' +
@@ -604,7 +605,7 @@ function renderSite(spec, palette, designStyle) {
     '      var sb = window.supabase.createClient(CLAY_SUPABASE_URL, CLAY_SUPABASE_KEY);\n' +
     '      sb.from("project_records").insert({\n' +
     '        project_id: CLAY_PROJECT_ID,\n' +
-    '        collection_name: "contacts",\n' +
+    '        collection_name: collectionName,\n' +
     '        record: record\n' +
     '      }).then(function(){\n' +
     '        if(ff&&fs){ff.style.display="none";fs.style.display="block";}\n' +
@@ -658,6 +659,9 @@ function renderSite(spec, palette, designStyle) {
     else if (section.type === 'faq') html += renderFAQ(section.content || content, designStyle);
     else if (section.type === 'portfolio') html += renderPortfolio(section.content || content, designStyle, palette);
     else if (section.type === 'cta-compact') html += renderCTACompact(section.content || content, designStyle);
+    else if (section.type === 'newsletter') html += renderNewsletter(section.content || content, designStyle);
+    else if (section.type === 'booking') html += renderBooking(section.content || content, designStyle);
+    else if (section.type === 'order') html += renderOrderForm(section.content || content, designStyle);
   });
 
   // Footer
@@ -916,6 +920,81 @@ function renderCTACompact(c, style) {
     '<h2 style="font-size:1.5rem;margin-bottom:0.5rem;">' + (c.headline || 'Ready?') + '</h2>' +
     '<p style="margin-bottom:1.5rem;opacity:0.9;">' + (c.subtitle || '') + '</p>' +
     '<a href="#contact" style="display:inline-block;background:var(--on-accent);color:var(--accent);padding:0.75rem 1.75rem;border-radius:' + (style === 'playful' ? '16px' : '8px') + ';font-weight:700;">' + (c.button_text || 'Get started') + '</a>' +
+  '</section>';
+}
+
+// ============================================================================
+// DATA-COLLECTING COMPONENTS (newsletter, booking, order)
+// ============================================================================
+function renderNewsletter(c, style) {
+  var r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '8px';
+  return '<section id="newsletter" class="anim-fade" style="padding:4rem 2rem;max-width:600px;margin:0 auto;text-align:center;">' +
+    '<h2 style="font-size:1.8rem;margin-bottom:0.5rem;">' + (c.title || 'Stay updated') + '</h2>' +
+    '<p style="color:var(--muted);margin-bottom:2rem;font-size:1rem;">' + (c.subtitle || 'Get the latest updates straight to your inbox.') + '</p>' +
+    '<form data-collection="newsletter" style="display:flex;gap:0.5rem;max-width:420px;margin:0 auto;">' +
+      '<div class="ff" style="display:flex;gap:0.5rem;flex:1;">' +
+        '<input type="email" placeholder="your@email.com" required style="flex:1;padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<button type="submit" style="background:var(--accent);color:var(--on-accent);padding:0.85rem 1.5rem;border:none;border-radius:' + r + ';font-weight:700;font-size:0.92rem;cursor:pointer;font-family:inherit;">Subscribe</button>' +
+      '</div>' +
+      '<div class="fs" style="display:none;padding:1rem;background:var(--bg);border-radius:' + r + ';color:var(--text);">' +
+        '<i class="fa-solid fa-circle-check" style="font-size:1.5rem;color:var(--success);margin-bottom:0.5rem;"></i>' +
+        '<p style="font-weight:600;margin:0;">You\'re subscribed! Thank you.</p>' +
+      '</div>' +
+    '</form>' +
+  '</section>';
+}
+
+function renderBooking(c, style) {
+  var r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '8px';
+  return '<section id="booking" class="anim-fade" style="padding:4rem 2rem;max-width:560px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'Book an appointment') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2rem;">' + (c.subtitle || 'Schedule your visit with us.') + '</p>' +
+    '<form data-collection="bookings" style="display:flex;flex-direction:column;gap:1rem;">' +
+      '<div class="ff" style="display:flex;flex-direction:column;gap:1rem;">' +
+        '<input type="text" placeholder="Your name" required style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<input type="email" placeholder="Your email" required style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<input type="tel" placeholder="Phone number" style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<input type="date" required style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<select style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+          '<option value="">Select a service</option>' +
+          (c.services || ['Consultation', 'Session', 'Workshop']).map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('') +
+        '</select>' +
+        '<textarea placeholder="Notes (optional)" rows="3" style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;"></textarea>' +
+        '<button type="submit" style="background:var(--accent);color:var(--on-accent);padding:0.9rem;border:none;border-radius:' + r + ';font-weight:700;font-size:0.95rem;cursor:pointer;font-family:inherit;">Book appointment</button>' +
+      '</div>' +
+      '<div class="fs" style="display:none;text-align:center;padding:2rem;background:var(--bg);border-radius:' + r + ';border:1px solid var(--border);">' +
+        '<i class="fa-solid fa-circle-check" style="font-size:2.5rem;color:var(--success);margin-bottom:0.5rem;"></i>' +
+        '<p style="font-weight:600;font-size:1.1rem;margin:0;">Booking confirmed! We\'ll be in touch shortly.</p>' +
+      '</div>' +
+    '</form>' +
+  '</section>';
+}
+
+function renderOrderForm(c, style) {
+  var r = style === 'playful' ? '20px' : style === 'brutalism' ? '0' : '8px';
+  var products = c.products || ['Item 1', 'Item 2', 'Item 3'];
+  return '<section id="order" class="anim-fade" style="padding:4rem 2rem;max-width:560px;margin:0 auto;">' +
+    '<h2 style="font-size:1.8rem;text-align:center;margin-bottom:0.5rem;">' + (c.title || 'Place an order') + '</h2>' +
+    '<p style="text-align:center;color:var(--muted);margin-bottom:2rem;">' + (c.subtitle || 'Fill in your details and we\'ll prepare your order.') + '</p>' +
+    '<form data-collection="orders" style="display:flex;flex-direction:column;gap:1rem;">' +
+      '<div class="ff" style="display:flex;flex-direction:column;gap:1rem;">' +
+        '<input type="text" placeholder="Your name" required style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<input type="email" placeholder="Your email" required style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<input type="tel" placeholder="Phone number" style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<input type="text" placeholder="Delivery address" style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<select style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+          '<option value="">Select a product</option>' +
+          products.map(function(p) { return '<option value="' + p + '">' + p + '</option>'; }).join('') +
+        '</select>' +
+        '<input type="number" placeholder="Quantity" min="1" value="1" style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;">' +
+        '<textarea placeholder="Special instructions (optional)" rows="3" style="padding:0.85rem 1rem;border:1px solid var(--border);border-radius:' + r + ';font-size:0.95rem;background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;"></textarea>' +
+        '<button type="submit" style="background:var(--accent);color:var(--on-accent);padding:0.9rem;border:none;border-radius:' + r + ';font-weight:700;font-size:0.95rem;cursor:pointer;font-family:inherit;">Place order</button>' +
+      '</div>' +
+      '<div class="fs" style="display:none;text-align:center;padding:2rem;background:var(--bg);border-radius:' + r + ';border:1px solid var(--border);">' +
+        '<i class="fa-solid fa-circle-check" style="font-size:2.5rem;color:var(--success);margin-bottom:0.5rem;"></i>' +
+        '<p style="font-weight:600;font-size:1.1rem;margin:0;">Order placed! We\'ll confirm via email shortly.</p>' +
+      '</div>' +
+    '</form>' +
   '</section>';
 }
 

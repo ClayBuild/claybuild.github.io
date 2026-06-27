@@ -119,7 +119,7 @@ function wireButtons() {
     location.href = `./data.html?id=${PROJECT.id}`;
   });
 
-  // File download buttons
+  // File download function (used by file browser icons + download all)
   function downloadFile(filename, content, mime) {
     var blob = new Blob([content], { type: mime || 'text/plain' });
     var url = URL.createObjectURL(blob);
@@ -127,15 +127,7 @@ function wireButtons() {
     a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
   }
-  document.getElementById('download-html')?.addEventListener('click', function() {
-    if (PROJECT.website_files && PROJECT.website_files['index.html']) downloadFile('index.html', PROJECT.website_files['index.html'], 'text/html');
-  });
-  document.getElementById('download-css')?.addEventListener('click', function() {
-    if (PROJECT.website_files && PROJECT.website_files['styles.css']) downloadFile('styles.css', PROJECT.website_files['styles.css'], 'text/css');
-  });
-  document.getElementById('download-js')?.addEventListener('click', function() {
-    if (PROJECT.website_files && PROJECT.website_files['script.js']) downloadFile('script.js', PROJECT.website_files['script.js'], 'text/javascript');
-  });
+  window.downloadFile = downloadFile;
   document.getElementById('download-all')?.addEventListener('click', function() {
     if (!PROJECT.website_files) return;
     Object.keys(PROJECT.website_files).forEach(function(name) {
@@ -167,11 +159,19 @@ function renderFileBrowser(files) {
   browser.innerHTML = Object.keys(files).map(name => {
     const ext = '.' + name.split('.').pop();
     const ic = icons[ext] || 'fa-regular fa-file';
-    return `<div class="file" data-file="${escapeAttr(name)}"><i class="${ic}"></i> ${escapeHtml(name)}</div>`;
+    return `<div class="file" data-file="${escapeAttr(name)}"><i class="${ic}"></i> <span class="file-name">${escapeHtml(name)}</span> <i class="fa-solid fa-download file-download-icon" data-download="${escapeAttr(name)}" style="margin-left:auto;opacity:0.4;cursor:pointer;font-size:0.72rem;"></i></div>`;
   }).join('');
 
   browser.querySelectorAll('.file').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e) => {
+      // If clicking the download icon, download instead of select
+      if (e.target.classList.contains('file-download-icon')) {
+        e.stopPropagation();
+        const fname = e.target.dataset.download;
+        const mime = fname.endsWith('.html') ? 'text/html' : fname.endsWith('.css') ? 'text/css' : fname.endsWith('.js') ? 'text/javascript' : 'text/plain';
+        downloadFile(fname, files[fname], mime);
+        return;
+      }
       browser.querySelectorAll('.file').forEach(f => f.classList.remove('active'));
       el.classList.add('active');
       activeFile = el.dataset.file;

@@ -69,17 +69,21 @@ Do NOT always use the same sections in the same order. Vary which sections you i
 - "team" (variant: "default"): team member cards with photos (placeholders)
 - "faq" (variant: "default"): expandable FAQ questions
 - "portfolio" (variant: "default"): portfolio/project grid with overlay labels
+- "newsletter" (variant: "default"): email signup form that saves to a "newsletter" collection
+- "booking" (variant: "default"): appointment booking form (name, email, phone, date, service, notes) that saves to a "bookings" collection
+- "order" (variant: "default"): order form (name, email, phone, address, product, quantity, instructions) that saves to an "orders" collection
 
 DOMAIN-SPECIFIC SECTIONS (include based on business type):
-- Bakery/restaurant/food/cafe: include "menu" (with 4-6 items, prices), "gallery" (food photos), skip "products"
-- Photography/portfolio/creative: include "portfolio" (6 projects), "gallery"
-- Tutoring/education: include "pricing" (course tiers), "stats", "team" (instructors)
-- SaaS/tech/software: include "pricing", "stats", "faq"
-- Law/finance/consulting: include "stats", "team" (partners), "faq", skip "gallery"
-- Retail/shop/e-commerce/store: include "products" (4-8 products with prices and Buy buttons), "pricing" (shipping tiers)
-- Gym/fitness/wellness: include "pricing" (membership tiers), "stats", "team" (trainers)
-- Real estate: include "gallery" (listings), "stats", "team" (agents)
-- Agency/studio: include "portfolio", "team", "stats"
+- Bakery/restaurant/food/cafe: include "menu" (with 4-6 items, prices), "gallery" (food photos), "order" (for online ordering)
+- Photography/portfolio/creative: include "portfolio" (6 projects), "gallery", "booking" (for session bookings)
+- Tutoring/education: include "pricing" (course tiers), "stats", "team" (instructors), "booking" (for class scheduling)
+- SaaS/tech/software: include "pricing", "stats", "faq", "newsletter"
+- Law/finance/consulting: include "stats", "team" (partners), "faq", "booking" (for consultations)
+- Retail/shop/e-commerce/store: include "products" (4-8 products), "order" (for placing orders), "newsletter"
+- Gym/fitness/wellness: include "pricing" (membership tiers), "stats", "team" (trainers), "booking" (for class bookings)
+- Real estate: include "gallery" (listings), "stats", "team" (agents), "booking" (for viewing appointments)
+- Agency/studio: include "portfolio", "team", "stats", "newsletter"
+- Spa/salon: include "pricing", "booking", "gallery", "team"
 
 VARIETY RULE: Even for the same business type, vary the section order and which sections you include. Don't always do the same structure. Mix it up. Sometimes start with stats, sometimes put about before features, sometimes skip testimonial, use cta-compact instead of cta, etc. Pick 4-6 sections (plus contact) and order them differently each time.
 
