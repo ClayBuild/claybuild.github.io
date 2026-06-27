@@ -42,7 +42,8 @@ function placeholderImage(w, h, label, color1, color2, icon) {
     '<rect x="' + (w/2 - 30) + '" y="' + (h/2 + 20) + '" width="60" height="4" rx="2" fill="rgba(255,255,255,0.4)"/>' +
     (label ? '<text x="' + (w/2) + '" y="' + (h - 30) + '" text-anchor="middle" font-family="sans-serif" font-size="14" fill="rgba(255,255,255,0.7)" font-weight="600">' + label + '</text>' : '') +
     '</svg>';
-  return 'data:image/svg+xml;base64,' + btoa(svg);
+  // Use encodeURIComponent to handle non-Latin1 characters safely
+  return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
 }
 
 // Generate a pleasant gradient from the palette colors
