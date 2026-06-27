@@ -447,8 +447,8 @@ body > * { position: relative; z-index: 1; }
 .file-browser { font-size: 0.85rem; }
 .file-browser .file { padding: 0.55rem 0.7rem; cursor: pointer; border-radius: var(--radius); display: flex; align-items: center; gap: 0.5rem; color: var(--text-2); font-weight: 500; transition: background .15s, color .15s; }
 .file-browser .file:hover { background: rgba(255,255,255,0.5); }
-.file-browser .file.active { background: var(--accent-light); color: var(--accent); }
-.file-browser .file.active i { color: var(--accent); }
+.file-browser .file.active { background: var(--accent-light) !important; color: var(--accent) !important; }
+.file-browser .file.active i { color: var(--accent) !important; }
 .file-browser .file i { width: 16px; }
 .code-viewer { background: #0F172A; color: #E0E7FF; border-radius: var(--radius); padding: 1rem; overflow: auto; max-height: 460px; font-size: 0.78rem; line-height: 1.6; white-space: pre; font-family: 'SF Mono', 'Monaco', monospace; }
 .code-viewer::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -555,7 +555,7 @@ body > * { position: relative; z-index: 1; }
 .uiverse-bar .uv-glow { filter: blur(30px); opacity: 0.3; height: 76px; top: -10px; }
 .uiverse-bar .uv-white::before, .uiverse-bar .uv-border::before, .uiverse-bar .uv-darkBorder::before, .uiverse-bar .uv-glow::before {
   content: ''; z-index: 0; top: 50%; left: 50%; transform: translate(-50%,-50%) rotate(83deg);
-  position: absolute; width: 600px; height: 600px; background-repeat: no-repeat; background-position: 0 0;
+  position: absolute; width: 2000px; height: 2000px; background-repeat: no-repeat; background-position: 0 0;
 }
 .uiverse-bar .uv-white::before {
   background-image: conic-gradient(rgba(0,0,0,0) 0%, var(--cyan), rgba(0,0,0,0) 8%, rgba(0,0,0,0) 50%, var(--accent), rgba(0,0,0,0) 58%);
@@ -570,7 +570,6 @@ body > * { position: relative; z-index: 1; }
 }
 .uiverse-bar .uv-glow::before {
   background-image: conic-gradient(rgba(255,255,255,0), var(--accent) 5%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 50%, var(--cyan) 60%, rgba(255,255,255,0) 87%);
-  width: 999px; height: 999px;
 }
 .uiverse-bar:hover .uv-white::before { transform: translate(-50%,-50%) rotate(-97deg); transition: all 2s; }
 .uiverse-bar:hover .uv-border::before { transform: translate(-50%,-50%) rotate(-110deg); transition: all 2s; }
