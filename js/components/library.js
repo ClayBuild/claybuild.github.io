@@ -571,22 +571,52 @@ function renderSite(spec, palette, designStyle) {
     hoverCSS(designStyle);
 
   // ---- Build JS file ----
-  const jsContent = `// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(function(a){
-  a.addEventListener('click',function(e){
-    var t=document.querySelector(a.getAttribute('href'));
-    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
-  });
-});
-// Contact form handler
-document.querySelectorAll('form').forEach(function(f){
-  f.addEventListener('submit',function(e){
-    e.preventDefault();
-    var ff=f.querySelector('.ff');var fs=f.querySelector('.fs');
-    if(ff&&fs){ff.style.display='none';fs.style.display='block';}
-  });
-});
-`;
+  // The generated website includes Supabase client to save form submissions
+  // to the project's database. The project ID is injected so the form data
+  // is associated with the correct project.
+  var projectIdForDb = spec._projectId || '';
+  var jsContent = '// Smooth scroll\n' +
+    'document.querySelectorAll(\'a[href^="#"]\').forEach(function(a){\n' +
+    '  a.addEventListener(\'click\',function(e){\n' +
+    '    var t=document.querySelector(a.getAttribute(\'href\'));\n' +
+    '    if(t){e.preventDefault();t.scrollIntoView({behavior:\'smooth\'});}\n' +
+    '  });\n' +
+    '});\n' +
+    '// Contact form handler — saves to Clay database\n' +
+    'var CLAY_PROJECT_ID = "' + projectIdForDb + '";\n' +
+    'var CLAY_SUPABASE_URL = "' + (window.CLAY_CONFIG ? window.CLAY_CONFIG.SUPABASE_URL : '') + '";\n' +
+    'var CLAY_SUPABASE_KEY = "' + (window.CLAY_CONFIG ? window.CLAY_CONFIG.SUPABASE_ANON_KEY : '') + '";\n' +
+    'document.querySelectorAll("form").forEach(function(f){\n' +
+    '  f.addEventListener("submit",function(e){\n' +
+    '    e.preventDefault();\n' +
+    '    var ff=f.querySelector(".ff");var fs=f.querySelector(".fs");\n' +
+    '    // Collect form data\n' +
+    '    var inputs = f.querySelectorAll("input, textarea, select");\n' +
+    '    var record = {};\n' +
+    '    inputs.forEach(function(inp){\n' +
+    '      if (inp.type === "submit" || inp.type === "button") return;\n' +
+    '      var key = inp.placeholder || inp.name || inp.id || "field";\n' +
+    '      key = key.replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();\n' +
+    '      record[key] = inp.value;\n' +
+    '    });\n' +
+    '    // Try to save to Clay database\n' +
+    '    if (CLAY_PROJECT_ID && CLAY_SUPABASE_URL && window.supabase) {\n' +
+    '      var sb = window.supabase.createClient(CLAY_SUPABASE_URL, CLAY_SUPABASE_KEY);\n' +
+    '      sb.from("project_records").insert({\n' +
+    '        project_id: CLAY_PROJECT_ID,\n' +
+    '        collection_name: "contacts",\n' +
+    '        record: record\n' +
+    '      }).then(function(){\n' +
+    '        if(ff&&fs){ff.style.display="none";fs.style.display="block";}\n' +
+    '      }).catch(function(err){\n' +
+    '        console.warn("Clay DB save failed:", err);\n' +
+    '        if(ff&&fs){ff.style.display="none";fs.style.display="block";}\n' +
+    '      });\n' +
+    '    } else {\n' +
+    '      if(ff&&fs){ff.style.display="none";fs.style.display="block";}\n' +
+    '    }\n' +
+    '  });\n' +
+    '});\n';
 
   // ---- Build HTML file ----
   let html = `<!DOCTYPE html>
@@ -600,6 +630,7 @@ document.querySelectorAll('form').forEach(function(f){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=${sf.gf}&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body${designStyle==='glassmorphism'?' style="background:transparent;"':''}><div id="top"></div>`;
 

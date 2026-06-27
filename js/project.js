@@ -115,6 +115,9 @@ function wireButtons() {
   document.getElementById('edit-btn').addEventListener('click', () => {
     location.href = `./new-project.html?reuse=${PROJECT.id}&edit=1`;
   });
+  document.getElementById('data-btn').addEventListener('click', () => {
+    location.href = `./data.html?id=${PROJECT.id}`;
+  });
   document.getElementById('delete-btn').addEventListener('click', deleteProject);
 
   // Deploy modal buttons

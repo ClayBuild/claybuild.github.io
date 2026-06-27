@@ -892,6 +892,9 @@ async function generate() {
       spec.logo_ext = STATE.logo.ext;
     }
 
+    // Pass project ID so the generated website can save form data to the DB
+    spec._projectId = projectId;
+
     // Use the component library to render the final HTML
     STATE.website_files = window.CLAY_COMPONENTS.renderSite(spec, palette, STATE.design_style);
 
@@ -913,6 +916,31 @@ async function generate() {
       } catch (e) {
         console.warn('Logo upload to storage failed:', e);
       }
+    }
+
+    // ---- 4b. Create a default "contacts" collection for form submissions ----
+    try {
+      // Check if collection already exists
+      const { data: existingColl } = await supabase
+        .from('project_collections')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('name', 'contacts')
+        .maybeSingle();
+
+      if (!existingColl) {
+        await supabase.from('project_collections').insert({
+          project_id: projectId,
+          name: 'contacts',
+          schema: {
+            your_name: 'Name',
+            your_email: 'Email',
+            your_message: 'Message'
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Collection creation failed:', e);
     }
     updateGenStage('save', 'done');
 
