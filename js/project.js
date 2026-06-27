@@ -258,10 +258,10 @@ function updatePublishCard() {
       <h4>Your site is live</h4>
       <p>Open it, share it, or republish if you've made changes.</p>
       <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
-        <a class="btn" href="${escapeAttr(PROJECT.published_url)}" target="_blank" rel="noopener" style="flex:1;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>
-        <button class="btn btn-on-dark" id="copy-link-btn" style="flex:1;"><i class="fa-solid fa-link"></i> Copy link</button>
+        <a href="${escapeAttr(PROJECT.published_url)}" target="_blank" rel="noopener" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.7rem 1.3rem; background:#FFFFFF !important; color:var(--accent) !important; border:none; border-radius:var(--radius); font-weight:700; font-size:0.9rem; text-decoration:none !important; box-shadow:0 2px 8px rgba(0,0,0,0.1);"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open site</a>
+        <button id="copy-link-btn" style="flex:1; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.7rem 1.3rem; background:rgba(255,255,255,0.15) !important; color:#FFFFFF !important; border:1px solid rgba(255,255,255,0.3) !important; border-radius:var(--radius); font-weight:700; font-size:0.9rem; cursor:pointer; transition:background 0.15s;"><i class="fa-solid fa-link"></i> Copy link</button>
       </div>
-      <button class="btn btn-ghost" id="republish-btn" style="width:100%; background:rgba(255,255,255,0.1); color:#FFF; border-color:rgba(255,255,255,0.2);"><i class="fa-solid fa-rotate"></i> Republish</button>
+      <button id="republish-btn" style="width:100%; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.7rem 1.3rem; background:rgba(255,255,255,0.1) !important; color:#FFFFFF !important; border:1px solid rgba(255,255,255,0.25) !important; border-radius:var(--radius); font-weight:700; font-size:0.9rem; cursor:pointer; transition:background 0.15s;"><i class="fa-solid fa-rotate"></i> Republish</button>
     `;
     document.getElementById('copy-link-btn').addEventListener('click', () => {
       navigator.clipboard.writeText(PROJECT.published_url).then(() => {
@@ -275,7 +275,7 @@ function updatePublishCard() {
     card.innerHTML = `
       <h4>Ready to publish?</h4>
       <p>Your website will be live at a URL like claybuild.github.io/your-project/ in about 60 seconds.</p>
-      <button class="btn" id="publish-btn-2"><i class="fa-solid fa-rocket"></i> Publish now</button>
+      <button id="publish-btn-2" style="width:100%; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; padding:0.7rem 1.3rem; background:#FFFFFF !important; color:var(--accent) !important; border:none !important; border-radius:var(--radius); font-weight:700; font-size:0.9rem; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1);"><i class="fa-solid fa-rocket"></i> Publish now</button>
     `;
     document.getElementById('publish-btn-2').addEventListener('click', openPublishModal);
   } else {

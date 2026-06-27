@@ -6,8 +6,9 @@
 <title>Clay — Build a website by talking to AI</title>
 <meta name="description" content="Clay helps non-tech people build, host, and ship a real website by answering a few simple questions.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=29">
+<link rel="stylesheet" href="./css/main.css?v=30">
 <style>
+  body { overflow-x: hidden; }
   .hero { padding: 3.5rem 0 3rem; }
   .hero-inner { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 3rem; align-items: center; }
   .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.1; letter-spacing: -0.04em; margin-bottom: 1.25rem; }
@@ -176,20 +177,15 @@
     if (data.session) { document.getElementById('nav-login').classList.add('hidden'); document.getElementById('nav-signup').classList.add('hidden'); document.getElementById('nav-dashboard').classList.remove('hidden'); }
   });
 
-  // Get user count and animate
-  supabase.from('profiles').select('id', { count: 'exact', head: true }).then(function({ count }) {
-    var el = document.getElementById('user-count');
-    el.dataset.target = count || 0;
-    animateCounter(el);
-  }).catch(function() { document.getElementById('user-count').textContent = '?'; });
-
-  // Animate all counters
-  function animateCounter(el) {
-    var target = parseInt(el.dataset.target || 0);
-    if (isNaN(target) || target === 0) { el.textContent = target; return; }
-    var current = 0; var duration = 1500; var start = performance.now();
-    function step(now) {
-      var progress = Math.min((now - start) / duration, 1);
+  // Animate counter function — smooth, reliable, always runs
+  function animateCounter(el, target, duration) {
+    target = target !== undefined ? target : parseInt(el.dataset.target || 0);
+    duration = duration || 2000;
+    if (isNaN(target) || target === 0) { el.textContent = '0'; return; }
+    var start = null;
+    function step(timestamp) {
+      if (!start) start = timestamp;
+      var progress = Math.min((timestamp - start) / duration, 1);
       var eased = 1 - Math.pow(1 - progress, 3);
       el.textContent = Math.floor(eased * target);
       if (progress < 1) requestAnimationFrame(step);
@@ -197,8 +193,14 @@
     }
     requestAnimationFrame(step);
   }
-  // Animate the "10" counter
-  animateCounter(document.querySelector('.stat-card-hp .n[data-target="10"]'));
+
+  // Animate "10 Templates" immediately
+  animateCounter(document.querySelector('.stat-card-hp .n[data-target="10"]'), 10, 2000);
+
+  // Get user count and animate
+  supabase.from('profiles').select('id', { count: 'exact', head: true }).then(function({ count }) {
+    animateCounter(document.getElementById('user-count'), count || 0, 2000);
+  }).catch(function() { document.getElementById('user-count').textContent = '?'; });
 
   // Hero input
   var ideaInput = document.getElementById('hero-idea-input');
@@ -247,7 +249,7 @@
     var card = document.createElement('div');
     card.className = 'carousel-card';
     card.dataset.index = i;
-    card.innerHTML = '<div class="thumb"><iframe src="./samples/' + s.name + '.html" loading="lazy" sandbox="allow-same-origin allow-scripts"></iframe></div><div class="info"><div class="name">' + s.name + '</div><div class="desc">' + s.desc + '</div></div>';
+    card.innerHTML = '<div class="thumb"><iframe src="./samples/' + s.name + '.html" loading="lazy" sandbox="allow-same-origin allow-scripts"></iframe></div><div class="info"><div class="name">' + s.name + '</div><div class="desc">' + s.desc + '</div></div><div class="wipe-overlay"><div class="wo-name">' + s.name + '</div><div class="wo-desc">' + s.desc + '</div><div class="wo-btn">Click to preview <i class="fa-solid fa-arrow-right"></i></div></div>';
     card.addEventListener('click', function() {
       if (parseInt(card.dataset.index) === currentCenter) {
         document.getElementById('style-modal-title').textContent = s.name;
