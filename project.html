@@ -6,7 +6,7 @@
 <title>Project — Clay</title>
 <link rel="icon" type="image/png" href="./assets/favicon.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="./css/main.css?v=42">
+<link rel="stylesheet" href="./css/main.css?v=43">
 <style>
   .proj-header { padding: 1.5rem 0; }
   .proj-header .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; }
@@ -15,10 +15,10 @@
   .proj-header h1 { font-size: 1.85rem; }
   .proj-header .meta { display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-3); margin-top: 0.6rem; flex-wrap: wrap; }
   .proj-header .meta .item { display: flex; align-items: center; gap: 0.4rem; }
-  .proj-header .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; flex-shrink: 0; justify-content: flex-end; max-width: 50%; }
-  @media (max-width: 768px) {
+  .proj-header .actions { display: flex; gap: 0.5rem; flex-wrap: nowrap; flex-shrink: 0; justify-content: flex-end; align-items: center; }
+  @media (max-width: 900px) {
     .proj-header .row1 { flex-direction: column; }
-    .proj-header .actions { max-width: 100%; justify-content: flex-start; }
+    .proj-header .actions { flex-wrap: wrap; justify-content: flex-start; }
   }
 
   .preview-wrap { border: 1px solid var(--border-strong); border-radius: var(--radius-md); overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
