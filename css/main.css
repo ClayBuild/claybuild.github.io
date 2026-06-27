@@ -119,8 +119,10 @@ body > * { position: relative; z-index: 1; }
   position: sticky; top: 0; z-index: 50;
 }
 .topbar-inner { max-width: var(--maxw); margin: 0 auto; padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
-.brand { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 900; font-size: 1.3rem; letter-spacing: -0.04em; color: var(--text); }
+.brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 900; font-size: 1.3rem; letter-spacing: -0.04em; color: var(--text); }
 .brand:hover { color: var(--text); text-decoration: none; }
+.brand .logo-img { height: 32px; width: auto; transition: transform 0.2s; }
+.brand:hover .logo-img { transform: scale(1.05); }
 .brand .mark { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: var(--accent); color: #FFF; border-radius: var(--radius-sm); font-size: 1rem; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: transform 0.2s; }
 .brand:hover .mark { transform: rotate(-5deg) scale(1.05); }
 .topbar nav { display: flex; gap: 0.35rem; align-items: center; }
