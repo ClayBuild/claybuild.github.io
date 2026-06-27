@@ -821,7 +821,7 @@ async function generate() {
         specResult = await clayInvoke(CLAY_CONFIG.EDGE_FUNCTIONS.AI_GENERATE, {
           business_idea: STATE.business_idea,
           project_name: finalName,
-          generate_name: STATE._generateName || false,
+          generate_name: false,
           questionnaire: { answers: STATE.answers, questions: STATE.questions },
           design_style: STATE.design_style,
           palette: STATE.logo ? null : STATE.palette,
@@ -879,17 +879,9 @@ async function generate() {
       STATE.logo.info.recommended_text_color || '#1A1A1A',
     ] : (STATE.palette ? STATE.palette.colors : ['#FFFFFF', '#000000', '#555555', '#3B82F6', '#1A1A1A']);
 
-    // If the AI generated a name (generate_name mode), use it
-    if (STATE._generateName && spec.content.brand_name) {
-      STATE.ai_name = spec.content.brand_name;
-      // Update the project name in the DB
-      const finalNameFromAI = spec.content.brand_name;
-      STATE.slug = claySlugify(finalNameFromAI) || STATE.slug;
-      await supabase.from('projects').update({
-        name: finalNameFromAI,
-        slug: STATE.slug,
-      }).eq('id', projectId);
-    }
+    // The name was already set by ai-init (STATE.ai_name) and passed to
+    // ai-generate as project_name. ai-generate should use that exact name.
+    // No override needed here.
 
     // If a logo was uploaded, tell the renderer to use it
     if (STATE.logo) {

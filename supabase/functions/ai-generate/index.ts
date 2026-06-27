@@ -89,6 +89,14 @@ VARIETY RULE: Even for the same business type, vary the section order and which 
 
 Always include "contact" last (before footer).
 
+CRITICAL — SEPARATE FORMS:
+Each form type (contact, newsletter, booking, order) MUST be its OWN SEPARATE section in the sections array. Do NOT combine multiple form types into one form. Each form is a separate section with its own type:
+- {"type":"contact","variant":"standard","content":{...}} — the contact form, always last
+- {"type":"newsletter","variant":"default","content":{...}} — a separate newsletter signup section
+- {"type":"booking","variant":"default","content":{...}} — a separate booking form section
+- {"type":"order","variant":"default","content":{...}} — a separate order form section
+If a business needs both a booking form AND a newsletter signup, include BOTH as separate sections in the sections array. NEVER merge them into the contact form.
+
 CONTENT FOR SHOPPING/MENU:
 - For "products": generate 4-8 realistic products with names, descriptions, and prices (e.g. $12.99). Include a "Buy" button (href="#contact").
 - For "menu": generate 4-6 menu items with names, descriptions, and prices. Include an "Order" button.
